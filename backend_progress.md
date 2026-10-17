@@ -167,6 +167,12 @@ Newest first. One entry per session:
 - **Notes:** blockers, decisions, gotchas (optional)
 ```
 
+### 2026-10-17 · Andrew (remove the Claude PR review)
+- **Did:** Removed the broken Claude review from CI: deleted the `claude-review` job from `.github/workflows/pr-checks.yml` (the deterministic conflict check stays), updated `README.md` and the two `CLAUDE.md` lines that described it. `@claude` PR/issue comments (`claude.yml`) and `conflict-watch.yml` are untouched. No backend code changed.
+- **Files:** `.github/workflows/pr-checks.yml`, `README.md`, `CLAUDE.md`, `overlap.md`, this file
+- **Next:** "Claude review" must also be removed from `main`'s required status checks (repo settings → branch protection) or no PR can merge; Andrew is doing that by hand since sessions can't.
+- **Notes:** PRs now merge on the conflict check alone — review each other's PRs manually, or ask `@claude review this PR` in a comment when wanted.
+
 ### 2026-10-17 · Andrew (secure-link doctor emails)
 - **Did:** Built `notify-doctor` (saves the message with a random token, emails a link-only notice through Resend, maps the trigger's limit hints to 4xx, deletes the row if the email fails) and `view-doctor-message` (no login; token + expiry check, sets `opened_at`, returns message + first name + current notes, no-store, per-IP limit). Team decision: no PIN for now, just the link + 7-day expiry. Email for the demo: Resend's test sender, no domain. Tested live through temporary `-preview` deploys (22/22), then deleted them and the temporary secrets.
 - **Files:** `functions/notify-doctor/` (`index.ts`, `email.ts`, `token.ts`, `email_test.ts`), `functions/view-doctor-message/index.ts`, `config.toml`, `PLAN.md`, `overlap.md`, `todo.md`, this file

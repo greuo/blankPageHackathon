@@ -21,6 +21,8 @@ Things both sides rely on: API base URL, ports, data shapes, auth, env vars. Eit
 
 ## Backend → Frontend
 
+- [ ] 2026-10-17 · Andrew: **The automatic Claude review on PRs is gone** (it was broken). Only the Conflict check runs and is required now; it's also being removed from `main`'s required status checks, after which PRs merge on the Conflict check alone. `@claude ...` comments still work (incl. `@claude resolve the merge conflicts`, or `@claude review this PR` if you want a review). Review each other's PRs manually.
+
 - [ ] 2026-10-17 · Andrew: **"Send to my doctor" backend is built (PR `backend/doctor-message-link`, deployed after merge).** The email to the doctor holds only "Your patient <first name> sent you a message" + a secure link (expires in 7 days); the message stays in Supabase. Contracts: `backend_progress.md` → Edge functions. What we need from you:
   - **"Send to my doctor" button:** `supabase.functions.invoke('notify-doctor', { body: { doctor_id, content } })` → 201 `{ id, expires_at }`. Show `error` from the response on failure; `code: "guest_must_sign_up"` (403) means ask the guest to add an email first. 429 = too many sends, 502 = email failed (nothing saved, retry). "Opened" status: `doctor_messages.opened_at`.
   - **Public page `/doctor-message`** (no login): read the token from `location.hash` (after `#`), call `supabase.functions.invoke('view-doctor-message', { body: { token } })`, show `content`, `patient_first_name`, `created_at` and `care_notes.content`. 410 `code: "expired"` → "This link has expired, ask your patient to send it again"; 404/400 → "This link isn't valid". Please add `<meta name="referrer" content="no-referrer">` on that page.
