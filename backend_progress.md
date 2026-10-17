@@ -24,15 +24,18 @@ Snapshot of what exists right now. Rewrite it each session; don't append.
     - Alex Rivera, `alex@demo.example.com`. Password in Andrew's `backend/.env.local`.
     - a guest "Sam" (anonymous, can't be logged into)
     - each has a doctor, care notes with a `normal` list (Alex v1 + v2, Sam v1) and a short chat. Alex has a sent doctor message, Sam a used QR link.
+- **Built, not deployed yet (PR `backend/doctor-message-link`):** `notify-doctor` and `view-doctor-message`, the secure-link doctor emails. Contracts below. Deploy both after merge, and only once the email secrets are set (see "Start here" step 1); until then `notify-doctor` answers 503 and saves nothing.
 - **Tests (all passing):**
   - `tests/access.sql`: 94/94 on hosted.
   - `chat` unit tests: 19/19.
   - Live run of the bot against Claude: 15/15 cases as expected, 0 unsafe.
+  - `notify-doctor` unit tests: 7/7 (token format, hashing, first-name escaping, email has no message content).
+  - Doctor-message live run against temporary `-preview` deploys on hosted: 22/22 (since deleted).
 - **How to run / deploy:**
   - Frontend: nothing to run, use the hosted project (URL and key in `overlap.md` → Agreed).
   - Local stack: `cd backend && supabase start && supabase db reset`. Needs Docker; seeds the demo patients with password `local-demo-only`.
-  - Unit tests: `deno test --config backend/supabase/functions/chat/deno.json backend/supabase/functions/chat/`
-  - Deploy a function: `cd backend && supabase functions deploy <name> --project-ref repvtuxyszlqdjzciojx --use-api`. `--use-api` means no Docker.
+  - Unit tests: `deno test --config backend/supabase/functions/chat/deno.json backend/supabase/functions/chat/` and `deno test backend/supabase/functions/notify-doctor/`
+  - Deploy a function: `cd backend && supabase functions deploy <name> --project-ref repvtuxyszlqdjzciojx --use-api`. `--use-api` means no Docker. `view-doctor-message` also needs `--no-verify-jwt` (doctors have no login; `config.toml` says the same for local).
   - Schema change:
     1. Add `migrations/<timestamp>_<name>.sql`.
     2. Dry-run it on hosted together with `tests/access.sql` in one transaction that ends in an error, so it rolls back.
@@ -40,8 +43,10 @@ Snapshot of what exists right now. Rewrite it each session; don't append.
     4. Rerun `tests/access.sql`.
     - Use the Supabase MCP, the SQL editor, or the Management API `POST /v1/projects/<ref>/database/query` with the CLI's token.
   - Bot behaviour change: deploy the branch as a temporary `chat-preview` function, run the cases in `chat/eval_live.ts` through it, then delete it. That way the live `chat` is never touched before merge.
-- **In progress:** nothing. **Next: see "Start here: next session" below.**
+- **In progress:** doctor-message PR open; needs the Resend key and the frontend's `/doctor-message` page. **Next: see "Start here: next session" below.**
 - **Known issues:**
+  - Demo email uses Resend's test sender `onboarding@resend.dev` (no domain): it only delivers to the Resend account owner's address, so the demo doctor's email must be that address. Other recipients fail with 502 and nothing is saved.
+  - Leftovers from the doctor-message live test, still on hosted (the SQL cleanup was declined): one expired test message from Alex (`content` starts with `LIVE TEST`) and one anonymous test guest with doctor "Dr Test". Harmless; delete with `delete from public.doctor_messages where content like 'LIVE TEST%'; delete from auth.users where id = '7eba3d3a-d255-4809-9d93-6046f65d2d84';`
   - Supabase advisor: leaked-password protection is off (dashboard setting).
   - Supabase limits anonymous sign-ups to 30/hour per IP. Turn on captcha if that's not enough.
   - PR #4 (hospital-model chatbot) is closed. Its migration `20261017152104_chatbot.sql` stays in `migrations/` so the repo matches the hosted history; the patient-only migration drops its tables again.
@@ -64,18 +69,10 @@ Today's work, in order (details in the session log):
 
 Backend features to build next, in this order. Each one goes in its own PR with tests and a contract added to the Edge functions table below:
 
-1. **Email provider.** Pick one (Resend is quickest from an edge function), verify a sending domain, and add secrets `RESEND_API_KEY`, `EMAIL_FROM` and `APP_URL` (the frontend's public URL, for links).
-2. **`notify-doctor`** (patient, signed in).
-   - Body `{ doctor_id, content }`.
-   - Make a 32-byte random token and store its sha256 in `doctor_messages.token_hash` (service role). The insert trigger already enforces the limits; map its `hint` (`guest_must_sign_up`, `patient_rate_limited`, `recipient_rate_limited`, `doctor_has_no_email`) to 4xx errors the UI can show.
-   - Email **`recipient_email`** (not `doctors.email`) with fixed text: "Your patient <first name, escaped, ≤40 chars> sent you a message", the link `APP_URL/doctor-message#<token>`, and "not for emergencies".
-   - Return `{ id, expires_at }`.
-   - Decide what happens if the email fails: delete the row, or keep it with a status column.
-3. **`view-doctor-message`** (anyone with the link, `verify_jwt = false`).
-   - Body `{ token }`. Hash it, look it up and check `expires_at`.
-   - Set `opened_at` the first time.
-   - Return `{ content, created_at, patient_first_name, doctor_name, care_notes }`.
-   - Add a simple per-IP rate limit against token guessing.
+1. **Email setup (no domain needed for the demo).** Sign up at resend.com with the inbox the demo doctor will use, create an API key, then:
+   `supabase secrets set RESEND_API_KEY=re_… EMAIL_FROM="Care companion <onboarding@resend.dev>" APP_URL=<frontend URL> --project-ref repvtuxyszlqdjzciojx`. Set the demo doctor's email to that same inbox.
+2. **Merge the doctor-message PR, then deploy** `notify-doctor` and `view-doctor-message` (`--no-verify-jwt` on the second). Send one real email end to end.
+3. ~~`notify-doctor`~~ and ~~`view-doctor-message`~~: built, contracts in the Edge functions table. Decisions: if the email fails the row is deleted (502), so it doesn't count against the limits; the per-IP limit on `view-doctor-message` is in memory per instance (tokens are 256-bit, so it only stops hammering); an expired link answers 410 `code: "expired"`.
 4. **`entry-link`** (patient): create an `entry_links` token (30 minutes, one use) and return `{ url: APP_URL/doctor-entry#<token>, expires_at }` for the QR code.
 5. **`doctor-entry`** (anyone with a QR token, `verify_jwt = false`).
    - `{ token }` returns the current notes, so the form opens pre-filled (`PLAN.md` → multi-doctor rule).
@@ -114,12 +111,16 @@ Patient functions: `supabase.functions.invoke(name, { body })` while signed in (
 | Function | Who calls it | What it does | Status |
 | --- | --- | --- | --- |
 | `chat` | patient | message + current care notes → Claude; stores and returns the bot reply; flags "should notify doctor" | deployed, live |
-| `notify-doctor` | patient (email account) | creates a `doctor_messages` row, emails the doctor a link | next (limits already in the DB) |
-| `view-doctor-message` | anyone with the link | checks the token; returns the message, patient first name, current notes | planned |
+| `notify-doctor` | patient (email account) | creates a `doctor_messages` row, emails the doctor a link | built, in PR; deploy after merge + secrets |
+| `view-doctor-message` | anyone with the link | checks the token; returns the message, patient first name, current notes | built, in PR; deploy after merge |
 | `entry-link` | patient | creates a QR token (`entry_links`) | planned |
 | `doctor-entry` | anyone with a QR token | returns current notes, saves a new version (`entered_via = 'qr'`), marks the token used | planned |
 
 `chat`: body `{ content }` (1-4000 characters). Response 201 `{ patient_message, reply, action, suggest_notify_doctor }`; `action` is `answered` (from the notes or a clear implication of them, cited; symptom answers end with a fixed "contact your doctor / 911" line), `warning_sign` (the patient described a warning sign from the notes: what the notes say to do, `suggest_notify_doctor: true`), `small_talk` (fixed reply), `referred` ("check with your doctor", `suggest_notify_doctor: true`) or `emergency` (red-flag keyword: call 911 / clinic phone, no model call). 429 `{ error, retry_after_seconds }` past 20 messages per 10 minutes or 200 per day. Safety rules in `chat/safety.ts` (unit tests: `deno test --config backend/supabase/functions/chat/deno.json backend/supabase/functions/chat/`); live check against Claude: `chat/eval_live.ts`.
+
+`notify-doctor`: body `{ doctor_id, content }` (one of my doctors; content 1-4000 characters). Saves the message with a random 32-byte token (only its sha256 is stored) and emails `recipient_email` a fixed notice: "Your patient <first name> sent you a message", the link `APP_URL/doctor-message#<token>` (expires in 7 days), "not for emergencies". No message content in the email. Response 201 `{ id, expires_at }`. Errors carry `{ error, code? }`: 400 bad body or `code: "doctor_has_no_email"`; 401; 403 `code: "guest_must_sign_up"` (ask the guest to add an email); 404 not my doctor; 429 `code: "patient_rate_limited" | "recipient_rate_limited"`; 502 the email failed (nothing saved, try again); 503 email not configured. The patient sees the doctor opened it via `doctor_messages.opened_at`. Secret `EMAIL_DEV_MODE=true` skips the email and returns `dev_link` instead (demo fallback only).
+
+`view-doctor-message`: no login (`verify_jwt = false`). Body `{ token }` (the part after `#`). Response 200 `{ content, created_at, expires_at, opened_at, patient_first_name, doctor_name, care_notes: { version, content, entered_via, created_at } | null }`; sets `opened_at` on the first open. Errors: 400 malformed token, 404 unknown token, 410 `code: "expired"` ("ask your patient to send it again"), 429 too many tries from one IP (30 per 10 minutes). Responses are `Cache-Control: no-store`. Call it with `supabase.functions.invoke('view-doctor-message', { body: { token } })` from a signed-out client.
 
 ### supabase-js cheat sheet
 
@@ -165,6 +166,12 @@ Newest first. One entry per session:
 - **Next:** what should happen next
 - **Notes:** blockers, decisions, gotchas (optional)
 ```
+
+### 2026-10-17 · Andrew (secure-link doctor emails)
+- **Did:** Built `notify-doctor` (saves the message with a random token, emails a link-only notice through Resend, maps the trigger's limit hints to 4xx, deletes the row if the email fails) and `view-doctor-message` (no login; token + expiry check, sets `opened_at`, returns message + first name + current notes, no-store, per-IP limit). Team decision: no PIN for now, just the link + 7-day expiry. Email for the demo: Resend's test sender, no domain. Tested live through temporary `-preview` deploys (22/22), then deleted them and the temporary secrets.
+- **Files:** `functions/notify-doctor/` (`index.ts`, `email.ts`, `token.ts`, `email_test.ts`), `functions/view-doctor-message/index.ts`, `config.toml`, `PLAN.md`, `overlap.md`, `todo.md`, this file
+- **Next:** set the Resend secrets, merge, deploy both functions, send one real email; frontend builds `/doctor-message` and wires "Send to my doctor".
+- **Notes:** Token helpers live in `notify-doctor/token.ts` (not `_shared/`); `view-doctor-message` imports them from there. Two test leftovers remain on hosted (see Known issues).
 
 ### 2026-10-17 · Andrew (docs + handoff)
 - **Did:** Brought every backend and shared doc up to date for a fresh session. Rewrote "Current state", added "Start here: next session" (next features in order, with contracts), recorded how to apply migrations, deploy and test the bot safely. Ticked finished to-dos and added the next ones. Replied to stale `overlap.md` notes. Updated `PLAN.md` build status, `README.md` and the stale "no code yet" line in `CLAUDE.md` (user asked to update all docs).
