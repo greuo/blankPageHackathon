@@ -13,8 +13,12 @@ Shared list for both sides.
 - [x] Build and verify approved family-access/consented-handoff frontend pair locally (2026-10-17, Gold M for Ranveer).
 - [ ] Confirm Marcus file ownership and active repository sessions for continued parallel work (2026-10-17, Gold M for Ranveer).
 - [ ] Bind typed frontend adapter to Andrew's agreed Supabase auth/data/storage/AI/realtime contracts (2026-10-17, Gold M for Ranveer).
-- [ ] Publish current frontend through PR as explicitly requested, address Claude/conflict review; no merge without authorization (2026-10-17, Gold M for Ranveer).
+- [x] Publish frontend through PR and address Claude/conflict review; PR #13 UI revamp approved on initial review, no merge performed (2026-10-17, Gold M for Ranveer).
 - [ ] Verify full integrated GitHub revision with separate authenticated roles and direct server policy checks (2026-10-17, Gold M for Ranveer).
+
+- [x] Revamp green patient UI with requested typography, React Bits components, tooltips, skeletons and reduced-motion support; build + 62 tests and responsive browser checks pass (2026-10-17, Gold M for Ranveer).
+- [ ] When backend connection resumes, agree `/doctor-message#<token>` and `/doctor-entry#<token>` routes with Andrew; keep the local preview distinct from actual sending (2026-10-17, Gold M for Ranveer).
+- [ ] Add structured What's normal guidance and handle live `warning_sign` / `suggest_notify_doctor` responses during patient-adapter integration (2026-10-17, Gold M for Ranveer).
 
 ## Backend
 

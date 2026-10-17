@@ -4,15 +4,25 @@ Owned by the frontend side (Ranveer, Marcus). Only frontend sessions edit this f
 
 ## Current state
 
-- **Stack:** React + TypeScript, Vite, token CSS, Nunito Variable, GSAP/useGSAP, Lucide, Vitest. Isolated under `frontend/`.
-- **Run:** `npm --prefix frontend run dev -- --port 5188`; production build/preview on 5190.
-- **Current UI:** Patient-only dashboard and Add instructions page, embedded/full-screen companion, daily task/dose reporting, check-in/trend, read-only roadmap, reminders, demo emergency/call flow and progress preview and downloadable progress text. No reachable doctor/family/admin screen or role switcher.
-- **Data:** New typed browser-local patient adapter under `frontend/src/patient/`. Fictional data only. Legacy shared-care modules remain reference source and regression tests.
-- **Validation:** Build and 49 tests pass, bounded ECC-informed React/TypeScript source review, desktop/mobile browser flows. See `frontend/docs/VERIFICATION.md` for current versus historical checks.
-- **Deferred:** Andrew's backend, clinician input verification, real LLM, document extraction, email delivery and secure report links. No live privacy/security claim.
-- **Delivery:** PR #3 was merged on GitHub while this revision was in progress. This patient-only follow-up goes through a new PR and Claude/conflict checks. No merge authorization. Latest immutable head/check status is recorded in the local continuity checkpoint after publication.
+- **Stack:** React + TypeScript, Vite, semantic token CSS, Google Sans / Funnel Display / EB Garamond variable fonts, GSAP/useGSAP, Motion for React, Lucide, Vitest. Isolated under `frontend/`; fonts self-hosted with complete OFL licenses.
+- **Run:** `npm --prefix frontend run dev -- --port 5188`; `npm --prefix frontend run build`; production preview on 5190; `npm --prefix frontend test`.
+- **Current UI:** Patient-only green dashboard and Add instructions page; title-only To-Do rows; daily task/dose reporting; check-in/trend; read-only roadmap; reminders; demo emergency/call flow; original progress report and TXT download. No reachable doctor/family/admin account screens.
+- **Companion and motion:** Embedded/full-screen assistant with shared draft, PromptBar shortcuts, send/stop control and focus/hover tooltips. 1.8-second LightTunnel/GSAP opening with Skip, static fallback and reduced-motion bypass. SquishSwitch and StatusMark demonstrate an optional-instructions email draft preview. Skeletons reflect actual pending work.
+- **Data:** Typed browser-local patient adapter in `frontend/src/patient/`, fictional records only. Existing information and source wording preserved. Legacy shared-care modules remain reference source and regression tests. Local assistant remains deterministic.
+- **Validation:** Production build and 62 tests pass; independent ECC-informed review approved. Real-browser layout checks at 320/390/768/1024/1440px, keyboard focus/menu handling, intake, full-screen chat and report preview passed. Targeted text-contrast checks found no issues; final browser logs were clean. Vite reports an advisory 507 KB JS chunk. Details: `frontend/docs/VERIFICATION.md`.
+- **Integration next:** Andrew's documented Supabase patient-only tables, guest auth and live `chat` contract are available. Frontend binding is still deferred at Ranveer's request. Live inference, doctor input verification, extraction, email delivery and secure doctor links are not connected in this UI. No live privacy/security claim.
+- **Delivery:** Current revamp is PR #13 on `codex/patient-ui-motion`; initial Claude/conflict checks approved. Latest main documentation was merged cleanly and frontend handoff notes added to the same PR. Final exact revision/check status is recorded in the local continuity checkpoint. No merge performed.
 
 ## Session log
+
+### 2026-10-17 · React Bits patient UI revamp / Gold M for Ranveer
+
+- **Did:** Refined all green surfaces, continuous To-Do list and typography; added adapted PromptBar, tooltip, SquishSwitch, StatusMark and bounded LightTunnel components. Kept existing patient information, reports and flows. Added truthful local email draft preview without sending.
+- **References/tools:** Browsed/scrolled React Bits, Color Hunt and public Mobbin. Installed/authenticated official 21st CLI, retrieved a tooltip reference and ran its local review. Stitch workspace did not load; no generated output claimed. Applied relevant design/memory/ECC skills and documented adaptations.
+- **Validation:** Build + 62 tests pass; responsive and keyboard checks completed; source review approved. Claude's initial PR #13 verdict was looks good/no conflicts. Its aria-disabled visual suggestion is already covered by ReportDraft.css. Bundle advisory retained transparently.
+- **Coordination:** Incorporated PR #12's handoff docs without changing backend code. Read current backend notes; added integration follow-ups to frontend todo. Current email preview does not implement notify-doctor or the proposed public routes.
+- **Next:** Connect the patient adapter to the documented backend when that work resumes; agree the two public routes, structured What's normal field and warning-sign action behavior before live integration. Continue through PR review; no merge authorization.
+
 
 ### 2026-10-17 · Gold M / Codex PR review fixes
 
