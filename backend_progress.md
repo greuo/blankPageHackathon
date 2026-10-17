@@ -62,7 +62,7 @@ Today's work, in order (details in the session log):
 5. API key set
 6. bot refers less (#11)
 
-Backend features to build next, in this order. Each one goes in its own PR with tests and a contract added to the tables above:
+Backend features to build next, in this order. Each one goes in its own PR with tests and a contract added to the Edge functions table below:
 
 1. **Email provider.** Pick one (Resend is quickest from an edge function), verify a sending domain, and add secrets `RESEND_API_KEY`, `EMAIL_FROM` and `APP_URL` (the frontend's public URL, for links).
 2. **`notify-doctor`** (patient, signed in).
