@@ -93,11 +93,13 @@ export const precautions = [
   'Keep your follow-up appointment details with your care plan.',
   'Ask your doctor about guidance that is unclear.',
 ];
-export function seed(now = new Date()): PatientState {
+/** The prepared demo patient. A signed-in account's name replaces Alex's in the seeded copy. */
+export function seed(now = new Date(), name = ''): PatientState {
   const discharge = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
+  const who = name.trim();
   return {
     version: 1,
-    patient: 'Alex Morgan',
+    patient: who || 'Alex Morgan',
     discharged: dateKey(discharge),
     duration: 12,
     doctor: 'Dr. Maya Chen',
@@ -113,7 +115,7 @@ export function seed(now = new Date()): PatientState {
       {
         id: id(),
         role: 'assistant',
-        text: 'Hi Alex. Your daily tasks are ready. I can help you find your instructions, record a check-in, or review your reported progress.',
+        text: `Hi ${who.split(/\s+/)[0] || 'Alex'}. Your daily tasks are ready. I can help you find your instructions, record a check-in, or review your reported progress.`,
       },
     ],
     emergencies: [],

@@ -1,15 +1,25 @@
 import { parseState, seed, type PatientState } from './model';
 export const PATIENT_KEY = 'discharge-patient-only-v1';
-let current: PatientState;
+// Each signed-in account keeps its local demo data under its own key (`PATIENT_KEY:<user id>`), so
+// signing in as someone else on the same browser never shows or uploads the previous account's data.
+// Before anyone signs in, and in tests, the plain PATIENT_KEY is used.
+let storageKey = PATIENT_KEY;
+let ownerName = '';
+let current: PatientState = seed();
 let failure = '';
-try {
-  const saved = localStorage.getItem(PATIENT_KEY);
-  current = saved ? parseState(saved) : seed();
-} catch (e) {
-  current = seed();
-  failure = e instanceof Error ? e.message : 'Browser storage is unavailable.';
+function load() {
+  try {
+    const saved = localStorage.getItem(storageKey);
+    current = saved ? parseState(saved) : seed(new Date(), ownerName);
+    failure = '';
+  } catch (e) {
+    current = seed(new Date(), ownerName);
+    failure = e instanceof Error ? e.message : 'Browser storage is unavailable.';
+  }
 }
+load();
 const listeners = new Set<() => void>();
+const notify = () => listeners.forEach((listener) => listener());
 export const patientStore = {
   getSnapshot: () => current,
   subscribe: (listener: () => void) => {
@@ -19,6 +29,15 @@ export const patientStore = {
     };
   },
   error: () => failure,
+  /** Switch to an account's own data (`null`: nobody signed in). `name` personalizes a fresh seed. */
+  setOwner: (owner: string | null, name = '') => {
+    const key = owner ? `${PATIENT_KEY}:${owner}` : PATIENT_KEY;
+    if (key === storageKey) return;
+    storageKey = key;
+    ownerName = owner ? name : '';
+    load();
+    notify();
+  },
   update: (change: (draft: PatientState) => void) => {
     if (failure)
       throw new Error(
@@ -26,26 +45,26 @@ export const patientStore = {
       );
     const next = structuredClone(current);
     change(next);
-    localStorage.setItem(PATIENT_KEY, JSON.stringify(next));
+    localStorage.setItem(storageKey, JSON.stringify(next));
     current = next;
-    listeners.forEach((listener) => listener());
+    notify();
   },
   reset: () => {
-    const next = seed();
-    localStorage.setItem(PATIENT_KEY, JSON.stringify(next));
+    const next = seed(new Date(), ownerName);
+    localStorage.setItem(storageKey, JSON.stringify(next));
     current = next;
     failure = '';
-    listeners.forEach((listener) => listener());
+    notify();
   },
 };
 window.addEventListener('storage', (e) => {
-  if (e.key !== PATIENT_KEY && e.key !== null) return;
+  if (e.key !== storageKey && e.key !== null) return;
   try {
-    current = e.newValue ? parseState(e.newValue) : seed();
+    current = e.newValue ? parseState(e.newValue) : seed(new Date(), ownerName);
     failure = '';
   } catch (error) {
     failure = error instanceof Error ? error.message : 'Saved demo could not be read.';
     current = structuredClone(current);
   }
-  listeners.forEach((listener) => listener());
+  notify();
 });

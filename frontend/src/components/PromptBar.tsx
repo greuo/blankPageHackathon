@@ -181,7 +181,7 @@ export default function PromptBar({
           </motion.button>
         </Tooltip>
       </div>
-      <small>Your care team guides your treatment. Local demo.</small>
+      <small>Your care team guides your treatment.</small>
     </form>
   );
 }

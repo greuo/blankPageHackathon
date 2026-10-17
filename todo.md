@@ -58,12 +58,18 @@ Shared list for both sides.
 - [x] Host the frontend at `foredge.me` on Cloudflare, replacing the old Vercel record (2026-10-17, Andrew)
 - [ ] Delete the abandoned Vercel project that used to own `www.foredge.me` (2026-10-17, Andrew)
 - [ ] `entry-link` + `doctor-entry`: QR token (30 min, one use), pre-filled current notes, save as `entered_via = 'qr'` (2026-10-17, Andrew)
-- [ ] Turn on captcha for anonymous sign-ins if guest abuse shows up (2026-10-17, Andrew)
+- [ ] Turn on captcha for anonymous sign-ins if guest abuse shows up (2026-10-17, Andrew) (moot once sign-ups are off)
+- [x] Login-only: `enable_signup = false` in `config.toml`, sample admin `admin@demo.example.com` in `seed.sql` and on hosted, login page + gate in the frontend (written from the backend session at the user's request) (2026-10-17, Andrew)
+- [ ] After the login gate is merged: turn off "Allow new users to sign up" on hosted (Dashboard → Authentication → Sign In / Providers) and check `GET /auth/v1/settings` shows `disable_signup: true` (2026-10-17, Andrew)
+- [ ] Bring `config.toml` in line with the hosted auth settings (email confirmations, site URL, redirect URLs, OTP length, MFA) so `supabase config push` is safe to run (2026-10-17, Andrew)
+- [ ] Update `PLAN.md` flows once the team agrees to login-only (it still describes guests and self sign-up) (2026-10-17, Andrew)
 
 ## Ideas
 
 Future features and nice-to-haves, either side.
 
+- Re-open registration later: sign-up form + confirmation emails (needs an SMTP / Resend sender), then turn the hosted sign-up switch back on (2026-10-17, Andrew)
+- Role-based admin screens: read `app_metadata.role = 'admin'` in a policy or edge function if the admin account should ever do more than a normal patient (2026-10-17, Andrew)
 - Doctor replies from the message page, shown in the patient's chat (2026-10-17, Andrew)
 - Doctor sets a PIN at the visit; message links also ask for it, so a forwarded email alone can't be read. Parked by the team for now (2026-10-17, Andrew)
 - Show the patient what changed between care-note versions ("Dr. Okafor raised your dose on Oct 14") (2026-10-17, Andrew)

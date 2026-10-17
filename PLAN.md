@@ -4,6 +4,8 @@ The plan both sides build towards. Either side can edit it; post a note in `over
 
 **Status:** agreed by the whole team on 2026-10-17.
 
+**Update 2026-10-17 (pending the team's ack, see `overlap.md`):** the app is now **login-only**. The first screen is a login page (email + password); self sign-up and guest mode are off, so "Continue as guest" and "guest upgrades to an account" below no longer apply, and accounts are created by hand (a sample admin, `admin@demo.example.com`, exists for the demo). Everything else in this plan is unchanged. Hosted flips over when its sign-up switch is turned off.
+
 ## The idea
 
 One app, for patients only. There is no doctor app and no hospital setup, so anyone can start using it today.
