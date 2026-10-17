@@ -384,7 +384,6 @@ export default function PatientApp() {
                           <span>
                             <strong>{task.title}</strong>
                           </span>
-                          <ChevronRight size={19} />
                         </button>
                       </div>
                     );

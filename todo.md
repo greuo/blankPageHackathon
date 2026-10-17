@@ -8,6 +8,7 @@ Shared list for both sides.
 
 ## Frontend
 
+- [x] Remove trailing arrows from To-Do rows (2026-10-17, Gold M for Ranveer).
 - [x] Build and verify care-space/conversation frontend pair in fictional demo (2026-10-17, Gold M for Ranveer).
 - [x] Build and verify clinician-builder/checklist frontend pair with provenance and approval (2026-10-17, Gold M for Ranveer).
 - [x] Build and verify approved family-access/consented-handoff frontend pair locally (2026-10-17, Gold M for Ranveer).

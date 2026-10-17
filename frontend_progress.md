@@ -6,7 +6,7 @@ Owned by the frontend side (Ranveer, Marcus). Only frontend sessions edit this f
 
 - **Stack:** React + TypeScript, Vite, semantic token CSS, Google Sans / Funnel Display / EB Garamond variable fonts, GSAP/useGSAP, Motion for React, Lucide, Vitest. Isolated under `frontend/`; fonts self-hosted with complete OFL licenses.
 - **Run:** `npm --prefix frontend run dev -- --port 5188`; `npm --prefix frontend run build`; production preview on 5190; `npm --prefix frontend test`.
-- **Current UI:** Patient-only green dashboard and Add instructions page; title-only To-Do rows; daily task/dose reporting; check-in/trend; read-only roadmap; reminders; demo emergency/call flow; original progress report and TXT download. No reachable doctor/family/admin account screens.
+- **Current UI:** Patient-only green dashboard and Add instructions page; title-only To-Do rows without trailing arrows; daily task/dose reporting; check-in/trend; read-only roadmap; reminders; demo emergency/call flow; original progress report and TXT download. No reachable doctor/family/admin account screens.
 - **Companion and motion:** Embedded/full-screen assistant with shared draft, PromptBar shortcuts, send/stop control and focus/hover tooltips. 1.8-second LightTunnel/GSAP opening with Skip, static fallback and reduced-motion bypass. SquishSwitch and StatusMark demonstrate an optional-instructions email draft preview. Skeletons reflect actual pending work.
 - **Data:** Typed browser-local patient adapter in `frontend/src/patient/`, fictional records only. Existing information and source wording preserved. Legacy shared-care modules remain reference source and regression tests. Local assistant remains deterministic.
 - **Validation:** Production build and 62 tests pass; independent ECC-informed review approved. Real-browser layout checks at 320/390/768/1024/1440px, keyboard focus/menu handling, intake, full-screen chat and report preview passed. Targeted text-contrast checks found no issues; final browser logs were clean. Vite reports an advisory 507 KB JS chunk. Details: `frontend/docs/VERIFICATION.md`.
@@ -14,6 +14,11 @@ Owned by the frontend side (Ranveer, Marcus). Only frontend sessions edit this f
 - **Delivery:** Current revamp is PR #13 on `codex/patient-ui-motion`; initial Claude/conflict checks approved. Latest main documentation was merged cleanly and frontend handoff notes added to the same PR. Final exact revision/check status is recorded in the local continuity checkpoint. No merge performed.
 
 ## Session log
+
+### 2026-10-17 · To-Do arrow removal / Gold M for Ranveer
+
+- Removed the trailing arrow from each To-Do row; task buttons and reporting behavior remain available.
+- Production build passed; browser confirmed three task rows and zero row arrows. Narrow source review approved. Published through the existing PR #13.
 
 ### 2026-10-17 · React Bits patient UI revamp / Gold M for Ranveer
 
