@@ -1,0 +1,32 @@
+name: Conflict watch
+
+# When something lands on main, other open PRs can suddenly conflict with it.
+# Re-check every open PR and warn the ones that broke.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: conflict-watch
+  cancel-in-progress: true
+
+jobs:
+  recheck-open-prs:
+    name: Re-check open PRs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Check every open PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for pr in $(gh pr list --repo "$GITHUB_REPOSITORY" --state open --limit 100 --json number --jq '.[].number'); do
+            bash .github/scripts/check-conflicts.sh "$pr" || echo "::warning::check failed for #$pr"
+          done

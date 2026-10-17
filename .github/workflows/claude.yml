@@ -1,0 +1,42 @@
+name: Claude
+
+# Mention @claude in a PR/issue comment or review to ask Claude to do something,
+# e.g. "@claude resolve the merge conflicts". Only people with write access to
+# the repo can trigger it.
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  pull_request_review:
+    types: [submitted]
+  issues:
+    types: [opened, assigned]
+
+jobs:
+  claude:
+    if: |
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
+      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          claude_args: |
+            --allowedTools "Read,Edit,Write,Glob,Grep,Bash(git:*),Bash(gh pr:*),Bash(gh issue:*),Bash(npm:*),Bash(npx:*),Bash(pnpm:*),Bash(yarn:*),Bash(node:*),Bash(python:*),Bash(python3:*),Bash(pip:*),Bash(pytest:*),Bash(ls:*),Bash(cat:*)"
+            --append-system-prompt "This repo requires every change to go through a PR; never push to main. When asked to resolve merge conflicts (or to integrate/combine conflicting changes) on a PR: 1) run `git fetch --unshallow origin || true` and `git fetch origin <base branch>`; 2) run `git merge origin/<base branch>` on the PR branch (never rebase or force-push); 3) for each conflicted file, read BOTH sides and the history of each (`git log -p origin/<base> -- <file>`, `git log -p HEAD -- <file>`) to understand what each change was trying to do, then rewrite the code so BOTH intentions work together. Do not just pick ours or theirs, and do not drop either side's feature. If a function was renamed on one side and used on the other, update the usages. 4) Make sure no conflict markers remain (`git diff --check`, grep for <<<<<<<), and run the project's build/tests if they exist; 5) commit the merge with a message explaining how each conflict was integrated and push to the PR branch; 6) reply with a short per-file summary of what you kept from each side and anything the authors should double-check. If two changes are truly incompatible (they want opposite behaviour), stop and explain the choice instead of guessing."
