@@ -4,12 +4,22 @@
 -- Password for Alex: 'local-demo-only' for a local `supabase db reset`.
 -- On the hosted project the real demo password lives in backend/.env.local (ask Andrew);
 -- seed there with `set seed.demo_password_hash = '<bcrypt hash>';` before running this file.
--- Rerunning this file resets both demo patients (it deletes them first).
+-- Rerunning this file resets the demo patients and the admin (it deletes them first).
+--
+-- Sign-ups are off (config.toml: auth.enable_signup = false), so these seeded accounts are the only
+-- ones that can log in. The sample admin's hosted password is ADMIN_PASSWORD in backend/.env.local;
+-- seed there with `set seed.admin_password_hash = '<bcrypt hash>';`. Locally it is 'local-demo-only'.
+-- WARNING: if that setting is missing the admin gets the publicly documented 'local-demo-only'
+-- password, and rerunning this file deletes and recreates the account. Never run this file against
+-- the hosted project without setting seed.admin_password_hash (and seed.demo_password_hash) first.
 --
 -- Patients (the auth.users insert trigger creates their `patients` rows)
 --   ...0101  Alex Rivera  email account alex@demo.example.com
 --   ...0102  Sam          guest (anonymous sign-in, no email or password). A guest only lives on the
 --                         device that created it, so nobody can sign in as Sam; it's here for tests.
+--   ...0103  Admin        sample admin admin@demo.example.com. app_metadata.role = 'admin' (users can't
+--                         edit app_metadata). No policy reads the role yet; the account is a patient
+--                         with an empty care space, like any other.
 -- Doctors (contact details only; doctors have no accounts)
 --   ...0201  Dr. Maya Okafor, Harbor Family Clinic   (Alex's)
 --   ...0202  Dr. Leo Martins, Bayside Urgent Care    (Sam's)
@@ -33,7 +43,8 @@ delete from auth.users where id in (
   '00000000-0000-0000-0000-000000000051',
   '00000000-0000-0000-0000-000000000061',
   '00000000-0000-0000-0000-000000000101',
-  '00000000-0000-0000-0000-000000000102'
+  '00000000-0000-0000-0000-000000000102',
+  '00000000-0000-0000-0000-000000000103'
 );
 
 -- ---------------------------------------------------------------------------
@@ -61,6 +72,31 @@ insert into auth.identities (id, user_id, provider_id, provider, identity_data, 
 values (
   gen_random_uuid(), '00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000101', 'email',
   '{"sub":"00000000-0000-0000-0000-000000000101","email":"alex@demo.example.com","email_verified":true,"phone_verified":false}',
+  now(), now(), now()
+);
+
+-- Admin: sample admin, email + password. The role lives in app_metadata, which only the service role
+-- can write, so a user can't promote themselves.
+insert into auth.users (
+  instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
+  raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
+  confirmation_token, recovery_token, email_change_token_new, email_change
+) values (
+  '00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000103',
+  'authenticated', 'authenticated', 'admin@demo.example.com',
+  coalesce(
+    nullif(current_setting('seed.admin_password_hash', true), ''),
+    extensions.crypt('local-demo-only', extensions.gen_salt('bf'))
+  ),
+  now(),
+  '{"provider":"email","providers":["email"],"role":"admin"}', '{"display_name":"Admin"}', now(), now(),
+  '', '', '', ''
+);
+
+insert into auth.identities (id, user_id, provider_id, provider, identity_data, last_sign_in_at, created_at, updated_at)
+values (
+  gen_random_uuid(), '00000000-0000-0000-0000-000000000103', '00000000-0000-0000-0000-000000000103', 'email',
+  '{"sub":"00000000-0000-0000-0000-000000000103","email":"admin@demo.example.com","email_verified":true,"phone_verified":false}',
   now(), now(), now()
 );
 

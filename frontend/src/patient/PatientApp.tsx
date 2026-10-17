@@ -19,6 +19,7 @@ import {
   Footprints,
   Home,
   HeartPulse,
+  LogOut,
   MessageCircle,
   BookOpen,
   Mail,
@@ -39,6 +40,8 @@ import Assistant from './Assistant';
 import ReportDraft from './ReportDraft';
 import { Tooltip } from '../components/Tooltip';
 import Instructions from './Instructions';
+import type { AuthUser } from '../data/supabase';
+import { firstName } from '../auth/identity';
 import { patientStore } from './store';
 import {
   clock,
@@ -59,7 +62,19 @@ import {
 import './patient.css';
 type Dialog =
   'pills' | 'checkin' | 'roadmap' | 'report' | 'notifications' | 'source' | 'reset' | null;
-export default function PatientApp() {
+/** First name for the greeting. The prepared demo patient is Alex until someone signs in. */
+function greetingName(user?: AuthUser): string {
+  if (!user) return 'Alex';
+  return firstName(user) || 'there';
+}
+export default function PatientApp({
+  user,
+  onSignOut,
+}: {
+  user?: AuthUser;
+  onSignOut?: () => Promise<void>;
+}) {
+  const name = greetingName(user);
   const state = useSyncExternalStore(patientStore.subscribe, patientStore.getSnapshot);
   const [showOpening, setShowOpening] = useState(() => {
     try {
@@ -118,6 +133,13 @@ export default function PatientApp() {
     }
     setShowOpening(false);
     requestAnimationFrame(() => document.getElementById('main')?.focus({ preventScroll: true }));
+  }
+  async function signOut() {
+    try {
+      await onSignOut?.();
+    } catch (reason) {
+      setError(errorText(reason));
+    }
   }
   function navigate(next: 'home' | 'add') {
     setRoute(next);
@@ -293,13 +315,24 @@ export default function PatientApp() {
               {reminders.length > 0 && <span />}
             </button>
           </Tooltip>
+          {onSignOut && (
+            <Tooltip text="Sign out">
+              <button
+                className="icon-btn"
+                aria-label={user?.email ? `Sign out ${user.email}` : 'Sign out'}
+                onClick={() => void signOut()}
+              >
+                <LogOut size={22} />
+              </button>
+            </Tooltip>
+          )}
           <Tooltip text="Your profile and progress">
             <button
               className="patient-profile"
               aria-label="Patient profile and progress"
               onClick={() => setDialog('report')}
             >
-              A
+              {name.charAt(0).toUpperCase()}
             </button>
           </Tooltip>
         </div>
@@ -333,7 +366,7 @@ export default function PatientApp() {
                       : now.getHours() < 18
                         ? 'Good afternoon'
                         : 'Good evening'}
-                    , Alex
+                    , {name}
                   </h1>
                   <p>Your care plan, one step at a time.</p>
                   <time className="greeting-date" dateTime={today}>

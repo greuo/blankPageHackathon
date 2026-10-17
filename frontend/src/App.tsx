@@ -3,6 +3,8 @@ import { HeartPulse } from 'lucide-react';
 import { errorText } from './components/ui';
 import { patientStore } from './patient/store';
 import PatientApp from './patient/PatientApp';
+import AuthGate from './auth/AuthGate';
+import { signOut } from './data/supabase';
 import { InteractionFeedback } from './components/InteractionFeedback';
 class ErrorBoundary extends Component<
   { children: ReactNode },
@@ -53,7 +55,7 @@ export default function App() {
   return (
     <ErrorBoundary>
       <InteractionFeedback>
-        <PatientApp />
+        <AuthGate>{(user) => <PatientApp user={user} onSignOut={signOut} />}</AuthGate>
       </InteractionFeedback>
     </ErrorBoundary>
   );

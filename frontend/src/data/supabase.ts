@@ -1,4 +1,4 @@
-import { createClient, FunctionsHttpError } from '@supabase/supabase-js';
+import { createClient, FunctionsHttpError, type User } from '@supabase/supabase-js';
 
 // Live Supabase backend (contracts: backend_progress.md → Edge functions; config: overlap.md → Agreed).
 // The publishable key is safe in the browser; Row Level Security does the access control.
@@ -11,13 +11,80 @@ const SUPABASE_ANON_KEY =
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-/** Guests get a Supabase anonymous session on first use; an existing session is reused. */
+/**
+ * The app is login-only: sign-ups are off on the project (backend/supabase/config.toml), which also
+ * blocks anonymous guest sessions. A missing session therefore means "sign in again", never "start
+ * a guest session". The AuthGate shows the login page when the session ends.
+ */
 export async function ensureSession(): Promise<void> {
   const { data } = await supabase.auth.getSession();
-  if (data.session) return;
-  const { error } = await supabase.auth.signInAnonymously();
-  if (error)
-    throw new Error('Could not start your care session. Check your connection and try again.');
+  if (!data.session || data.session.user?.is_anonymous)
+    throw new Error('Your session ended. Sign in again to continue.');
+}
+
+/** The signed-in account, trimmed to what the UI shows. */
+export type AuthUser = { id: string; email: string; name: string };
+
+export function toAuthUser(user: Pick<User, 'id' | 'email' | 'user_metadata'>): AuthUser {
+  const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
+  const name = [meta.display_name, meta.full_name].find((v) => typeof v === 'string') as
+    string | undefined;
+  return { id: user.id, email: user.email ?? '', name: (name ?? '').trim() };
+}
+
+/**
+ * Calls back with the current account (or null) now and on every sign-in, sign-out or expiry.
+ * A leftover guest session from before the app was login-only doesn't count as signed in: it is
+ * reported as signed out and dropped from storage so it stops refreshing.
+ */
+export function watchSession(onChange: (user: AuthUser | null) => void): () => void {
+  const { data } = supabase.auth.onAuthStateChange((_event, session) => {
+    const user = session?.user;
+    if (user?.is_anonymous) {
+      // Deferred: auth-js callbacks must not call other auth methods synchronously.
+      setTimeout(() => void supabase.auth.signOut({ scope: 'local' }), 0);
+      onChange(null);
+      return;
+    }
+    onChange(user ? toAuthUser(user) : null);
+  });
+  return () => data.subscription.unsubscribe();
+}
+
+type SignInFailure = { code?: string; status?: number; name?: string };
+
+/**
+ * Patient-facing text for a failed password sign-in. A wrong password and an unknown email get the
+ * same answer, so the form can't be used to find out which emails have accounts.
+ */
+export function signInErrorText(error: SignInFailure): string {
+  if (error.code === 'invalid_credentials')
+    return 'That email and password don’t match. Check them and try again.';
+  if (error.code === 'email_not_confirmed')
+    return 'This account’s email hasn’t been confirmed yet.';
+  if (error.status === 429 || error.code?.startsWith('over_'))
+    return 'Too many sign-in attempts. Wait a minute, then try again.';
+  if (error.name === 'AuthRetryableFetchError' || error.status === 0)
+    return 'Could not reach the care service. Check your connection and try again.';
+  return 'We couldn’t sign you in. Try again in a moment.';
+}
+
+/** Email + password sign-in. Rejects with an Error whose message is safe to show the patient. */
+export async function signIn(email: string, password: string): Promise<void> {
+  let failure: SignInFailure | null = null;
+  try {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    failure = error;
+  } catch {
+    failure = { status: 0 };
+  }
+  if (failure) throw new Error(signInErrorText(failure));
+}
+
+/** Ends this browser's session only (`local`), so other devices staying signed in aren't kicked out. */
+export async function signOut(): Promise<void> {
+  const { error } = await supabase.auth.signOut({ scope: 'local' });
+  if (error) throw new Error('Could not sign you out. Try again.');
 }
 
 /** A non-2xx edge-function response, with the contract's `code` and 429 retry hint. */

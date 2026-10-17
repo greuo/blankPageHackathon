@@ -1817,3 +1817,29 @@
     gap: 4px;
   }
 }
+
+/* The sign-out control made the header actions one button wider. Where that no longer fits, show
+   the sound toggle as an icon (its text stays available to screen readers) and, on the narrowest
+   phones, trim the round buttons from 44px to 40px. */
+@media (max-width: 900px) {
+  .patient-header-actions .care-sound-toggle {
+    padding: 0;
+    width: 44px;
+  }
+  .patient-header-actions .care-sound-toggle span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+@media (max-width: 360px) {
+  .patient-header-actions .care-sound-toggle,
+  .patient-header-actions .icon-btn {
+    width: 40px;
+    height: 40px;
+    min-height: 40px;
+  }
+}
