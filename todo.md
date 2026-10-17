@@ -21,10 +21,16 @@ Shared list for both sides.
 - [x] Pick stack (Supabase) and set up `backend/` (2026-10-17, Andrew)
 - [x] Hospital access model: roles, care teams, conversations, escalations, RLS + tests (2026-10-17, Andrew)
 - [x] `admin-create-user` and `escalate` edge functions (2026-10-17, Andrew)
-- [ ] Chatbot edge function: reply to patient messages with Claude, escalate when a human is needed (2026-10-17, Andrew)
-- [ ] Escalation inbox query: open first, own patients (`routed_to = me`) on top (2026-10-17, Andrew)
-- [ ] Try `admin-create-user` and `escalate` with real demo logins (2026-10-17, Andrew)
+- [ ] ~~Chatbot edge function with hospital escalation~~ replaced by `chat` below (patient-only pivot, see `PLAN.md`) (2026-10-17, Andrew)
+- [ ] ~~Escalation inbox query~~ dropped: no doctor accounts after the pivot (2026-10-17, Andrew)
+- [ ] ~~Try `admin-create-user` and `escalate` with real demo logins~~ dropped: both functions go away (2026-10-17, Andrew)
 - [ ] Turn on leaked-password protection in Supabase Auth settings (2026-10-17, Andrew)
+- [ ] Patient-only migration: replace hospital model with `patients`, `doctors`, `care_notes`, `messages`, `doctor_messages`, `entry_links` + RLS + tests (2026-10-17, Andrew)
+- [ ] Guest mode: enable Supabase anonymous sign-in; guest → email account upgrade keeps data (2026-10-17, Andrew)
+- [ ] `chat` edge function: Claude answers from the current care notes, flags when to notify the doctor (2026-10-17, Andrew)
+- [ ] `notify-doctor` + `view-doctor-message`: email a link-only notice, token-checked page data (2026-10-17, Andrew)
+- [ ] `entry-link` + `doctor-entry`: optional QR flow for the doctor's own phone (2026-10-17, Andrew)
+- [ ] Pick email provider (Resend?) and sending address (2026-10-17, Andrew)
 
 ## Ideas
 

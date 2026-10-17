@@ -13,7 +13,7 @@ Snapshot of what exists right now. Rewrite it each session; don't append.
   - Edge functions `admin-create-user` and `escalate` deployed; both reject unauthenticated calls.
   - Demo data seeded on the hosted project (2 hospitals, 9 users). The demo password is in Andrew's `backend/.env.local` (not committed); ask him.
   - Realtime on `messages` and `escalations`.
-- **In progress:** nothing
+- **In progress:** patient-only pivot (agreed 2026-10-17, see `PLAN.md`). Next up is the migration that replaces the hospital model below; until it lands, everything below describes the old model.
 - **Known issues:**
   - The chatbot itself doesn't exist yet: bot messages in the seed are hard-coded.
   - Edge function role checks (admin vs doctor, owner vs other patient) are written but not yet exercised with real logins.
@@ -62,6 +62,12 @@ Newest first. One entry per session:
 - **Next:** what should happen next
 - **Notes:** blockers, decisions, gotchas (optional)
 ```
+
+### 2026-10-17 · Andrew (pivot)
+- **Did:** Wrote `PLAN.md`: patient-only app, Doctor mode on the patient's phone (optional QR form), guest or signed-in patients, link-only doctor emails backed by Supabase. Whole team agreed. Updated `overlap.md` Agreed (auth, roles, data shapes) and the backend to-dos.
+- **Files:** `PLAN.md`, `overlap.md`, `todo.md`, this file
+- **Next:** patient-only migration + RLS tests, anonymous sign-in, then the `chat` edge function.
+- **Notes:** We trust the patient: doctor notes aren't locked against edits. The old hospital tables and the `admin-create-user` / `escalate` functions go away with the migration.
 
 ### 2026-10-17 · Andrew
 - **Did:** Picked Supabase. Built the hospital access model (schema, RLS, triggers), seeded demo data, deployed `admin-create-user` and `escalate` edge functions, wrote and ran RLS tests. Fixed two PR review findings in a second migration: patients can see the profile of a non-care-team doctor who replied after an escalation, and reopening an escalation clears `resolved_at` (49/49 pass).
