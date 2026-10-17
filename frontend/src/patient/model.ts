@@ -183,6 +183,8 @@ export function reply(state: PatientState, question: string) {
   const { day, percent } = timeline(state);
   if (/progress|how far|summary|report/i.test(question))
     return `You are on day ${day} of your ${state.duration}-day plan (${percent}% of planned time). This describes your timeline. Your report includes ${state.checkIns.length} check-ins and ${Object.values(state.doses).reduce((n, a) => n + a.length, 0)} reported doses. Open Progress report to review the details.`;
+  if (/show my provided instructions/i.test(question))
+    return `Your provided instructions:\n${state.instructions}\nSource: text added for ${state.doctor}. Clinician identity has not been verified in this demo.`;
   if (/tasks|to.do/i.test(question))
     return dailyTasks.map((task) => `${task.title}: ${task.detail}`).join('\n');
   if (/check.?in|feeling/i.test(question))

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { Bot, Maximize2, Minimize2, Send, FileText, CircleHelp } from 'lucide-react';
+import { MessageCircle, Maximize2, Minimize2, Send, FileText, CircleHelp } from 'lucide-react';
 import { Skeleton, errorText } from '../components/ui';
 import { useSurfaceEntrance } from '../components/motion';
 import { id, isEmergency, reply, type PatientState } from './model';
@@ -69,11 +69,13 @@ export default function Assistant({
     >
       <header className="assistant-heading">
         <span className="patient-icon">
-          <Bot size={26} />
+          <MessageCircle size={25} />
         </span>
         <div>
-          <h2>Care assistant</h2>
-          <p>Ask about your care plan</p>
+          {!expanded && <h2>Care assistant</h2>}
+          <p>
+            {expanded ? 'Your questions. Your provided guidance.' : 'Here with your care plan.'}
+          </p>
         </div>
         <button
           className="icon-btn"
@@ -117,7 +119,7 @@ export default function Assistant({
           <div key={message.id} className={`patient-message ${message.role}`}>
             {message.role === 'assistant' && (
               <span className="message-icon">
-                <Bot size={19} />
+                <MessageCircle size={18} />
               </span>
             )}
             <p>{message.text}</p>
@@ -127,8 +129,10 @@ export default function Assistant({
       </div>
       <div className="assistant-prompts">
         <button onClick={() => void send('Review my tasks')}>Review my tasks</button>
-        <button onClick={() => void send('What can you do?')}>How you can help</button>
-        <button onClick={onReport}>
+        <button onClick={() => void send('Show my provided instructions')}>
+          Your instructions
+        </button>
+        <button className="assistant-report-link" onClick={onReport}>
           <FileText size={15} />
           Progress report
         </button>

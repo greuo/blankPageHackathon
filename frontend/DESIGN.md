@@ -1,52 +1,49 @@
-# Discharge Companion design
+# Care companion design
 
-Current direction, October 17, 2026: light blue, mint and cool off-white, friendly rounded typography and a short automatic introduction. This replaces the earlier ivory/serif direction. Design names, palette choices and research language belong in these documents, never in product copy.
+Current direction: a light patient recovery workspace with clear blue and mint regions, rounded Nunito typography and flat surfaces. Ranveer's two original desktop compositions define the product structure. His newer healthcare mobile references inform hierarchy, navigation and grouping. They are inspiration rather than a booking/doctor-directory feature request.
 
-## Design DNA
+## Tokens and typography
 
-A calm recovery workspace with a clearer blue presence. Flat rows, small corners, readable guidance and consistent spacing keep the experience composed. Green communicates support and confirmation; blue identifies actions and selected surfaces. No gradients, shadows, pure-white backgrounds, rainbow categories, colored left stripes, sparkle decorations, glass effects or animated arrows.
+| Token       | Value     | Role                                          |
+| ----------- | --------- | --------------------------------------------- |
+| Canvas      | `#F2F7FA` | Cool off-white page                           |
+| Surface     | `#F9FCFE` | Task rows, forms and dialogs                  |
+| Blue        | `#DCEFFF` | Welcome, navigation and assistant context     |
+| Mint        | `#D9F3E9` | Support and confirmation                      |
+| Action      | `#246DBB` | Primary actions                               |
+| Green       | `#167660` | Add instructions, reported state and timeline |
+| Ink         | `#183A4B` | Text and icons                                |
+| Muted       | `#4F6878` | Supporting copy                               |
+| Line        | `#CDDFE8` | Structural dividers                           |
+| Strong line | `#809CAB` | Control boundaries                            |
+| Danger      | `#9A453D` | Urgent and destructive actions                |
 
-| Token       | Value     | Role                              |
-| ----------- | --------- | --------------------------------- |
-| Canvas      | `#F5F9FC` | Cool off-white page               |
-| Surface     | `#FAFDFE` | Forms and dialogs                 |
-| Blue        | `#D6EDFB` | Welcome zone and message surfaces |
-| Mint        | `#DAF1E6` | Support and confirmation surfaces |
-| Action      | `#3271AB` | Primary buttons                   |
-| Green       | `#247454` | Confirmation and approved states  |
-| Rail        | `#EAF2F6` | Navigation field                  |
-| Selected    | `#D7E8F2` | Selected navigation               |
-| Ink         | `#20394A` | Text and navigation icons         |
-| Muted       | `#4F6470` | Supporting copy                   |
-| Line        | `#C1D2DA` | Dividers                          |
-| Strong line | `#819BA9` | Control boundaries                |
-| Earth       | `#805D2A` | Caution                           |
-| Danger      | `#9A453D` | Errors and destructive actions    |
+The blue/mint relationship was adapted from [Color Hunt](https://colorhunt.co/palette/3674b5578fcaa1e3f9d1f8ef) and refined against readable foregrounds. Palette names and design-process text stay out of the app.
 
-Adapted from [Color Hunt blue and mint](https://colorhunt.co/palette/3674b5578fcaa1e3f9d1f8ef), with lighter surfaces and darker readable foregrounds. See [research](docs/DESIGN-RESEARCH.md) for alternatives and attribution.
+One self-hosted Latin **Nunito Variable** WOFF2 asset supplies the interface. Main headings use 800; controls 700–750; body 400. Desktop greeting is 32–41px according to breakpoint; mobile is 30px. Sections are 21–24px; task titles 17–18px; editable fields and most care text stay 15–16px. Headings balance short lines, care text wraps naturally and numeric progress uses tabular figures. Font license is distributed at `public/fonts/Nunito-LICENSE.txt`.
 
-## Typography and structure
+## Layout and shape
 
-Self-hosted **Nunito Variable**, one Latin WOFF2 asset, replaces Newsreader and Source Sans 3. Its softer letterforms follow Ranveer's confirmed preference. Body text is 400; headings generally 650–750. Workspace titles scale 32–48px, sections 25–26px and care rows 18px. Editable inputs and messages remain 16px. Care information stays on plain surfaces, outside photography.
+Desktop uses an 82px horizontal header, a 1440px maximum page and two working columns with a 28px gap. Home, My instructions and Progress connect to real existing flows. The blue greeting includes the actual local date and Add action. To-Do remains the exact requested heading; freestanding rows show patient report state. Provided guidance uses a blue region. A mint timeline shows elapsed plan time and the next actual milestone. It never claims healing percentage.
 
-Desktop retains a navigation rail, utility bar, welcome band and two working columns. Five care contexts use divided rows. Columns stack below 960px; navigation becomes a horizontal text row below 760px. Spacing follows 4/8/12/16/24/32/40 units; corners are 3px. The locally served dune photograph remains in the workspace, with a genuine pending-image skeleton.
+The assistant has a blue header, quiet transcript, exact-instructions shortcut, report control and a stable composer. Its message log scrolls independently and preserves older-message reading position. Expanded mode fills the viewport with narrow gutters and one title. Native dialog focus containment, Escape, explicit close and return focus remain.
 
-## Opening and motion
+Below 850px the dashboard stacks and a fixed Home/My plan/Companion dock connects to existing navigation. Space is reserved below content and focus targets have a bottom scroll margin. At 390px, task icons recede to preserve text width; native checkboxes and action labels remain clear. The assistant becomes an in-page panel and can expand to a nearly full viewport.
 
-The initial HTML contains the same centered monogram, title, tagline and canvas as React. An authored GSAP sequence draws two blue/green frame paths, settles the monogram and type, then automatically opens the workspace after approximately 1.06 seconds. A visible Skip intro control enters immediately. Session storage remembers entry; the sidebar wordmark replays the intro. Focus moves into main on completion.
+Add instructions is a centered page up to 1060px wide. Doctor name/email are paired on desktop and stack on mobile. Source wording, attachments and Cancel/Save follow one clear vertical sequence. Source, check-in, pill, roadmap, report and urgent dialogs use the same form vocabulary.
 
-Reduced motion bypasses the timed intro and removes spatial/transitional effects. GSAP selectors are scoped with lifecycle cleanup; skip cancels the active sequence. The interface remains readable without animation. A 50ms end-to-end paint time is not guaranteed.
+Corners range from 5–12px according to control and surface scale. Structure comes from spacing, tinted regions and single borders. Icons use the existing Lucide library. No clinician portraits or generated product screenshots are introduced.
 
-Workspace sections, tab content, conversations, newly shown messages, disclosures and dialogs have short state transitions. Dialog exit lasts 140ms and preserves native modality and focus restoration. Hover remains static. Skeletons show only while images or replies are actually pending, with a quiet opacity pulse and no shimmer gradient. No artificial loading delay is inserted.
+## Motion and state
 
-## Product truth
+The initial HTML and React opening share the final canvas, title and centered geometric mark. A scoped GSAP line/wordmark sequence enters automatically after about 1.06 seconds. Skip enters immediately; reduced motion bypasses the timed sequence. Session storage remembers entry, and a demo control can replay it. Focus enters main afterward.
 
-This remains a fictional browser-local frontend. Backend connection is deferred. No server authentication, live LLM or remote delivery is implied. Existing permissions and publication behavior remain intact. The next larger overhaul is patient-focused, with clinician input and a patient companion, pending Ranveer's full prompt/reference image.
+Interface transitions communicate state with short enter/exit motion, including 140ms dialog exit. GSAP contexts clean up and empty selectors return before starting animation. Default content remains readable. Hover stays static. Real pending images/replies have skeleton feedback; no artificial loading wait is added. Reduced-motion CSS/JS guards remove motion. No 50ms paint or frame-rate guarantee is claimed.
 
-## Patient-only reference implementation
+Keep empty, pending, saved and failed states explicit. Errors appear inside their active dialog. Emergency help opens even if persistence fails. Check-in emergency detection occurs on submission, with the interrupted draft restored on return.
 
-Ranveer supplied two selected reference images: a patient dashboard with task/important-guidance/timeline stack beside a companion, and a centered Add instructions form. The current app uses that composition. It replaces the navigation rail and care-space overview with a simple horizontal Home header, notifications and patient report control. The photograph and role picker are absent from the patient UI.
+## Product truth and exclusions
 
-At 1536px the dashboard uses approximately two-thirds content and one-third chat, with a 24px gap and 32px page inset. The chat is sticky and independently scrollable. Below 850px the content stacks and chat becomes an in-page panel. Add instructions uses a 1080px maximum width, two doctor fields on desktop, one column on mobile, a large source textarea and a file drop target. Form fields align at the top.
+Patient-only fictional browser-local prototype. No reachable doctor/family/admin screen. Clinician verification, live model, document extraction, email delivery and hosted report links remain deferred. The companion quotes provided text and reports recorded entries. Adding text does not silently change the prepared dose schedule or read-only roadmap.
 
-User-selected Nunito and cool off-white tokens intentionally override the reference's pure white, shadows and stronger roundness. Panels use 8–10px corners, rows 6px and chat bubbles 9px. Icons come from the existing Lucide library. No raster illustration is needed for these functional screens. The pre-existing custom geometric opening remains, now titled Care companion.
+No gradients, shadows, pure-white canvas, hover movement, rainbow/neon category colors, glass, sparkle decorations, colored left stripes, three-feature-card rows, fake testimonials, pricing or legal-footer clutter. Medical urgency remains distinct from routine guidance. No contrast slogans or palette commentary appear in product copy.

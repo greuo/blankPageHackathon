@@ -54,6 +54,7 @@ describe('patient-only model', () => {
   it('quotes provided instructions and declines missing clinical answers', () => {
     const state = seed(now);
     state.instructions = 'Read the journal before your visit.';
+    expect(reply(state, 'Show my provided instructions')).toContain(state.instructions);
     expect(reply(state, 'Tell me about my journal')).toContain(
       '“Read the journal before your visit.”',
     );

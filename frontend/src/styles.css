@@ -6,18 +6,18 @@
   font-weight: 400;
   font-size: 16px;
   line-height: 1.55;
-  --canvas: #f5f9fc;
-  --surface: #fafdfe;
-  --ink: #20394a;
-  --muted: #4f6470;
-  --green: #247454;
-  --mint: #daf1e6;
-  --blue: #d6edfb;
-  --action: #3271ab;
+  --canvas: #f2f7fa;
+  --surface: #f9fcfe;
+  --ink: #183a4b;
+  --muted: #4f6878;
+  --green: #167660;
+  --mint: #d9f3e9;
+  --blue: #dcefff;
+  --action: #246dbb;
   --rail: #eaf2f6;
   --selected: #d7e8f2;
-  --line-strong: #819ba9;
-  --line: #c1d2da;
+  --line-strong: #809cab;
+  --line: #cddfe8;
   --earth: #805d2a;
   --danger: #9a453d;
   --white: var(--surface);
@@ -551,7 +551,7 @@ legend {
   max-width: min(1120px, calc(100vw - 48px));
 }
 .modal::backdrop {
-  background: #20394a70;
+  background: #183a4b70;
 }
 .dialog-header {
   padding: 20px 26px;
@@ -1359,7 +1359,7 @@ a {
   font-size: 28px;
 }
 .modal::backdrop {
-  background: #20394a7a;
+  background: #183a4b7a;
 }
 .brand {
   display: inline-flex;
