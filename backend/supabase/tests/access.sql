@@ -145,6 +145,12 @@ select pg_temp.try_write('Alex: can delete an own version', true,
   $q$delete from care_notes where id = '00000000-0000-0000-0000-000000000301'$q$);
 select pg_temp.try_write('Alex: cannot delete Sam''s care notes', false,
   $q$delete from care_notes where patient_id = '00000000-0000-0000-0000-000000000102'$q$);
+select pg_temp.try_value('Alex: deleting the latest version doesn''t reuse its number (next is 3)', 3,
+  $q$with gone as (delete from care_notes where id = '00000000-0000-0000-0000-000000000302' returning 1)
+     insert into care_notes (doctor_id, content)
+     select '00000000-0000-0000-0000-000000000201', '{"reason":"Check-up"}' from gone returning version$q$);
+select pg_temp.try_write('Alex: cannot change own version counter', false,
+  $q$update patients set last_note_version = 0 where id = '00000000-0000-0000-0000-000000000101'$q$);
 
 -- Chat
 select pg_temp.try_write('Alex: can write a patient message', true,
@@ -254,6 +260,69 @@ select pg_temp.try_signup('Sign-up: email user gets a patients row named from me
 select pg_temp.try_signup('Sign-up: guest (anonymous) gets a patients row too',
   '00000000-0000-0000-0000-000000000902', null, true,
   '{}', null);
+
+-- ---------------------------------------------------------------- Doctor-message limits (as postgres)
+-- notify-doctor writes with the service role, so the limits are checked as a privileged writer.
+select pg_temp.try_write('Limits: email patient can message their doctor', true,
+  $q$insert into doctor_messages (patient_id, doctor_id, content, token_hash)
+     values ('00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000201', 'hi', 'check-1')$q$);
+select pg_temp.try_write('Limits: guest cannot message their doctor (must add an email)', false,
+  $q$insert into doctor_messages (patient_id, doctor_id, content, token_hash)
+     values ('00000000-0000-0000-0000-000000000102', '00000000-0000-0000-0000-000000000202', 'hi', 'check-2')$q$);
+select pg_temp.try_write('Limits: cannot send without a doctor', false,
+  $q$insert into doctor_messages (patient_id, content, token_hash)
+     values ('00000000-0000-0000-0000-000000000101', 'hi', 'check-3')$q$);
+select pg_temp.try_write('Limits: 5 messages in an hour are allowed', true,
+  $q$insert into doctor_messages (patient_id, doctor_id, content, token_hash)
+     select '00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000201', 'hi', 'hour-' || i
+     from generate_series(1, 5) i$q$);
+select pg_temp.try_write('Limits: a 6th message in the same hour is blocked', false,
+  $q$insert into doctor_messages (patient_id, doctor_id, content, token_hash)
+     select '00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000201', 'hi', 'hour-' || i
+     from generate_series(1, 6) i$q$);
+-- The seeded doctor message is over a day old, so it doesn't count towards today's cap of 10.
+select pg_temp.try_write('Limits: up to 10 messages a day to one doctor address', true,
+  $q$insert into doctor_messages (patient_id, doctor_id, content, token_hash, created_at)
+     select '00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000201', 'hi', 'day-' || i,
+            now() - interval '2 hours'
+     from generate_series(1, 10) i$q$);
+select pg_temp.try_write('Limits: an 11th message that day to the same address is blocked', false,
+  $q$insert into doctor_messages (patient_id, doctor_id, content, token_hash, created_at)
+     select '00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000201', 'hi', 'day-' || i,
+            now() - interval '2 hours'
+     from generate_series(1, 11) i$q$);
+
+select pg_temp.try_value('Limits: the recipient address is stored on the message', 1,
+  $q$insert into doctor_messages (patient_id, doctor_id, content, token_hash)
+     values ('00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000201', 'hi', 'addr-1')
+     returning (recipient_email = 'maya.okafor@example.com')::int$q$);
+-- Editing the doctor's email and re-adding the address as a new doctor must not reset the count.
+create or replace function pg_temp.recipient_cap_bypass() returns bigint language plpgsql as $$
+declare d uuid;
+begin
+  insert into public.doctor_messages (patient_id, doctor_id, content, token_hash, created_at)
+  select '00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000201', 'hi', 'bypass-' || i,
+         now() - interval '2 hours'
+  from generate_series(1, 10) i;
+  update public.doctors set email = 'someone.else@example.com' where id = '00000000-0000-0000-0000-000000000201';
+  insert into public.doctors (patient_id, name, email)
+  values ('00000000-0000-0000-0000-000000000101', 'Dr. Again', 'Maya.Okafor@example.com') returning id into d;
+  insert into public.doctor_messages (patient_id, doctor_id, content, token_hash)
+  values ('00000000-0000-0000-0000-000000000101', d, 'hi', 'bypass-11');
+  return 1;
+end $$;
+select pg_temp.try_value('Limits: editing the doctor row doesn''t reset the per-address cap (-1 = blocked)', -1,
+  $q$select pg_temp.recipient_cap_bypass()$q$);
+
+-- ---------------------------------------------------------------- Default privileges
+insert into results (check_name, expected, actual)
+select 'Future public tables: no write grants for anon/authenticated by default', 0, count(*)
+from pg_default_acl d, aclexplode(d.defaclacl) a
+join pg_roles r on r.oid = a.grantee
+where d.defaclnamespace = 'public'::regnamespace and d.defaclobjtype = 'r'
+  and d.defaclrole = 'postgres'::regrole
+  and r.rolname in ('anon', 'authenticated')
+  and a.privilege_type in ('INSERT', 'UPDATE', 'DELETE', 'TRUNCATE', 'REFERENCES', 'TRIGGER');
 
 -- ---------------------------------------------------------------- Realtime
 insert into results (check_name, expected, actual)

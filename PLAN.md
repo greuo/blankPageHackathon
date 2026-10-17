@@ -51,7 +51,7 @@ Supabase, as before. The patient is the only signed-in user; guests use Supabase
 | --- | --- | --- |
 | `patients` | `id` (= auth user), `display_name`, `created_at` | own row |
 | `doctors` | `id`, `patient_id`, `name`, `email`, `clinic`, `clinic_phone` | owning patient |
-| `care_notes` | `id`, `patient_id`, `doctor_id`, `version`, `content` (JSON: reason, meds, instructions, warning signs, contact rules, follow-up), `entered_via` (`patient_phone` \| `qr`), `created_at` | owning patient; latest version = current |
+| `care_notes` | `id`, `patient_id`, `doctor_id`, `version`, `content` (JSON: reason, meds, instructions, warning signs, contact rules, follow-up), `entered_via` (`patient_phone` \| `qr`), `created_at` | owning patient; latest version = current (see **Care notes with more than one doctor**) |
 | `messages` | `id`, `patient_id`, `sender` (`patient` \| `bot`), `content`, `created_at` | owning patient |
 | `doctor_messages` | `id`, `patient_id`, `doctor_id`, `content`, `token_hash`, `expires_at`, `opened_at`, `created_at` | owning patient; doctor reads through `view-doctor-message` |
 | `entry_links` | `id`, `patient_id`, `token_hash`, `expires_at`, `used_at` | owning patient; doctor writes through `doctor-entry` |
@@ -61,14 +61,41 @@ Edge functions:
 | Function | Who calls it | What it does |
 | --- | --- | --- |
 | `chat` | patient | Sends the message + current care notes to Claude, stores and returns the bot reply, flags "should notify doctor" |
-| `notify-doctor` | patient | Creates a `doctor_messages` row and emails the doctor the link |
+| `notify-doctor` | patient with an email account | Creates a `doctor_messages` row and emails the doctor the link. Rate-limited (see **Doctor emails: abuse limits**) |
 | `view-doctor-message` | anyone with the link | Checks the token and returns the message, patient first name and current care notes |
 | `entry-link` | patient | Creates a QR token |
 | `doctor-entry` | anyone with a QR token | Returns the current notes, saves a new version, marks the token used |
 
+### Care notes with more than one doctor
+
+- A patient has **one** set of care notes. `version` counts per patient (`unique (patient_id, version)`), and the highest version is the current notes. Version numbers are never reused, even after a delete.
+- `doctor_id` on a version is the doctor who saved it, not the owner of the notes.
+- Doctor mode (and the QR form) always opens pre-filled with the current notes and saves the whole set. So when a second doctor (say a GP after a cardiologist) saves, they edit on top of what's there, and nothing silently disappears. Items can name their doctor in the text if it matters ("Dr. Okafor: …").
+- Two saves at once can't get the same number: the server numbers versions under a per-patient lock. The later save becomes current; the earlier one stays in the history.
+
+### Doctor emails: abuse limits
+
+Guests are free to create, and the patient types in the doctor's email, so without limits `notify-doctor` would be an open relay. Enforced in the database (a trigger on `doctor_messages`), so it holds whatever the function does:
+
+- Only a patient with an email account can send. A guest is asked to add an email first (same account, data kept).
+- At most 5 doctor messages per patient per hour and 20 per day.
+- At most 10 messages per recipient address per day, across all patients. The address is saved on each message, so editing or deleting the doctor afterwards doesn't reset the count.
+- The email body is fixed text. The only patient-controlled part is the first name, which `notify-doctor` must escape and cut to 40 characters.
+
+The `chat` function is also rate-limited (20 messages per 10 minutes, 200 per day per patient), since each message can cost a Claude call. Supabase limits anonymous sign-ups to 30 per hour per IP; turn on captcha if that's not enough.
+
+### Care-notes content shape
+
+`content` is a JSON object. The backend accepts both:
+
+- the full shape above: `{ reason, medications: [{ name, dose, when, until }], instructions: [..], warning_signs: [{ sign, action }], contact_rules, follow_up }`
+- free text, which is what the frontend's "Add instructions" page has today: `{ "instructions": "line one\nline two" }`
+
+`chat` reads any keys, splits free text into lines and cites them, so the frontend can start with free text and move to the full shape later without a backend change.
+
 ## What changes from current code
 
-- **Backend:** the hospital / admin / nurse / care-team / escalation model gets replaced by a new migration. The `admin-create-user` and `escalate` functions go away; `escalate`'s logic becomes `notify-doctor`.
+- **Backend:** the hospital / admin / nurse / care-team / escalation model gets replaced by a new migration. The `admin-create-user` and `escalate` functions go away; `escalate`'s logic becomes `notify-doctor`. `chat` keeps PR #4's safety design (red-flag screen before the model, answers only when they cite the notes, everything else refers to the doctor).
 - **Frontend:** the clinician builder (draft, preview, publish) maps onto Doctor mode; the role switcher becomes "patient app + Doctor mode". Frontend decides what happens to family access.
 
 ## Open questions

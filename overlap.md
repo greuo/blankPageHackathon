@@ -17,9 +17,15 @@ Things both sides rely on: API base URL, ports, data shapes, auth, env vars. Eit
 - **Auth:** patients only. Guest = Supabase anonymous sign-in; signed in = email + password, self sign-up. A guest can upgrade to an account and keep their data.
 - **Roles:** none. Every signed-in user (guest or not) is a patient and sees only their own rows.
 - **Data shapes:** the patient-only tables are live (2026-10-17); "Data model", "Edge functions" and the supabase-js cheat sheet in `backend_progress.md` are the source of truth. `PLAN.md` has the overview. Edge function contracts get added there as each one lands.
-- **Demo logins:** `alex@demo.example.com` (patient with a doctor, two care-note versions, chat and a sent doctor message; password: ask Andrew). Guest: `supabase.auth.signInAnonymously()` gives a fresh, empty patient (on hosted once the dashboard toggle is on). The old hospital logins are deleted.
+- **Demo logins:** `alex@demo.example.com` (patient with a doctor, two care-note versions, chat and a sent doctor message; password: ask Andrew). Guest: `supabase.auth.signInAnonymously()` gives a fresh, empty patient (on hosted too, since 2026-10-17). The old hospital logins are deleted.
 
 ## Backend → Frontend
+
+- [ ] 2026-10-17 · Andrew: **`chat` is live for the patient-only tables, and guest sign-in is on hosted.**
+  - Call `supabase.functions.invoke('chat', { body: { content } })` instead of inserting into `messages` yourself. It saves the patient message and the bot reply (both also arrive by realtime). Response: `{ patient_message, reply, action, suggest_notify_doctor }`, `action` is `answered` | `small_talk` | `referred` | `emergency`. When `suggest_notify_doctor` is true, offer "Send to my doctor". 429 means too many messages (20 per 10 minutes).
+  - Care notes: saving your free-text instructions as `{ "instructions": "…" }` works today; the bot reads it line by line. See `PLAN.md` → Care-notes content shape.
+  - "Send to my doctor" will need an email account: guests get asked to add an email first (anti-spam, `PLAN.md` → Doctor emails: abuse limits).
+  - `supabase.auth.signInAnonymously()` now works on hosted.
 
 - [ ] 2026-10-17 · Andrew: **Patient-only tables are live on hosted; bind to these.** Full columns, rules and supabase-js snippets: `backend_progress.md` → Data model / cheat sheet.
   - `patients` (`id` = auth user, `display_name`): created on sign-up; you can update `display_name`.
