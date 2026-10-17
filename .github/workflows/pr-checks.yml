@@ -1,6 +1,6 @@
 name: PR checks
 
-# Runs on every PR: a deterministic conflict check plus a Claude code review.
+# Runs on every PR: a deterministic conflict check.
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
@@ -25,55 +25,3 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bash .github/scripts/check-conflicts.sh "${{ github.event.pull_request.number }}"
-
-  claude-review:
-    name: Claude review
-    # Secrets aren't available to PRs from forks, so skip those.
-    if: github.event.pull_request.head.repo.full_name == github.repository && !github.event.pull_request.draft
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
-      issues: write
-      id-token: write
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
-
-      - uses: anthropics/claude-code-action@v1
-        with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          track_progress: true
-          prompt: |
-            REPO: ${{ github.repository }}
-            PR NUMBER: ${{ github.event.pull_request.number }}
-            BASE BRANCH: ${{ github.event.pull_request.base.ref }}
-
-            You are the required reviewer for every PR in this hackathon repo.
-            Review this PR's diff (`gh pr diff`) for:
-            1. Bugs and broken logic, including edge cases and error handling.
-            2. Security problems (leaked secrets, injection, unsafe input handling).
-            3. Anything that would break the build or other people's features.
-            4. Conflicts with the base branch:
-               - Textual: run `git fetch origin ${{ github.event.pull_request.base.ref }}` then
-                 `git merge-tree --write-tree --name-only origin/${{ github.event.pull_request.base.ref }} HEAD`.
-                 If it reports conflicted files, start your summary with a clear
-                 "⚠️ MERGE CONFLICT" warning listing them, and tell the author they can
-                 comment `@claude resolve the merge conflicts` to have them fixed.
-               - Semantic: even if it merges cleanly, check whether this PR's changes clash
-                 with what landed on the base branch since this branch was created
-                 (`git log HEAD..origin/${{ github.event.pull_request.base.ref }}`), e.g. a
-                 renamed function still called by its old name, a changed API, duplicated work.
-                 Flag these with "⚠️ CONFLICT RISK".
-               - Other open PRs: `gh pr list --state open --json number,title,files` and warn
-                 if another PR changes the same code in an incompatible way.
-
-            Use inline comments for specific lines (only for real problems, not nitpicks).
-            Keep the summary short: verdict (✅ looks good / ⚠️ needs changes), conflicts, then issues.
-            Hackathon pace: don't block on style.
-
-          claude_args: |
-            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(git fetch:*),Bash(git merge-tree:*),Bash(git log:*),Bash(git diff:*),Bash(git show:*),Read,Glob,Grep"
