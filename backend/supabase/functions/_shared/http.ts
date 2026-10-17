@@ -25,15 +25,14 @@ export function callerClient(req: Request): SupabaseClient {
   });
 }
 
-export type Caller = { user: User; role: "admin" | "doctor" | "nurse" | "patient"; hospital_id: string };
+export type Caller = { user: User };
 
-// Resolves the signed-in user and their profile, or returns an error response.
+// Resolves the signed-in user from the bearer token, or returns an error response.
+// Every signed-in user (anonymous guest or email) is a patient: public.patients.id = user.id.
 export async function getCaller(req: Request, admin: SupabaseClient): Promise<Caller | Response> {
   const token = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "");
   if (!token) return json({ error: "Not signed in" }, 401);
   const { data: { user }, error } = await admin.auth.getUser(token);
   if (error || !user) return json({ error: "Not signed in" }, 401);
-  const { data: profile } = await admin.from("profiles").select("role, hospital_id").eq("id", user.id).single();
-  if (!profile) return json({ error: "No profile for this user" }, 403);
-  return { user, role: profile.role, hospital_id: profile.hospital_id };
+  return { user };
 }
