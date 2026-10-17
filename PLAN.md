@@ -26,13 +26,19 @@ One app, for patients only. There is no doctor app and no hospital setup, so any
 2. **Doctor visit.** The patient taps **Doctor visit** and hands over the phone. The doctor enters:
    - name, email, clinic, clinic phone
    - diagnosis or reason for the visit, in plain words
+   - what's normal to expect afterwards (so the chatbot can answer "is this normal?")
    - medications (what, how much, when, for how long)
    - instructions (activity, diet, wound care, …)
    - warning signs, and what to do about each one
    - when to contact them, and the next follow-up date
 
    **Optional:** instead of typing on the patient's phone, the doctor taps **Use my own phone**, scans the QR code, and fills in the same form in their browser. The link expires after 30 minutes and works once.
-3. **Chat.** The patient asks questions. The chatbot answers only from the doctor's notes plus general safety. It says when the notes don't cover something, and it sends emergencies to 911 or the clinic phone, never to email.
+3. **Chat.** The patient asks questions. The chatbot answers only from the doctor's notes plus general safety, but uses them sensibly:
+   - clear implications get a clear answer ("don't soak it in a pool" → "no swimming until the stitches are out")
+   - "is this normal?" gets "yes, that's expected" when the notes say so, plus the warning signs to watch for
+   - if the patient then describes one of those warning signs, the bot tells them what the notes say to do and offers **Send to my doctor**
+   - anything unclear (e.g. "can I cover it and swim anyway?"), any treatment change, or anything the notes don't cover: "check with your doctor"
+   - emergencies go to 911 or the clinic phone, never to email
 4. **Notify the doctor.** The patient taps **Send to my doctor**, or the chatbot suggests it (e.g. a warning sign comes up). The app saves the message in Supabase and emails the doctor a link. The email holds no medical details, only "Your patient <first name> sent you a message" and the link. The link opens a page showing the message and the current care notes.
 5. **Next visit.** The doctor opens Doctor mode again and edits the notes. Each save becomes a new version; the patient can see what changed and when.
 
@@ -88,7 +94,7 @@ The `chat` function is also rate-limited (20 messages per 10 minutes, 200 per da
 
 `content` is a JSON object. The backend accepts both:
 
-- the full shape above: `{ reason, medications: [{ name, dose, when, until }], instructions: [..], warning_signs: [{ sign, action }], contact_rules, follow_up }`
+- the full shape above, plus an optional `normal` list: `{ reason, normal: [..], medications: [{ name, dose, when, until }], instructions: [..], warning_signs: [{ sign, action }], contact_rules, follow_up }`. `normal` is what the doctor expects after the visit ("slight pinkness along the stitches for 2-3 days"); it's what lets the bot answer "is this normal?"
 - free text, which is what the frontend's "Add instructions" page has today: `{ "instructions": "line one\nline two" }`
 
 `chat` reads any keys, splits free text into lines and cites them, so the frontend can start with free text and move to the full shape later without a backend change.
