@@ -51,10 +51,10 @@ Skip all of this if the session changed nothing (e.g. it only answered questions
 - In `todo.md`, don't add, tick or remove items in the other side's section. Ask through `overlap.md` instead.
 - In `overlap.md`, write new notes only in your direction's section (or under "Agreed", following its rules). On the other side's notes you may only tick them and add a reply.
 - When resolving merge conflicts in these docs, keep both sides' entries. They're logs, so nothing should be dropped.
-- Automated runs (the PR review and `@claude` comments in GitHub Actions) skip the start and end steps above unless the comment asks for them, since there's no one to confirm the side.
+- Automated runs (`@claude` comments in GitHub Actions) skip the start and end steps above unless the comment asks for them, since there's no one to confirm the side.
 
 ## Repo workflow
 
 - `main` is protected: every change goes through a PR. See `README.md`.
-- Every PR gets a conflict check and a Claude review. Comment `@claude resolve the merge conflicts` on a PR to have conflicts fixed.
+- Every PR gets a conflict check. Comment `@claude resolve the merge conflicts` on a PR to have conflicts fixed.
 - Each side records its stack and how to run it under "Current state" in its progress file (backend: Supabase in `backend/`; frontend: React + Vite in `frontend/`).

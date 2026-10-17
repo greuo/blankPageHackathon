@@ -29,7 +29,9 @@ Snapshot of what exists right now. Rewrite it each session; don't append.
     - Sample admin, `admin@demo.example.com` (id `…0103`, in `seed.sql` and created on hosted 2026-10-17). An ordinary patient with an empty care space; the only difference is `app_metadata.role = 'admin'`, which only the service role can write. No policy or function reads it yet, so it is a label, not extra access. Password: `ADMIN_PASSWORD` in `backend/.env.local` (git-ignored); `local-demo-only` after a local `db reset`.
     - a guest "Sam" (anonymous, can't be logged into)
     - each has a doctor, care notes with a `normal` list (Alex v1 + v2, Sam v1) and a short chat. Alex has a sent doctor message, Sam a used QR link.
-- **Built, not deployed yet (PR `backend/doctor-message-link`):** `notify-doctor` and `view-doctor-message`, the secure-link doctor emails. Contracts below. Deploy both after merge, and only once the email secrets are set (see "Start here" step 1); until then `notify-doctor` answers 503 and saves nothing.
+- **Deployed, waiting on one secret:** `notify-doctor` and `view-doctor-message`, the secure-link doctor emails (contracts below). `APP_URL=https://foredge.me` and `EMAIL_FROM="Care companion <notify@mail.foredge.me>"` are set; `RESEND_API_KEY` is not, so `notify-doctor` answers 503 and saves nothing until it is.
+- **Email domain:** `mail.foredge.me` is verified in Resend (DKIM, SPF and DMARC records in Cloudflare DNS for `foredge.me`), so any doctor's address works.
+- **Frontend hosting:** `https://foredge.me` and `www.foredge.me` serve `frontend/dist` from the Cloudflare Worker `foredge` (static assets, SPA fallback so `/doctor-message` loads). Config `frontend/wrangler.jsonc`; deploy with `cd frontend && npm run deploy` (needs `npx wrangler login` to Andrew's Cloudflare account). The old Vercel `www` record is gone.
 - **Tests (all passing):**
   - `tests/access.sql`: 94/94 on hosted.
   - `chat` unit tests: 19/19.
@@ -48,9 +50,8 @@ Snapshot of what exists right now. Rewrite it each session; don't append.
     4. Rerun `tests/access.sql`.
     - Use the Supabase MCP, the SQL editor, or the Management API `POST /v1/projects/<ref>/database/query` with the CLI's token.
   - Bot behaviour change: deploy the branch as a temporary `chat-preview` function, run the cases in `chat/eval_live.ts` through it, then delete it. That way the live `chat` is never touched before merge.
-- **In progress:** login gate written, tested (123 frontend tests) and independently reviewed, but not committed (see the session log); once it is merged, turn off the hosted sign-up switch. Doctor-message PR open; needs the Resend key and the frontend's `/doctor-message` page. **Next: see "Start here: next session" below.**
+- **In progress:** login gate written, tested (123 frontend tests) and independently reviewed, committed on branch `feat/login-page` (not pushed or merged yet; see the session log); once it is merged, turn off the hosted sign-up switch. Doctor-message emails: set `RESEND_API_KEY` (currently the placeholder `re_PASTE_KEY`, so sends fail with 502) and send one real email end to end; `/doctor-message` (#17) is live on foredge.me. **Next: see "Start here: next session" below.**
 - **Known issues:**
-  - Demo email uses Resend's test sender `onboarding@resend.dev` (no domain): it only delivers to the Resend account owner's address, so the demo doctor's email must be that address. Other recipients fail with 502 and nothing is saved.
   - Leftovers from the doctor-message live test, still on hosted (the SQL cleanup was declined): one expired test message from Alex (`content` starts with `LIVE TEST`) and one anonymous test guest with doctor "Dr Test". Harmless; delete with `delete from public.doctor_messages where content like 'LIVE TEST%'; delete from auth.users where id = '7eba3d3a-d255-4809-9d93-6046f65d2d84';`
   - Supabase advisor: leaked-password protection is off (dashboard setting).
   - Supabase limits anonymous sign-ups to 30/hour per IP. Turn on captcha if that's not enough. (Moot once sign-ups are off.)
@@ -75,9 +76,8 @@ Today's work, in order (details in the session log):
 
 Backend features to build next, in this order. Each one goes in its own PR with tests and a contract added to the Edge functions table below:
 
-1. **Email setup (no domain needed for the demo).** Sign up at resend.com with the inbox the demo doctor will use, create an API key, then:
-   `supabase secrets set RESEND_API_KEY=re_… EMAIL_FROM="Care companion <onboarding@resend.dev>" APP_URL=<frontend URL> --project-ref repvtuxyszlqdjzciojx`. Set the demo doctor's email to that same inbox.
-2. **Merge the doctor-message PR, then deploy** `notify-doctor` and `view-doctor-message` (`--no-verify-jwt` on the second). Send one real email end to end.
+1. **Email key.** Domain, `APP_URL` and `EMAIL_FROM` are done. Create a sending API key in Resend, then `supabase secrets set RESEND_API_KEY=re_… --project-ref repvtuxyszlqdjzciojx`.
+2. ~~Deploy `notify-doctor` and `view-doctor-message`~~ done. Send one real email end to end once the key is set.
 3. ~~`notify-doctor`~~ and ~~`view-doctor-message`~~: built, contracts in the Edge functions table. Decisions: if the email fails the row is deleted (502), so it doesn't count against the limits; the per-IP limit on `view-doctor-message` is in memory per instance (tokens are 256-bit, so it only stops hammering); an expired link answers 410 `code: "expired"`.
 4. **`entry-link`** (patient): create an `entry_links` token (30 minutes, one use) and return `{ url: APP_URL/doctor-entry#<token>, expires_at }` for the QR code.
 5. **`doctor-entry`** (anyone with a QR token, `verify_jwt = false`).
@@ -186,6 +186,17 @@ Newest first. One entry per session:
 - **Files:** `backend/supabase/config.toml`, `backend/supabase/seed.sql`, `frontend/src/auth/*`, `frontend/src/data/supabase.ts` (top block), `frontend/src/data/supabase.auth.test.ts`, `frontend/src/patient/PatientApp.tsx`, `PatientApp.auth.test.tsx`, `store.ts` + `store.owner.test.ts`, `model.ts` (seed takes a name), `patient.css` (header fit), `frontend/src/App.tsx` + `App.test.tsx`, `PLAN.md`, `overlap.md`, `todo.md`, this file
 - **Next:** merge the login gate, then turn off "Allow new users to sign up" on hosted (dashboard) and confirm `GET /auth/v1/settings` says `disable_signup: true`. Team to ack that guests and self sign-up are gone (changes `overlap.md` → Agreed → Auth).
 - **Notes:** I could not flip the hosted switch myself: the permission check denied reading the Supabase CLI token from the keychain, which the Management API call needs. `supabase config push` is not an option either: it would rewrite eight unrelated hosted auth settings (see Known issues). Nothing is committed from this session; the frontend files sit in the shared checkout beside another Claude session's chat-binding work.
+### 2026-10-17 · Andrew (remove the Claude PR review)
+- **Did:** Removed the broken Claude review from CI: deleted the `claude-review` job from `.github/workflows/pr-checks.yml` (the deterministic conflict check stays), updated `README.md` and the two `CLAUDE.md` lines that described it. `@claude` PR/issue comments (`claude.yml`) and `conflict-watch.yml` are untouched. No backend code changed.
+- **Files:** `.github/workflows/pr-checks.yml`, `README.md`, `CLAUDE.md`, `overlap.md`, this file
+- **Next:** "Claude review" must also be removed from `main`'s required status checks (repo settings → branch protection) or no PR can merge; Andrew is doing that by hand since sessions can't.
+- **Notes:** PRs now merge on the conflict check alone — review each other's PRs manually, or ask `@claude review this PR` in a comment when wanted.
+
+### 2026-10-17 · Andrew (email domain + hosting on foredge.me)
+- **Did:** Verified `mail.foredge.me` in Resend and added its DKIM/SPF/DMARC records in Cloudflare. Removed the old `www` → Vercel record and hosted the frontend on Cloudflare at `foredge.me` + `www` (Worker `foredge`, SPA fallback). Set `APP_URL`/`EMAIL_FROM`, deployed `notify-doctor` and `view-doctor-message` (smoke: 400 bad token, 401 not signed in).
+- **Files:** `frontend/wrangler.jsonc`, `frontend/package.json` (wrangler + `deploy` script), `frontend/.gitignore`, docs.
+- **Next:** set `RESEND_API_KEY`, redeploy the frontend so `/doctor-message` (#17) is live, send one real email end to end.
+- **Notes:** Resend free plan allows one domain and the account already had `tidyweek.app`; adding `mail.foredge.me` worked anyway. The old Vercel project still exists (not signed in there); delete it from the Vercel dashboard.
 
 ### 2026-10-17 · Andrew (secure-link doctor emails)
 - **Did:** Built `notify-doctor` (saves the message with a random token, emails a link-only notice through Resend, maps the trigger's limit hints to 4xx, deletes the row if the email fails) and `view-doctor-message` (no login; token + expiry check, sets `opened_at`, returns message + first name + current notes, no-store, per-IP limit). Team decision: no PIN for now, just the link + 7-day expiry. Email for the demo: Resend's test sender, no domain. Tested live through temporary `-preview` deploys (22/22), then deleted them and the temporary secrets.
