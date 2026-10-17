@@ -24,6 +24,8 @@ Fixed sample settings and unresolved backend decisions are recorded in [companio
 
 ## Design
 
-Use Ranveer's supplied two screen compositions with lighter blue/mint/off-white tokens and rounded Nunito. Flat borders, restrained 6–10px panel corners, no shadows, gradients, hover animation, pure-white canvas or marketing boilerplate. Short automatic SVG/GSAP intro, reduced-motion bypass, real pending-state skeletons and concise interface transitions.
+Use Ranveer's supplied two screen compositions with lighter blue/mint/off-white tokens and rounded Nunito. Flat borders, restrained 5–12px corners, no shadows, gradients, hover animation, pure-white canvas or marketing boilerplate. Short automatic SVG/GSAP intro, reduced-motion bypass, real pending-state skeletons and concise interface transitions.
 
 The former care-space repository and component source remain available for backend reconciliation, but are not rendered or navigable in the patient app. Their existing data tests remain regression checks; current patient tests and browser evidence are listed separately in `docs/VERIFICATION.md`.
+
+The latest presentation brief is5 minutes and fewer than 6 slides; the saved generation prompt mandates exactly 5 slides total with a60-second demo. The slideshow is reported to be 25% of the grade. UI changes now include active desktop navigation, a functional mobile dock, a derived next milestone and an exact-source shortcut; these do not add a live model or change care schedules.

@@ -1,34 +1,34 @@
-# Patient reference implementation QA
+# Patient UI revamp QA
 
 Date: October 17, 2026. Mode: Operate. **final result: passed**
 
-## Targets and evidence
+## Visual authority and scope
 
-Source: Ranveer's two selected 1536×1024 images, supplied as `codex-clipboard-a8c4e3da-a5c8-401e-b513-86d7ac4e2198.png` (dashboard) and `codex-clipboard-14081b46-d1f5-4e9d-b9eb-3a7c3fe19d02.png` (intake). Both opened and inspected. Current implementation: production Vite preview, http://127.0.0.1:5190/.
+Ranveer requested a UI revamp after supplying two healthcare mobile references. Their hierarchy, grouping, lightness and navigation inform this revision. The original patient dashboard/intake references and the chosen Nunito/blue/mint identity remain product context. This is an adaptation inside the existing React app, not an appointment-directory clone. Doctor portraits, booking claims, gradients and shadows are excluded under the user's instructions.
 
-Compared source and rendered images in the same review input. CSS viewport 1536×1024 for desktop; backend full-page capture returns 1521px content width excluding the 15px scrollbar. Full-page dashboard is taller than source because the implementation adds the functional check-in/report area and explicit demo controls. Compared matching dashboard content rather than treating capture height as drift. Source static greeting/sample medical text differs intentionally from the current clock and provided-text records.
+Before editing, captured and opened the current dashboard at `output/playwright/revamp-before.jpg`. It showed repeated nested frames, weak color hierarchy, sparse navigation and an undersized expanded chat. The final implementation uses distinct blue/mint working regions, freestanding task rows, a derived next milestone, desktop navigation, a functional mobile dock and viewport-sized chat.
 
-Current evidence, ignored local artifacts under `frontend/output/playwright/`:
+## Evidence
 
-- `patient-dashboard-desktop.jpg`: complete header, roughly two-thirds task/instructions/timeline region and one-third sticky companion.
-- `patient-instructions-desktop.jpg`: centered intake, name/email pair, source text, attachment target, Cancel/Save.
-- `patient-dashboard-mobile.jpg`, `patient-instructions-mobile.jpg`: 375px CSS viewport, single-column reflow.
-- `patient-assistant-mobile.jpg`: full-screen modal, usable composer and internally scrolling transcript.
+Production preview: http://127.0.0.1:5190/. Current asset: `index-DZzCm5PD.js`.
 
-## Five fidelity surfaces
+- Desktop 1440×1000: `revamp-desktop.jpg` full-page, `revamp-instructions-desktop.jpg`, `revamp-fullscreen.jpg` viewport and `revamp-report.jpg` report crop. Content width excludes a 15px scrollbar.
+- Mobile 390×844: `revamp-mobile.jpg` viewport. An earlier full-page mobile capture placed the fixed dock in the middle of the stitched image; replaced it with a viewport capture for presentation use.
+- Source mobile references and final captures were opened for visual review. Layout/typography differences follow the requested app identity rather than pretending to match a different doctor's marketplace pixel for pixel.
 
-- **Type:** self-hosted rounded Nunito, as directly selected by Ranveer; strong task/headline hierarchy and readable input/body copy. This deliberately replaces the source mock's font.
-- **Layout:** the selected screen structure is preserved, including top Home header, patient greeting, Add action, daily task rows, important guidance, time bar and right-hand chat. Form structure matches the second image. Scoped the legacy overview grid so it cannot squeeze the new dashboard. Form fields align at the top.
-- **Color:** lighter blue/mint/cool off-white from the confirmed tokens. No pure-white canvas, shadows, gradients or hover motion. Reference shadows and highly rounded pills were excluded under explicit prior instructions.
-- **Images/icons:** no photographic region exists in either selected screen. Existing consistent Lucide icons represent tasks, bot, upload and navigation. No raster placeholders or fake testimonials.
-- **Copy/content:** care text comes from saved input; percentage labels elapsed plan time. Current sample name is Alex. Model/email/extraction limits are explicit without design-process text in product UI. No contrast slogans added.
+## Checks and corrections
 
-## Interaction and accessibility
+- **Hierarchy/type:** exact To-Do retained. Nunito remains self-hosted. Task text has a clear name/helper hierarchy. No oversized healed-percentage claim; timeline labels elapsed planned time.
+- **Color:** blue defines greeting/guidance/assistant context, mint defines reported state/timeline. Foregrounds passed targeted computed-style contrast checks on desktop/mobile dashboard and mobile intake. No pure-white canvas, shadow, gradient, hover motion or rainbow categories introduced.
+- **Navigation:** desktop My instructions/Progress and mobile My plan/Companion open the existing source/report/chat flows. Next milestone opens the roadmap. The new guidance shortcut returns exact saved text.
+- **Chat:** shared draft survives close/reopen. Mobile expanded dialog is about 827px high within an 844px viewport; composer bottom is about 802px. Close remains visible. Shift+Tab from Close reaches Send when enabled; Tab returns to Close. Escape and focus restoration work. Message scrolling stays internal.
+- **Geometry:** no document horizontal overflow at desktop/mobile checks. Mobile dock has reserved bottom space and focus scroll margins. Form fields stack and remain readable.
+- **Motion/states:** scoped GSAP cleanup, empty-target guard and reduced-motion support remain. Existing real pending skeletons and explicit local errors stay intact.
+- **Source review:** fresh read-only reviewer applied ECC React/TypeScript and relevant design guidance, found zero actionable findings, and requested the mobile geometry confirmation completed above.
+- **Build/tests:** production build and all 49 tests pass. Current-asset console check returned no warnings/errors. This is not a fresh full axe, clinical or backend-security audit.
 
-Browser-verified Add/save exact wording, attachment intake/save, shared draft on full-screen expansion, prepared progress reply, check-in save, dose reporting, factual TXT export, emergency phrase routing, call animation without dialing, acknowledgment and reload persistence. Mobile dashboard/intake/full-screen have no horizontal overflow. Targeted computed-style text contrast scan returned zero findings on mobile dashboard and intake. Keyboard Shift+Tab in full-screen reaches its last enabled composer field; Tab returns to Close; Escape dismisses. Reduced-motion intro is covered by lifecycle tests and source guards. These checks are not a full clinical, screen-reader, axe or backend security certification.
+## Presentation artifact
 
-## Corrections and remaining limits
+The separate subagent-authored prompt is approximately 4,500 words. It mandates exactly five slides, a five-minute hard finish including a 60-second demo, four speakers, actual screenshots, product truth, slide copy/layout/notes, fallback and judge Q&A. It creates no deck by itself. Prompt and screenshots are packaged locally for use in a slide-generation tool.
 
-Fixed the legacy main-grid collision, document-scrolling chat arrival, fullscreen draft loss, storage-dependent emergency visibility and errors hidden behind dialogs. Final source review found no remaining blocker. Empty-target GSAP transitions now return before starting a timeline.
-
-The subsequent PR review correction was browser-verified: common negated symptoms no longer interrupt a check-in; affirmative symptoms are evaluated on submission and the draft returns after closing help. Emergency email preview was removed under the newer team plan. No P0/P1/P2 visual or interaction finding remains in the checked states. Live LLM, document extraction, medical schedule configuration, email delivery and hosted secure report links remain deferred product integration work, with a frontend preview rather than false success states.
+No P0/P1/P2 finding remains in the checked revision. Backend, live model, OCR/PDF parsing, email delivery and hosted report links remain deferred.

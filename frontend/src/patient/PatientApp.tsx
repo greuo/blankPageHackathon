@@ -18,11 +18,13 @@ import {
   FileText,
   Footprints,
   Home,
+  HeartPulse,
+  MessageCircle,
+  BookOpen,
   Mail,
   Pill,
   Plus,
   Phone,
-  TriangleAlert,
   X,
 } from 'lucide-react';
 import Opening from '../components/Opening';
@@ -128,6 +130,7 @@ export default function PatientApp() {
     setDialog(null);
     action((s) => s.emergencies.push(event));
   }
+  const nextMilestone = milestones.find((item) => item.day > progress.day);
   const important = state.instructions
     .split('\n')
     .map((line) => line.trim())
@@ -241,12 +244,25 @@ export default function PatientApp() {
           onClick={() => navigate('home')}
           aria-label="Care companion home"
         >
-          Care <span>companion</span>
+          <span className="patient-brand-symbol" aria-hidden="true">
+            <HeartPulse size={24} />
+          </span>
+          <span className="patient-brand-name">
+            Care <span>companion</span>
+          </span>
         </button>
         <nav aria-label="Main navigation">
           <button className={route === 'home' ? 'current' : ''} onClick={() => navigate('home')}>
             <Home size={21} />
             Home
+          </button>
+          <button onClick={() => setDialog('source')}>
+            <BookOpen size={18} />
+            My instructions
+          </button>
+          <button onClick={() => setDialog('report')}>
+            <FileText size={18} />
+            Progress
           </button>
         </nav>
         <div className="patient-header-actions">
@@ -299,6 +315,14 @@ export default function PatientApp() {
                     , Alex
                   </h1>
                   <p>Your care plan, one step at a time.</p>
+                  <time className="greeting-date" dateTime={today}>
+                    <CalendarDays size={16} />
+                    {now.toLocaleDateString('en-US', {
+                      weekday: 'long',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </time>
                 </div>
                 <button className="btn primary add-instructions" onClick={() => navigate('add')}>
                   <Plus size={22} />
@@ -322,10 +346,10 @@ export default function PatientApp() {
                 <div className="patient-section-heading">
                   <div>
                     <h2>To-Do</h2>
-                    <p>Daily steps from your prepared plan</p>
+                    <p>Your daily steps, all in one place.</p>
                   </div>
-                  <span>
-                    {dailyTasks.length} tasks · {dailyTasks.filter(done).length} completed
+                  <span className="task-count">
+                    {dailyTasks.filter(done).length} of {dailyTasks.length} reported
                   </span>
                 </div>
                 <div className="patient-task-list">
@@ -364,12 +388,12 @@ export default function PatientApp() {
               </section>
               <section className="patient-panel important-instructions">
                 <div className="patient-section-heading">
-                  <span className="caution-icon">
-                    <TriangleAlert size={23} />
+                  <span className="guidance-icon">
+                    <BookOpen size={22} />
                   </span>
                   <div>
                     <h2>Important instructions</h2>
-                    <p>From your care guidance</p>
+                    <p>Keep your provided guidance close.</p>
                   </div>
                   <button className="text-button" onClick={() => setDialog('source')}>
                     View all
@@ -395,14 +419,14 @@ export default function PatientApp() {
               <section className="patient-panel recovery-progress">
                 <div className="progress-heading">
                   <h2>Recovery timeline</h2>
-                  <strong>{progress.percent}%</strong>
+                  <span className="timeline-percent">{progress.percent}% of planned time</span>
                   <button className="text-button" onClick={() => setDialog('roadmap')}>
                     View roadmap
                     <ChevronRight size={17} />
                   </button>
                 </div>
                 <p>
-                  Day {progress.day} of {state.duration} · Timeline from the prepared demo plan
+                  Day {progress.day} of {state.duration} · Your prepared care plan
                 </p>
                 <progress
                   max="100"
@@ -414,6 +438,22 @@ export default function PatientApp() {
                   <span>100%</span>
                 </div>
                 <small>Elapsed time is separate from how you are healing.</small>
+                {nextMilestone && (
+                  <div className="next-milestone">
+                    <CalendarDays size={21} />
+                    <div>
+                      <strong>{nextMilestone.title}</strong>
+                      <span>Next in your roadmap · around day {nextMilestone.day}</span>
+                    </div>
+                    <button
+                      className="icon-btn"
+                      aria-label="Open next roadmap milestone"
+                      onClick={() => setDialog('roadmap')}
+                    >
+                      <ChevronRight size={20} />
+                    </button>
+                  </div>
+                )}
               </section>
               <section className="patient-lower">
                 <div>
@@ -485,6 +525,20 @@ export default function PatientApp() {
           </div>
         </main>
       )}
+      <nav className="patient-mobile-nav" aria-label="Mobile navigation">
+        <button className={route === 'home' ? 'current' : ''} onClick={() => navigate('home')}>
+          <Home size={20} />
+          <span>Home</span>
+        </button>
+        <button onClick={() => setDialog('source')}>
+          <BookOpen size={20} />
+          <span>My plan</span>
+        </button>
+        <button onClick={() => setFullChat(true)}>
+          <MessageCircle size={20} />
+          <span>Companion</span>
+        </button>
+      </nav>
       {fullChat && (
         <Modal title="Your care assistant" onClose={() => setFullChat(false)} wide>
           <div className="fullscreen-assistant">{assistant(true)}</div>

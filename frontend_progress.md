@@ -53,3 +53,9 @@ Owned by the frontend side (Ranveer, Marcus). Only frontend sessions edit this f
 - Implemented the four patient feature areas locally, full-screen draft continuity, exact-source intake, factual TXT report and companion behavior contract. Real email/link/backend integration stays deferred.
 - Audited 282 local skill entrypoints and all 71 ECC role definitions; recorded applicability and actual-use limits in `frontend/docs/SKILL-APPLICATION.md`.
 - Fixed review findings and browser-discovered legacy layout and chat scroll collisions. Build48tests pass; desktop/mobile and interaction evidence in the verification document.
+
+### 2026-10-17 · UI revamp and slideshow prompt
+
+- Strengthened blue/mint regions, removed nested To-Do framing, added actual date/next milestone, mobile navigation dock and viewport-sized companion. Kept patient-only scope, exact To-Do label, Nunito and prior visual restrictions.
+- Added a subagent-authored detailed slideshow prompt: exactly 5 slides/5 minutes including60-second demo, four speakers, META story, authentic screenshots, truth boundaries, notes/fallback/Q&A. Prompt files under frontend/docs.
+- Build and 49 tests pass, new navigation/shortcut and mobile fullscreen/focus verified, targeted contrast/overflow clean. Fresh source/visual review had no actionable findings. Same PR8 will be updated if still open; no merge authorization.
