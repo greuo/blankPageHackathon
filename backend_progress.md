@@ -9,7 +9,7 @@ Snapshot of what exists right now. Rewrite it each session; don't append.
 - **Stack:** Supabase (Postgres + Supabase Auth + Row Level Security + Edge Functions). Hosted project `blankPageHackathon` (ref `repvtuxyszlqdjzciojx`, us-east-1). Code in `backend/supabase/`.
 - **How to run:** nothing to run for the frontend: use the hosted project (URL and key in `overlap.md` → Agreed). Local stack: `cd backend && supabase start && supabase db reset` (needs Docker; seeds demo data with password `local-demo-only`). Schema changes: add a file under `backend/supabase/migrations/`, apply it, rerun `backend/supabase/tests/access.sql`.
 - **Working:**
-  - Access model: hospitals → admin / doctor / nurse / patient accounts, care teams, chatbot conversations + messages, escalations ("forwarded to the hospital"). All enforced with RLS; 46/46 checks in `tests/access.sql` pass on the hosted project.
+  - Access model: hospitals → admin / doctor / nurse / patient accounts, care teams, chatbot conversations + messages, escalations ("forwarded to the hospital"). All enforced with RLS; 49/49 checks in `tests/access.sql` pass on the hosted project.
   - Edge functions `admin-create-user` and `escalate` deployed; both reject unauthenticated calls.
   - Demo data seeded on the hosted project (2 hospitals, 9 users). The demo password is in Andrew's `backend/.env.local` (not committed); ask him.
   - Realtime on `messages` and `escalations`.
@@ -23,7 +23,7 @@ Snapshot of what exists right now. Rewrite it each session; don't append.
 
 | | Patient | Nurse | Doctor | Admin |
 | --- | --- | --- | --- | --- |
-| Profiles | self + own care team | own hospital's staff + assigned patients | own hospital's staff + assigned/escalated patients | whole hospital |
+| Profiles | self + own care team + any staff who replied to them or claimed their escalation | own hospital's staff + assigned patients | own hospital's staff + assigned/escalated patients | whole hospital |
 | Patients | self | assigned | assigned + any with an escalation | whole hospital |
 | Conversations / messages | own: read + send | assigned: read + reply | assigned or escalated: read + reply | none |
 | Escalations | none | assigned patients': read | whole hospital: read, claim, resolve | none |
@@ -64,7 +64,7 @@ Newest first. One entry per session:
 ```
 
 ### 2026-10-17 · Andrew
-- **Did:** Picked Supabase. Built the hospital access model (schema, RLS, triggers), seeded demo data, deployed `admin-create-user` and `escalate` edge functions, wrote and ran RLS tests (46/46 pass).
-- **Files:** `backend/supabase/migrations/20261017144002_access_model.sql`, `backend/supabase/seed.sql`, `backend/supabase/tests/access.sql`, `backend/supabase/functions/`
-- **Next:** the chatbot edge function (Claude, calls into `escalate` logic when a human is needed); escalation inbox sorted own-patients-first; try the edge functions with real demo logins.
+- **Did:** Picked Supabase. Built the hospital access model (schema, RLS, triggers), seeded demo data, deployed `admin-create-user` and `escalate` edge functions, wrote and ran RLS tests. Fixed two PR review findings in a second migration: patients can see the profile of a non-care-team doctor who replied after an escalation, and reopening an escalation clears `resolved_at` (49/49 pass).
+- **Files:** `backend/supabase/migrations/20261017144002_access_model.sql`, `20261017145639_review_fixes.sql`, `backend/supabase/seed.sql`, `backend/supabase/tests/access.sql`, `backend/supabase/functions/`
+- **Next:** the chatbot edge function (Claude; `escalate` only accepts a signed-in patient today, so share its insert logic in a helper the chatbot can import); escalation inbox sorted own-patients-first; try the edge functions with real demo logins.
 - **Notes:** Admins can't read chats or escalations, on purpose (privacy). Opening an escalation gives every doctor in the hospital read + reply on that one conversation. Migrations are applied through the Supabase MCP, so the version in the filename matches the hosted project's migration history.

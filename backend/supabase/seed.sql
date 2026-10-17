@@ -14,7 +14,8 @@
 --   dr.reyes@riverside.example.com doctor
 --   casey@riverside.example.com    patient
 --
--- Conversations: Alex (no escalation), Jordan (escalated → Dr. Kim), Sam (no escalation),
+-- Conversations: Alex (no escalation), Jordan (escalated → Dr. Kim; Dr. Patel, not on Jordan's
+-- team, replied), Sam (no escalation),
 -- Casey (escalated → Dr. Reyes).
 
 insert into public.hospitals (id, name) values
@@ -82,6 +83,7 @@ insert into public.messages (conversation_id, sender_type, sender_id, content, c
   ('00000000-0000-0000-0000-0000000000c1', 'patient', '00000000-0000-0000-0000-000000000041', 'Thanks, that helps.', now() - interval '48 minutes'),
   ('00000000-0000-0000-0000-0000000000c2', 'patient', '00000000-0000-0000-0000-000000000042', 'My stitches look red and swollen and I have a fever.', now() - interval '20 minutes'),
   ('00000000-0000-0000-0000-0000000000c2', 'bot',     null, 'That could be an infection. I have forwarded this to your care team.', now() - interval '19 minutes'),
+  ('00000000-0000-0000-0000-0000000000c2', 'staff',   '00000000-0000-0000-0000-000000000022', 'This is Dr. Patel. Please come in to the clinic today so we can take a look.', now() - interval '15 minutes'),
   ('00000000-0000-0000-0000-0000000000c3', 'patient', '00000000-0000-0000-0000-000000000043', 'When can I start exercising again?', now() - interval '10 minutes'),
   ('00000000-0000-0000-0000-0000000000c3', 'bot',     null, 'Most patients can resume light exercise after two weeks. Check with Dr. Patel at your follow-up.', now() - interval '9 minutes'),
   ('00000000-0000-0000-0000-0000000000c4', 'patient', '00000000-0000-0000-0000-000000000061', 'I ran out of my prescription.', now() - interval '5 minutes'),

@@ -53,11 +53,17 @@ select pg_temp.try_write('Alex: can rename self', true,
 select pg_temp.try_write('Alex: cannot escalate directly', false,
   $q$insert into escalations (conversation_id, reason) values ('00000000-0000-0000-0000-0000000000c1', 'x')$q$);
 
+-- ---------------------------------------------------------------- Jordan (patient, Dr. Kim; Dr. Patel replied after escalation)
+set request.jwt.claims = '{"sub":"00000000-0000-0000-0000-000000000042","role":"authenticated"}';
+insert into results (check_name, expected, actual)
+select 'Jordan: sees self + Kim (team) + Patel (replied)', 3, count(*) from profiles union all
+select 'Jordan: still no escalation rows', 0, count(*) from escalations;
+
 -- ---------------------------------------------------------------- Dr. Kim (treated Alex and Jordan)
 set request.jwt.claims = '{"sub":"00000000-0000-0000-0000-000000000021","role":"authenticated"}';
 insert into results (check_name, expected, actual)
 select 'Kim: sees Alex + Jordan conversations', 2, count(*) from conversations union all
-select 'Kim: sees their 5 messages', 5, count(*) from messages union all
+select 'Kim: sees their 6 messages', 6, count(*) from messages union all
 select 'Kim: sees own hospital''s escalation only', 1, count(*) from escalations union all
 select 'Kim: sees Alex + Jordan patient rows', 2, count(*) from patients union all
 select 'Kim: cannot see Sam''s chat', 0, count(*) from messages where conversation_id = '00000000-0000-0000-0000-0000000000c3';
@@ -66,7 +72,7 @@ select 'Kim: cannot see Sam''s chat', 0, count(*) from messages where conversati
 set request.jwt.claims = '{"sub":"00000000-0000-0000-0000-000000000022","role":"authenticated"}';
 insert into results (check_name, expected, actual)
 select 'Patel: sees Sam (assigned) + Jordan (escalated)', 2, count(*) from conversations union all
-select 'Patel: sees escalated Jordan chat', 2, count(*) from messages where conversation_id = '00000000-0000-0000-0000-0000000000c2' union all
+select 'Patel: sees escalated Jordan chat', 3, count(*) from messages where conversation_id = '00000000-0000-0000-0000-0000000000c2' union all
 select 'Patel: cannot see Alex''s chat (not escalated)', 0, count(*) from messages where conversation_id = '00000000-0000-0000-0000-0000000000c1' union all
 select 'Patel: sees hospital escalation', 1, count(*) from escalations union all
 select 'Patel: sees Sam + Jordan patient rows', 2, count(*) from patients;
@@ -129,4 +135,19 @@ select 'anon: reads no profiles', 0, count(*) from profiles union all
 select 'anon: reads no messages', 0, count(*) from messages;
 
 reset role;
+
+-- ---------------------------------------------------------------- Triggers (as postgres)
+do $$
+declare stale boolean;
+begin
+  begin
+    update escalations set status = 'resolved' where id = '00000000-0000-0000-0000-0000000000e1';
+    update escalations set status = 'open' where id = '00000000-0000-0000-0000-0000000000e1';
+    select resolved_at is not null into stale from escalations where id = '00000000-0000-0000-0000-0000000000e1';
+    raise exception using errcode = 'P0001', message = 'undo';
+  exception when raise_exception then null;
+  end;
+  insert into results (check_name, expected, actual) values ('Reopening clears resolved_at', 0, stale::int);
+end $$;
+
 select n, check_name, expected, actual, expected = actual as pass from results order by n;
