@@ -21,12 +21,13 @@ Things both sides rely on: API base URL, ports, data shapes, auth, env vars. Eit
 
 ## Backend → Frontend
 
+- [ ] 2026-10-17 · Andrew: **The frontend is live at https://foredge.me (and `www`).** Hosted on Cloudflare as static assets with an SPA fallback, so `/doctor-message` and `/doctor-entry` load `index.html` and your code reads `location.pathname`. Deploy with `cd frontend && npm run deploy` (builds, then `wrangler deploy`; needs `npx wrangler login` to Andrew's Cloudflare account, ask him). Added in `frontend/`: `wrangler.jsonc`, `wrangler` devDependency, `deploy` script, `.wrangler/` in `.gitignore`. Emailed doctor links now point at `https://foredge.me/doctor-message#<token>` (`APP_URL`), sent from `notify@mail.foredge.me`, so the demo doctor can be any address. Anything else you build needs no env vars yet; if you add some, tell us so the deploy picks them up.
 - [ ] 2026-10-17 · Andrew: **"Send to my doctor" backend is built (PR `backend/doctor-message-link`, deployed after merge).** The email to the doctor holds only "Your patient <first name> sent you a message" + a secure link (expires in 7 days); the message stays in Supabase. Contracts: `backend_progress.md` → Edge functions. What we need from you:
   - **"Send to my doctor" button:** `supabase.functions.invoke('notify-doctor', { body: { doctor_id, content } })` → 201 `{ id, expires_at }`. Show `error` from the response on failure; `code: "guest_must_sign_up"` (403) means ask the guest to add an email first. 429 = too many sends, 502 = email failed (nothing saved, retry). "Opened" status: `doctor_messages.opened_at`.
   - **Public page `/doctor-message`** (no login): read the token from `location.hash` (after `#`), call `supabase.functions.invoke('view-doctor-message', { body: { token } })`, show `content`, `patient_first_name`, `created_at` and `care_notes.content`. 410 `code: "expired"` → "This link has expired, ask your patient to send it again"; 404/400 → "This link isn't valid". Please add `<meta name="referrer" content="no-referrer">` on that page.
-  - **Tell us the frontend's URL** for the demo (it becomes `APP_URL`, the base of the emailed link).
+  - ~~Tell us the frontend's URL~~ done: `https://foredge.me` (see the note above).
   - On a non-2xx, `functions.invoke` returns `data: null`; read the body with `await error.context.json()` to get `error` / `code`.
-  - Demo caveat: we use Resend's test sender (no domain), so the doctor's email in the demo must be the address the Resend account was created with.
+  - ~~Demo caveat about Resend's test sender~~ gone: we send from the verified `mail.foredge.me` now.
 
 - [ ] 2026-10-17 · Andrew: **Next backend work: "Send to my doctor" and the QR doctor entry.** Proposed routes for the two public doctor pages, token in the URL hash so it never reaches server logs:
   - `/doctor-message#<token>`: reads `view-doctor-message`; shows the patient's message and current care notes.
