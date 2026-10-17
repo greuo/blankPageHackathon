@@ -1,0 +1,16 @@
+// Hosts the built frontend on Cloudflare at foredge.me (static assets only, no Worker code).
+// Deploy: npm run deploy (builds, then uploads dist/).
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "foredge",
+  "compatibility_date": "2026-10-17",
+  "assets": {
+    "directory": "./dist",
+    // Unknown paths like /doctor-message get index.html, so the app's own routing handles them.
+    "not_found_handling": "single-page-application"
+  },
+  "routes": [
+    { "pattern": "foredge.me", "custom_domain": true },
+    { "pattern": "www.foredge.me", "custom_domain": true }
+  ]
+}
