@@ -90,7 +90,7 @@ Guests are free to create, and the patient types in the doctor's email, so witho
 - At most 10 messages per recipient address per day, across all patients. The address is saved on each message, so editing or deleting the doctor afterwards doesn't reset the count.
 - The email body is fixed text. The only patient-controlled part is the first name, which `notify-doctor` must escape and cut to 40 characters.
 
-The `chat` function is also rate-limited (20 messages per 10 minutes, 200 per day per patient), since each message can cost a Claude call. Supabase limits anonymous sign-ups to 30 per hour per IP; turn on captcha if that's not enough.
+The `chat` function is also rate-limited, since each message can cost a Claude call and nobody can be allow-listed (the judges are unknown). Three layers, all counted in the database and only for accepted messages: per account 5/minute, 20/hour, 60/day; per network address 8/minute, 40/hour, 150/day; and globally (everybody together, the spending cap) 15/minute, 100/hour, 400/day. A message is at most 1,000 characters. If the limiter can't be reached the chat refuses rather than run unlimited. The numbers are secrets (`CHAT_LIMIT_*`, see `backend_progress.md`). Per-account limits alone mean nothing while anyone can create a guest account, so sign-ups and guest sign-in stay off on hosted. Supabase limits anonymous sign-ups to 30 per hour per IP; turn on captcha if that's not enough.
 
 ### Care-notes content shape
 

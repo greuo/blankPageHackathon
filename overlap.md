@@ -22,6 +22,12 @@ Things both sides rely on: API base URL, ports, data shapes, auth, env vars. Eit
 
 ## Backend → Frontend
 
+- [ ] 2026-10-17 · Andrew: **`chat` gets strict rate limits (in a PR; live once the migration is applied and `chat` is redeployed).** What changes for you:
+  - **Messages are limited to 1,000 characters** (was 4,000). Please lower `MAX_CHAT_LENGTH` in `frontend/src/patient/Assistant.tsx` (and the `sendChat` comment in `data/supabase.ts`) to 1000, or longer messages get a 400.
+  - **429 now has a `code` and a real wait.** Body `{ error, code, retry_after_seconds }`, `code` = `rate_limited_user` | `rate_limited_ip` | `rate_limited_global`. `retry_after_seconds` is now the true wait until the window ends, so it can be hours for a daily limit (it used to be the window length). `error` is a ready-to-show sentence ("…Please try again in 3 hours. If this is an emergency, call 911."); showing it as-is is fine.
+  - **New 503** `code: "limiter_unavailable"`: the limits couldn't be checked, so the chat refuses; show `error`.
+  - Numbers: per account 5/min, 20/hour, 60/day; per network 8/min, 40/hour, 150/day; whole app 15/min, 100/hour, 400/day. Details: `backend_progress.md` → Chat rate limits. Hitting them while demoing? Tell us and we'll raise them (a secret, no redeploy).
+
 - [ ] 2026-10-17 · Andrew: **Care-notes sync added on top of the chat binding (branch `feat/ai-chat-binding`).** The assistant now inserts the app's saved instructions into `care_notes` (linked to the patient's `doctors` row, created/updated from the locally saved doctor) before each question, so the bot answers from the notes the app shows; structured notes with keys beyond `instructions` are never overwritten. For you: nothing to change in the chat flow; if you add a "What's normal" / warning-signs field to Add instructions later, extend `syncCareNotes` in `frontend/src/data/supabase.ts` to include those keys and the bot starts citing them. Verified live on hosted (cited "no swimming" answer, "is this normal?" from the normal line with the safety footer, dose change → referred with "Send to my doctor").
 
 - [ ] 2026-10-17 · Andrew: **Login-only: the app now opens on a login page; self sign-up and guest mode are going away.** The user asked for exactly this ("login page with Supabase, turn off registering, sample admin account"; no registration emails for now). This changes **Agreed → Auth**, so please ack or object.
