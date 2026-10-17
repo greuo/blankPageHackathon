@@ -1,4 +1,11 @@
-import { Component, useState, useSyncExternalStore, type FormEvent, type ReactNode } from 'react';
+import {
+  Component,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type FormEvent,
+  type ReactNode,
+} from 'react';
 import {
   ArrowDown,
   ArrowRight,
@@ -27,7 +34,9 @@ import { repository, getActor, getVisibleSpaces, localDate } from './data/reposi
 import type { Space } from './data/types';
 import Checklist from './components/Checklist';
 import CareSpace from './components/CareSpace';
-import { Avatar, Logo, Modal, errorText } from './components/ui';
+import { Avatar, Logo, Modal, CareImage, errorText } from './components/ui';
+import Opening from './components/Opening';
+import { useSurfaceEntrance } from './components/motion';
 const spaceIcons = [HeartPulse, Pill, Footprints, Utensils, CalendarDays];
 class ErrorBoundary extends Component<
   { children: ReactNode },
@@ -80,20 +89,26 @@ function Companion() {
   const spaces = getVisibleSpaces(state);
   const [showOpening, setShowOpening] = useState(() => {
     try {
-      return sessionStorage.getItem('companion-opening-v2') !== 'seen';
+      return sessionStorage.getItem('companion-opening-v3') !== 'seen';
     } catch {
       return true;
     }
   });
   function enterWorkspace() {
     try {
-      sessionStorage.setItem('companion-opening-v2', 'seen');
+      sessionStorage.setItem('companion-opening-v3', 'seen');
     } catch {
       /* The app remains usable without session storage. */
     }
     setShowOpening(false);
     requestAnimationFrame(() => document.getElementById('main')?.focus({ preventScroll: true }));
   }
+  const workspace = useRef<HTMLDivElement>(null);
+  useSurfaceEntrance(
+    workspace,
+    [showOpening],
+    '.page-heading, .welcome-strip, .care-spaces, .home-lower',
+  );
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState<{ id: string; tab?: string; sourceId?: string } | null>(
     null,
@@ -140,42 +155,13 @@ function Companion() {
       setError(errorText(e));
     }
   }
-  if (showOpening)
-    return (
-      <main className="opening" aria-label="Welcome to Discharge Companion">
-        <div className="opening-copy">
-          <Logo />
-          <div className="opening-message">
-            <h1>
-              Care for the
-              <br />
-              <span className="opening-second-line">days ahead.</span>
-            </h1>
-            <p>
-              Your clinician’s guidance, the people you trust, and a little clarity for each day.
-            </p>
-            <button className="btn primary opening-enter" onClick={enterWorkspace}>
-              Open my companion
-            </button>
-          </div>
-          <p className="opening-note">A fictional care experience. Saved on this device.</p>
-        </div>
-        <figure className="opening-landscape">
-          <img
-            src="/images/coastal-dunes.jpg"
-            alt="Quiet dunes beside a blue sea, photographed on film"
-            fetchPriority="high"
-          />
-          <figcaption>Room to take the next step.</figcaption>
-        </figure>
-      </main>
-    );
+  if (showOpening) return <Opening onEnter={enterWorkspace} />;
   return (
     <>
       <a className="skip-link" href="#main">
         Skip to content
       </a>
-      <div className="app-shell">
+      <div className="app-shell" ref={workspace}>
         <aside className="sidebar" aria-label="Workspace navigation">
           <button
             className="brand-home"
@@ -322,7 +308,7 @@ function Companion() {
                   {actor.role === 'doctor' ? 'Review daily guidance' : 'View today’s steps'}
                 </a>
               </div>
-              <img src="/images/coastal-dunes.jpg" alt="" className="welcome-photo" />
+              <CareImage src="/images/coastal-dunes.jpg" alt="" className="welcome-photo" />
             </section>
             <section id="care-spaces" className="care-spaces">
               <div className="section-title">

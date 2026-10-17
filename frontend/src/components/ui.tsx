@@ -1,5 +1,6 @@
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { X } from 'lucide-react';
+import { gsap, useGSAP, reducedMotion } from './motion';
 export function Logo() {
   return (
     <span className="brand">
@@ -10,6 +11,51 @@ export function Logo() {
         Discharge<span className="brand-bottom">companion</span>
       </span>
     </span>
+  );
+}
+export function CareImage({
+  src,
+  alt,
+  className = '',
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+}) {
+  const ref = useRef<HTMLImageElement>(null);
+  const [ready, setReady] = useState(false);
+  const [failed, setFailed] = useState(false);
+  useEffect(() => {
+    const image = ref.current;
+    setReady(image?.complete ?? false);
+    setFailed(!!image?.complete && image.naturalWidth === 0);
+  }, [src]);
+  return (
+    <div className={`care-image ${className}`} aria-busy={!ready}>
+      {!ready && (
+        <div className="image-skeleton" role="status">
+          <span className="sr-only">Loading image</span>
+          <span />
+          <span />
+        </div>
+      )}
+      {failed ? (
+        <span className="image-fallback">Image unavailable</span>
+      ) : (
+        <img
+          ref={ref}
+          src={src}
+          alt={alt}
+          decoding="async"
+          onLoad={() => setReady(true)}
+          onError={() => {
+            setReady(true);
+            setFailed(true);
+          }}
+          className={ready ? 'image-ready' : ''}
+        />
+      )}
+    </div>
   );
 }
 export function Avatar({
@@ -39,6 +85,23 @@ export function Modal({
   wide?: boolean;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
+  const closing = useRef(false);
+  const { contextSafe } = useGSAP({ scope: ref });
+  const dismiss = contextSafe(() => {
+    if (closing.current) return;
+    if (reducedMotion() || !ref.current) {
+      onClose();
+      return;
+    }
+    closing.current = true;
+    gsap.to(ref.current, {
+      opacity: 0,
+      y: 5,
+      duration: 0.14,
+      ease: 'power2.in',
+      onComplete: onClose,
+    });
+  });
   useEffect(() => {
     const previous = document.activeElement as HTMLElement;
     ref.current?.showModal();
@@ -52,7 +115,10 @@ export function Modal({
       className={`modal ${wide ? 'wide' : ''}`}
       ref={ref}
       aria-labelledby="dialog-title"
-      onCancel={onClose}
+      onCancel={(event) => {
+        event.preventDefault();
+        dismiss();
+      }}
       onKeyDown={(event) => {
         if (event.key !== 'Tab' || !ref.current) return;
         const nodes = Array.from(
@@ -92,13 +158,13 @@ export function Modal({
             e.clientY < r.top ||
             e.clientY > r.bottom
           )
-            onClose();
+            dismiss();
         }
       }}
     >
       <header className="dialog-header">
         <h2 id="dialog-title">{title}</h2>
-        <button className="icon-btn" aria-label="Close dialog" onClick={onClose}>
+        <button className="icon-btn" aria-label="Close dialog" onClick={dismiss}>
           <X size={21} />
         </button>
       </header>
@@ -112,8 +178,13 @@ export function Skeleton({
   kind?: 'cards' | 'conversation' | 'plan' | 'checklist';
 }) {
   return (
-    <div className={`skeletons ${kind}`} role="status" aria-label={`Loading ${kind}`}>
-      {Array.from({ length: kind === 'cards' ? 5 : 3 }, (_, i) => (
+    <div
+      className={`skeletons ${kind}`}
+      role="status"
+      aria-busy="true"
+      aria-label={`Loading ${kind}`}
+    >
+      {Array.from({ length: kind === 'cards' ? 5 : kind === 'conversation' ? 1 : 3 }, (_, i) => (
         <div className="skeleton" key={i}>
           <span />
           <span />

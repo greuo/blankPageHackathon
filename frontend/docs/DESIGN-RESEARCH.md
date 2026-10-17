@@ -1,6 +1,17 @@
 # Design research · October 17, 2026
 
-Selected direction: quiet coastal care notebook. See `/design-study.html` for seven palette studies, the selected token system, and three photographic options. All hex values below are read from Color Hunt palette URLs/titles, not estimated from screenshots. The final app palette is our adaptation.
+Current direction: lighter blue, mint and cool off-white, with Nunito Variable and an automatic brand introduction. The earlier seven studies below are historical. Their board is archived at `docs/archive-design-study.html`, outside the public app, to avoid confusing research with product UI. The final app palette is our adaptation.
+
+## Current lighter palette and font research
+
+- [Blue and mint](https://colorhunt.co/palette/3674b5578fcaa1e3f9d1f8ef): #3674B5 #578FCA #A1E3F9 #D1F8EF. Selected relationship: clearer blue actions, airy blue surfaces and a distinct mint support surface.
+- [Blue and green contrast](https://colorhunt.co/palette/f8f1f111698e19456b16c79a): #F8F1F1 #11698E #19456B #16C79A. Useful darker foregrounds; original green is too strong for broad backgrounds.
+- [Pale sea glass](https://colorhunt.co/palette/effffb50d8904f98ca272727): #EFFFFB #50D890 #4F98CA #272727. Adapted to quieter green and blue-gray ink.
+- [Nunito](https://fonts.google.com/specimen/Nunito): friendly rounded letterforms, matching Ranveer's selected font direction. Installed from Fontsource and served locally as one Latin variable WOFF2, with system fallbacks.
+
+Tokens and motion specifications are in `DESIGN.md`. The short intro is a custom SVG/GSAP composition, not copied art. Latest requests explicitly add animations and skeleton loaders; the original static-loading direction below has been superseded. Hover animations remain excluded.
+
+## Earlier palette studies
 
 - [Coastal mineral](https://colorhunt.co/palette/80a1ba91c4c3b4debdfff7dd): #80A1BA #91C4C3 #B4DEBD #FFF7DD. Best starting point. Blue, sea glass, sage and cream.
 - [Blue linen](https://colorhunt.co/palette/f5efe6e8dfca6d94c5cbdceb): #F5EFE6 #E8DFCA #6D94C5 #CBDCEB. Useful warm foundation; the blue needs darker text.

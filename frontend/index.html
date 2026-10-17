@@ -3,86 +3,65 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f2f0e7" />
+    <meta name="theme-color" content="#f5f9fc" />
     <meta
       name="description"
       content="A fictional demonstration of clinician-created recovery companions."
     />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="preload" as="image" href="/images/coastal-dunes.jpg" />
     <title>Discharge Companion · Care for the days ahead</title>
     <style>
       html,
       body {
         margin: 0;
-        background: #f2f0e7;
-        color: #283d38;
+        background: #f5f9fc;
+        color: #20394a;
       }
       .first-paint {
         min-height: 100svh;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        font-family: Georgia, serif;
-      }
-      .first-copy {
         display: flex;
+        align-items: center;
+        justify-content: center;
         flex-direction: column;
-        padding: 46px 5vw 28px;
+        padding: 28px;
+        box-sizing: border-box;
+        text-align: center;
+        font-family: 'Trebuchet MS', sans-serif;
       }
-      .first-brand {
-        font-size: 24px;
-        line-height: 1.2;
+      .first-symbol {
+        width: 112px;
+        height: 112px;
+        margin-bottom: 24px;
       }
-      .first-brand small {
-        display: block;
-        font-family: sans-serif;
-        font-size: 12px;
-        letter-spacing: 0.09em;
-      }
-      .first-message {
-        margin: auto 0;
-        padding: 80px 0;
-      }
-      .first-message h1 {
-        font-size: clamp(56px, 6.1vw, 90px);
-        font-weight: 400;
-        line-height: 1.02;
+      .first-title {
+        font-size: clamp(28px, 4vw, 44px);
+        font-weight: 700;
+        line-height: 1.15;
         letter-spacing: -0.035em;
         margin: 0;
       }
-      .first-message h1 span {
-        color: #355c4c;
-      }
-      .first-message p {
-        font-family: sans-serif;
-        line-height: 1.65;
-        font-size: 18px;
-        max-width: 35ch;
-        color: #53665e;
-        margin-top: 26px;
-      }
-      .first-photo {
-        background: #d4e0e6 url('/images/coastal-dunes.jpg') 60% 50% / cover;
+      .first-description {
+        font-size: 17px;
+        margin-top: 16px;
+        color: #4f6470;
       }
       .first-note {
-        font: 12px sans-serif;
-        color: #53665e;
+        position: absolute;
+        bottom: 28px;
+        font-size: 12px;
+        color: #4f6470;
       }
       @media (max-width: 760px) {
-        .first-paint {
-          grid-template-columns: 1fr;
-          grid-template-rows: minmax(490px, 68svh) minmax(240px, 32svh);
+        .first-symbol {
+          width: 96px;
+          height: 96px;
         }
-        .first-copy {
-          padding: 28px;
+        .first-title {
+          max-width: 15ch;
+          font-size: 30px;
         }
-        .first-message {
-          padding: 42px 0;
-        }
-        .first-message h1 {
-          font-size: clamp(52px, 11vw, 76px);
-        }
-        .first-message p {
+        .first-description {
+          max-width: 24ch;
           font-size: 16px;
         }
       }
@@ -91,17 +70,24 @@
   <body>
     <div id="root">
       <main class="first-paint" aria-label="Opening Discharge Companion">
-        <div class="first-copy">
-          <div class="first-brand">Discharge<small>companion</small></div>
-          <div class="first-message">
-            <h1>Care for the<br /><span>days ahead.</span></h1>
-            <p>
-              Your clinician’s guidance, the people you trust, and a little clarity for each day.
-            </p>
-          </div>
-          <p class="first-note">A fictional care experience. Saved on this device.</p>
-        </div>
-        <div class="first-photo"></div>
+        <svg class="first-symbol" viewBox="0 0 120 120" aria-hidden="true">
+          <path d="M18 102V21a3 3 0 0 1 3-3h81" fill="none" stroke="#3271ab" stroke-width="2" />
+          <path d="M102 18v81a3 3 0 0 1-3 3H18" fill="none" stroke="#247454" stroke-width="2" />
+          <text
+            x="59"
+            y="79"
+            text-anchor="middle"
+            font-family="Trebuchet MS,sans-serif"
+            font-size="51"
+            letter-spacing="-3"
+            fill="#20394a"
+          >
+            dc
+          </text>
+        </svg>
+        <h1 class="first-title">Discharge Companion</h1>
+        <p class="first-description">A little clarity for the days ahead.</p>
+        <p class="first-note">A fictional care experience.</p>
       </main>
     </div>
     <noscript>This fictional companion needs JavaScript to open its workspace.</noscript>

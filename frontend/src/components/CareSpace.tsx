@@ -119,7 +119,7 @@ export default function CareSpace({
               </button>
             ))}
           </nav>
-          <div className="space-tab-content">
+          <div className="space-tab-content" key={tab}>
             {tab === 'conversations' && (
               <Conversations
                 key={`${spaceId}:${actor.id}`}

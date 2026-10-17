@@ -11,7 +11,8 @@ import {
   Send,
 } from 'lucide-react';
 import { repository, getActor, getVisibleConversations, uid } from '../data/repository';
-import { errorText, time } from './ui';
+import { errorText, time, Skeleton } from './ui';
+import { useSurfaceEntrance } from './motion';
 
 export default function Conversations({
   spaceId,
@@ -38,6 +39,8 @@ export default function Conversations({
   const [requestId, setRequestId] = useState<string | null>(null);
   const [atBottom, setAtBottom] = useState(true);
   const feed = useRef<HTMLDivElement>(null);
+  const chat = useRef<HTMLElement>(null);
+  useSurfaceEntrance(chat, [active?.id]);
   const busy = useRef(false);
   const messages = state.messages.filter((m) => m.conversationId === active?.id);
   const users = state.users;
@@ -151,7 +154,7 @@ export default function Conversations({
           <LockKeyhole size={15} /> Your private chats stay with their participants.
         </p>
       </aside>
-      <section className="chat-panel" aria-label="Conversation">
+      <section className="chat-panel" ref={chat} aria-label="Conversation" aria-busy={pending}>
         {creating ? (
           <form className="stack new-conversation" onSubmit={create}>
             <h3>Start a conversation</h3>
@@ -324,6 +327,7 @@ export default function Conversations({
                   );
                 })
               )}
+              {pending && <Skeleton kind="conversation" />}
             </div>
             {!atBottom && (
               <button
