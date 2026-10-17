@@ -6,7 +6,7 @@ Hackathon project with four people on two sides. Each person works with their ow
 
 | Person  | Side     | Git name (local machines)   |
 | ------- | -------- | --------------------------- |
-| Sangwoo | Backend  | Sangwoo Joo / Andrew Joo    |
+| Andrew  | Backend  | Andrew Joo                  |
 | Sharon  | Backend  |                             |
 | Ranveer | Frontend |                             |
 | Marcus  | Frontend |                             |
