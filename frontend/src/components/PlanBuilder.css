@@ -24,15 +24,15 @@
   margin: 0;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  border-top: 1px solid #dce7e3;
-  border-bottom: 1px solid #dce7e3;
+  border-top: 1px solid var(--mint);
+  border-bottom: 1px solid var(--mint);
   gap: 14px;
 }
 .builder .builder-steps li {
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #526861;
+  color: var(--green);
   font-size: 0.86rem;
 }
 .builder .builder-steps li > span {
@@ -41,17 +41,17 @@
   flex-shrink: 0;
   display: grid;
   place-items: center;
-  border: 1px solid #c8d8d2;
+  border: 1px solid var(--mint);
   border-radius: 50%;
   font-weight: 650;
 }
 .builder .builder-steps li[aria-current] {
-  color: #165e4e;
+  color: var(--green);
 }
 .builder .builder-steps li[aria-current] > span {
-  background: #165e4e;
-  color: white;
-  border-color: #165e4e;
+  background: var(--green);
+  color: var(--surface);
+  border-color: var(--green);
 }
 .builder .builder-status-row {
   justify-content: space-between;
@@ -111,10 +111,10 @@
   min-width: 0;
   width: 100%;
   box-sizing: border-box;
-  background: #fff;
-  border: 1px solid #b7cbc3;
-  color: #19392f;
-  border-radius: 9px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--green);
+  border-radius: 3px;
   padding: 11px 12px;
   font: inherit;
   font-size: 0.87rem;
@@ -127,30 +127,30 @@
   padding: 9px;
 }
 .builder .field input[type='file']::file-selector-button {
-  background: #edf5f1;
+  background: var(--canvas);
   border: 0;
-  color: #244a3d;
+  color: var(--green);
   padding: 7px 10px;
   margin-right: 10px;
-  border-radius: 6px;
+  border-radius: 3px;
   cursor: pointer;
 }
 .builder .field input:focus-visible,
 .builder .field textarea:focus-visible,
 .builder .field select:focus-visible,
 .builder details summary:focus-visible {
-  outline: 3px solid #4c9b85;
+  outline: 3px solid var(--green);
   outline-offset: 3px;
 }
 .builder .builder-template {
-  background: #eff8f3;
+  background: var(--canvas);
 }
 .builder .builder-template-icon {
   width: 46px;
   height: 46px;
-  border-radius: 14px;
-  background: #d9eee2;
-  color: #2d6650;
+  border-radius: 3px;
+  background: var(--mint);
+  color: var(--green);
   display: grid;
   place-items: center;
 }
@@ -168,8 +168,8 @@
   gap: 12px;
 }
 .builder .source-box {
-  background: #f1f6f9;
-  border-radius: 11px;
+  background: var(--canvas);
+  border-radius: 3px;
   padding: 16px;
   display: flex;
   gap: 12px;
@@ -177,7 +177,7 @@
 }
 .builder .source-box > svg {
   flex-shrink: 0;
-  color: #42697a;
+  color: var(--green);
 }
 .builder .source-box.stack {
   gap: 12px;
@@ -191,7 +191,7 @@
   gap: 12px;
   padding-top: 24px;
   margin-top: 22px;
-  border-top: 1px solid #dce7e3;
+  border-top: 1px solid var(--mint);
 }
 .builder .builder-footer > .row {
   flex-wrap: wrap;
@@ -199,7 +199,7 @@
   gap: 10px;
 }
 .builder .builder-preview-item {
-  border-top: 1px solid #dce7e3;
+  border-top: 1px solid var(--mint);
   padding-top: 16px;
   display: flex;
   flex-direction: column;
@@ -218,20 +218,20 @@
 .builder .builder-preview-item summary {
   cursor: pointer;
   padding: 7px 0;
-  color: #28634f;
+  color: var(--green);
 }
 .builder blockquote {
   margin: 10px 0 0;
-  border-left: 1px solid #b7d7c8;
+  border-left: 1px solid var(--line);
   padding: 5px 0 5px 12px;
   overflow-wrap: anywhere;
   white-space: pre-wrap;
 }
 .builder .builder-publish-panel {
-  background: #f0f7f4;
+  background: var(--canvas);
 }
 .builder .builder-publish-panel > svg {
-  color: #23664e;
+  color: var(--green);
 }
 .builder .builder-approval {
   display: flex;
@@ -240,8 +240,8 @@
   font-size: 0.88rem;
   line-height: 1.6;
   padding: 16px 0;
-  border-top: 1px solid #ccded5;
-  border-bottom: 1px solid #ccded5;
+  border-top: 1px solid var(--mint);
+  border-bottom: 1px solid var(--mint);
   cursor: pointer;
 }
 .builder .builder-approval input {
@@ -249,7 +249,7 @@
   height: 20px;
   margin: 3px 0 0;
   flex-shrink: 0;
-  accent-color: #24664f;
+  accent-color: var(--green);
 }
 .builder .builder-published {
   align-items: center;
@@ -259,8 +259,8 @@
   margin: auto;
 }
 .builder .builder-published-icon {
-  color: #23664e;
-  background: #dff1e6;
+  color: var(--green);
+  background: var(--canvas);
   border-radius: 50%;
   padding: 22px;
   display: grid;
@@ -275,7 +275,7 @@
 }
 .builder progress {
   width: 100%;
-  accent-color: #24664f;
+  accent-color: var(--green);
 }
 @media (max-width: 700px) {
   .builder .builder-grid {

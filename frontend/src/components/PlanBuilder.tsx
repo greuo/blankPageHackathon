@@ -162,7 +162,7 @@ function BuilderEditor({ spaceId, onClose }: PlanBuilderProps) {
     setInstructions((items) => [
       ...items,
       ...reminders.map((text) =>
-        newInstruction(text, `${template} — fictional nonmedical demo template`, text),
+        newInstruction(text, `${template}: fictional nonmedical demo template`, text),
       ),
     ]);
     setNotice(
@@ -619,7 +619,7 @@ function BuilderEditor({ spaceId, onClose }: PlanBuilderProps) {
                       <h5>{item.text}</h5>
                       <p className="muted">
                         {item.dueAt ? readableTime(item.dueAt) : 'Date required'}
-                        {item.endsAt ? ` — ${readableTime(item.endsAt)}` : ''}
+                        {item.endsAt ? ` to ${readableTime(item.endsAt)}` : ''}
                       </p>
                       {item.kind === 'restriction' && (
                         <p className="muted">

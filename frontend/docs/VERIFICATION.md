@@ -26,3 +26,20 @@ ECC-informed specialist review found and corrected implicit family access for ne
 Backend integration is explicitly deferred by Ranveer. Andrew's Supabase schema/auth/API/storage/realtime contract is not present in inspected GitHub branches or team docs and has been requested in Slack. No Supabase backend, migration, storage/RLS policy, Edge Function, live AI or remote handoff is integrated or certified. UI role tests establish demo behavior only; all demo storage is readable in devtools. Independent authenticated sessions, direct-API isolation, private attachments/search/notifications/realtime revocation, actual live AI limits/failures and external delivery still need backend integration and runtime testing.
 
 Required active-agent roster and exact-change clearances have not been verified yet. No push, PR, approval, merge or deployment is claimed by this report. Fresh GitHub integrated-revision review must follow the eventual authorized integration; a local checkout check is recorded separately and is not equivalent.
+
+## Quiet coastal redesign · 2026-10-17
+
+This section describes the new local visual revision, separately from the original frontend snapshot in PR #3.
+
+- Production build and all 28 repository tests pass after the visual/focus changes.
+- Real in-app-browser inspection at 1280×720 and a narrow 304px viewport: opening screen, workspace, patient conversation, clinician care-space details and builder. Search filters correctly; doctor/patient switching remains usable; a companion question returns the expected attributed approved-source excerpt.
+- Read-only browser checks found no page overflow and no failing text contrast in the inspected opening, workspace, conversation, unavailable state and builder. This is a targeted computed-style check, not a new full axe audit. The full axe results above belong to the earlier frontend revision.
+- Found and fixed a real keyboard boundary issue: Chromium retained layout rectangles for the select inside closed `details`. The focus trap now excludes closed-details descendants except the visible summary. Verified Shift+Tab from Close lands on the summary, Tab from summary returns to Close, and Escape dismisses. Earlier background-tab native-key simulation was inconclusive; final confirmation used locator-targeted keyboard input.
+- Narrow clinician details now give the description a full text column and place the build action below it. The conversation composer is visible within a 720px-tall desktop dialog; long content remains scrollable.
+- Impeccable detector flagged cream and oversized italic display in the initial pass. Removed the italic display. Ivory is a deliberate brief-derived palette decision. Independent read-only review identified a lost unavailable-state style; restored its padding/grouping and confirmed the final disposition **Pass**. No further cosmetic revision recommended.
+- Source audit: no gradients, hover animations, drop shadows, pure-white backgrounds, sparkle icon, colored-left-stripe decorations, rainbow category surfaces or three-card care-context grid. Decorative checkbox strokes removed. Reduced-motion branch remains intact and no new entrance animation was added.
+- First paint includes inline styled HTML with a preloaded local photograph, readable fallback type and the final canvas. No artificial 100ms wait. A 50ms end-to-end paint time is not established or guaranteed.
+
+Current screenshot evidence, ignored from Git: `output/playwright/quiet-opening-desktop.png`, `quiet-opening-mobile.png`, `quiet-workspace-desktop.png`, `quiet-workspace-mobile.png`, `quiet-unavailable.png`, `quiet-builder-desktop.png`, `quiet-clinician-mobile.png`.
+
+Research deliverables: `public/design-study.html`, `docs/DESIGN-RESEARCH.md`, updated `DESIGN.md`, seven linked Color Hunt palettes and three licensed photographic options. The working prototype remains fictional and browser-local; backend integration is deferred.

@@ -1,4 +1,7 @@
 async (page) => {
+  const opening = page.getByRole('button', { name: 'Open my companion', exact: true });
+  if (await opening.isVisible()) await opening.click();
+
  const assert=(value,message)=>{if(!value)throw new Error(message)};
  if(await page.locator('dialog[open]').count())await page.getByRole('button',{name:'Close dialog',exact:true}).click();
  await page.getByRole('button',{name:'Reset fictional demo'}).click();await page.getByRole('button',{name:'Reset demo',exact:true}).click();

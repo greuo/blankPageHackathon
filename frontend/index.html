@@ -1,1 +1,110 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="theme-color" content="#f5faf8"/><meta name="description" content="A fictional demonstration of clinician-created recovery companions."/><link rel="icon" type="image/svg+xml" href="/favicon.svg"/><title>Discharge Companion · Your recovery, together</title></head><body><div id="root"></div><script type="module" src="/src/main.tsx"></script></body></html>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f2f0e7" />
+    <meta
+      name="description"
+      content="A fictional demonstration of clinician-created recovery companions."
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preload" as="image" href="/images/coastal-dunes.jpg" />
+    <title>Discharge Companion · Care for the days ahead</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        background: #f2f0e7;
+        color: #283d38;
+      }
+      .first-paint {
+        min-height: 100svh;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        font-family: Georgia, serif;
+      }
+      .first-copy {
+        display: flex;
+        flex-direction: column;
+        padding: 46px 5vw 28px;
+      }
+      .first-brand {
+        font-size: 24px;
+        line-height: 1.2;
+      }
+      .first-brand small {
+        display: block;
+        font-family: sans-serif;
+        font-size: 12px;
+        letter-spacing: 0.09em;
+      }
+      .first-message {
+        margin: auto 0;
+        padding: 80px 0;
+      }
+      .first-message h1 {
+        font-size: clamp(56px, 6.1vw, 90px);
+        font-weight: 400;
+        line-height: 1.02;
+        letter-spacing: -0.035em;
+        margin: 0;
+      }
+      .first-message h1 span {
+        color: #355c4c;
+      }
+      .first-message p {
+        font-family: sans-serif;
+        line-height: 1.65;
+        font-size: 18px;
+        max-width: 35ch;
+        color: #53665e;
+        margin-top: 26px;
+      }
+      .first-photo {
+        background: #d4e0e6 url('/images/coastal-dunes.jpg') 60% 50% / cover;
+      }
+      .first-note {
+        font: 12px sans-serif;
+        color: #53665e;
+      }
+      @media (max-width: 760px) {
+        .first-paint {
+          grid-template-columns: 1fr;
+          grid-template-rows: minmax(490px, 68svh) minmax(240px, 32svh);
+        }
+        .first-copy {
+          padding: 28px;
+        }
+        .first-message {
+          padding: 42px 0;
+        }
+        .first-message h1 {
+          font-size: clamp(52px, 11vw, 76px);
+        }
+        .first-message p {
+          font-size: 16px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <main class="first-paint" aria-label="Opening Discharge Companion">
+        <div class="first-copy">
+          <div class="first-brand">Discharge<small>companion</small></div>
+          <div class="first-message">
+            <h1>Care for the<br /><span>days ahead.</span></h1>
+            <p>
+              Your clinician’s guidance, the people you trust, and a little clarity for each day.
+            </p>
+          </div>
+          <p class="first-note">A fictional care experience. Saved on this device.</p>
+        </div>
+        <div class="first-photo"></div>
+      </main>
+    </div>
+    <noscript>This fictional companion needs JavaScript to open its workspace.</noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

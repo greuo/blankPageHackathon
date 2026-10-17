@@ -1,4 +1,7 @@
 async (page) => {
+  const opening = page.getByRole('button', { name: 'Open my companion', exact: true });
+  if (await opening.isVisible()) await opening.click();
+
   const assert = (value, message) => {
     if (!value) throw new Error(message);
   };

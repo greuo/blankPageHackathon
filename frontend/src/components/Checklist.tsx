@@ -38,22 +38,12 @@ function CheckControl({
         !previous.current &&
         !window.matchMedia('(prefers-reduced-motion: reduce)').matches
       ) {
-        const strokes = ref.current?.querySelectorAll('i');
         const tl = gsap.timeline();
         tl.fromTo(
           icon,
           { scale: 0.4, opacity: 0 },
           { scale: 1, opacity: 1, duration: 0.2, ease: 'power2.out' },
         );
-        if (strokes)
-          Array.from(strokes).forEach((stroke, i) => {
-            tl.fromTo(
-              stroke,
-              { x: 0, y: 0, opacity: 0, rotation: i * 40 - 40 },
-              { x: (i - 1) * 17, y: -23, opacity: 1, duration: 0.2, ease: 'power2.out' },
-              0,
-            ).to(stroke, { y: 14, opacity: 0, duration: 0.3, ease: 'power1.in' }, 0.2);
-          });
       }
       previous.current = checked;
     },
@@ -69,9 +59,6 @@ function CheckControl({
       onClick={onClick}
     >
       {pending ? <span className="spinner" /> : <Check size={18} className="check-icon" />}
-      <i />
-      <i />
-      <i />
     </button>
   );
 }

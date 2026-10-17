@@ -166,7 +166,7 @@ export default function CareSpace({
                       <h4>{i.text}</h4>
                       <p className="muted">
                         {dateTime(i.dueAt)}
-                        {i.endsAt ? ` — ${dateTime(i.endsAt)}` : ''} · {i.recurrence}
+                        {i.endsAt ? ` to ${dateTime(i.endsAt)}` : ''} · {i.recurrence}
                       </p>
                       <details>
                         <summary>View approved source</summary>

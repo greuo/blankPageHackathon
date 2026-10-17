@@ -18,9 +18,7 @@ import {
   Search,
   Settings2,
   ShieldCheck,
-  Sparkles,
   Stethoscope,
-  Sun,
   Users,
   Utensils,
   Footprints,
@@ -80,6 +78,22 @@ function Companion() {
   const state = useSyncExternalStore(repository.subscribe, repository.getSnapshot);
   const actor = getActor(state);
   const spaces = getVisibleSpaces(state);
+  const [showOpening, setShowOpening] = useState(() => {
+    try {
+      return sessionStorage.getItem('companion-opening-v2') !== 'seen';
+    } catch {
+      return true;
+    }
+  });
+  function enterWorkspace() {
+    try {
+      sessionStorage.setItem('companion-opening-v2', 'seen');
+    } catch {
+      /* The app remains usable without session storage. */
+    }
+    setShowOpening(false);
+    requestAnimationFrame(() => document.getElementById('main')?.focus({ preventScroll: true }));
+  }
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState<{ id: string; tab?: string; sourceId?: string } | null>(
     null,
@@ -126,6 +140,36 @@ function Companion() {
       setError(errorText(e));
     }
   }
+  if (showOpening)
+    return (
+      <main className="opening" aria-label="Welcome to Discharge Companion">
+        <div className="opening-copy">
+          <Logo />
+          <div className="opening-message">
+            <h1>
+              Care for the
+              <br />
+              <span className="opening-second-line">days ahead.</span>
+            </h1>
+            <p>
+              Your clinician’s guidance, the people you trust, and a little clarity for each day.
+            </p>
+            <button className="btn primary opening-enter" onClick={enterWorkspace}>
+              Open my companion
+            </button>
+          </div>
+          <p className="opening-note">A fictional care experience. Saved on this device.</p>
+        </div>
+        <figure className="opening-landscape">
+          <img
+            src="/images/coastal-dunes.jpg"
+            alt="Quiet dunes beside a blue sea, photographed on film"
+            fetchPriority="high"
+          />
+          <figcaption>Room to take the next step.</figcaption>
+        </figure>
+      </main>
+    );
   return (
     <>
       <a className="skip-link" href="#main">
@@ -133,7 +177,13 @@ function Companion() {
       </a>
       <div className="app-shell">
         <aside className="sidebar" aria-label="Workspace navigation">
-          <Logo />
+          <button
+            className="brand-home"
+            aria-label="Show welcome screen"
+            onClick={() => setShowOpening(true)}
+          >
+            <Logo />
+          </button>
           <div className="workspace-label">YOUR RECOVERY SPACE</div>
           <nav className="main-nav" aria-label="Main navigation">
             <a className="selected" href="#main">
@@ -163,7 +213,7 @@ function Companion() {
               <Leaf size={22} />
             </span>
             <h3>You’re not doing this alone.</h3>
-            <p>Your care team, instructions, and next steps. All in one place.</p>
+            <p>Keep your approved guidance and care team close.</p>
             <button onClick={() => setDialog('guide')}>
               Meet your companion <ArrowRight size={15} />
             </button>
@@ -219,14 +269,9 @@ function Companion() {
             <header className="page-heading">
               <div>
                 <p className="greeting">
-                  <Sun size={16} />
                   Welcome back, {actor.role === 'doctor' ? 'Dr. Chen' : actor.name.split(' ')[0]}
                 </p>
-                <h1>
-                  {actor.role === 'doctor'
-                    ? 'Make recovery feel supported.'
-                    : 'Your recovery, together.'}
-                </h1>
+                <h1>{actor.role === 'doctor' ? 'A plan to carry home.' : 'One day at a time.'}</h1>
                 <p>
                   {actor.role === 'doctor'
                     ? 'Create guidance your patient can carry home.'
@@ -258,28 +303,26 @@ function Companion() {
               </p>
             )}
             <section className="welcome-strip">
-              <div className="welcome-mark">
-                <Heart size={27} />
-              </div>
-              <div>
+              <div className="welcome-copy">
                 <h2>
                   {actor.role === 'doctor'
-                    ? 'Thoughtful care starts with your instructions.'
+                    ? 'Care continues beyond the clinic.'
                     : actor.role === 'family'
-                      ? 'Your support makes a difference.'
-                      : 'A little support for the days ahead.'}
+                      ? 'A place to support Jamie.'
+                      : 'Your care, kept close.'}
                 </h2>
                 <p>
                   {actor.role === 'doctor'
-                    ? 'Choose a space, shape the plan, and approve what your patient sees.'
+                    ? 'Shape a companion around your patient’s approved instructions.'
                     : actor.role === 'family'
-                      ? 'See what Jamie has shared, ask questions, and report the support you provide.'
-                      : 'Your care spaces keep the right people and approved guidance close.'}
+                      ? 'Find the guidance and conversations Jamie has shared with you.'
+                      : 'Find your approved guidance, ask a question, or see what’s next for today.'}
                 </p>
+                <a className="text-link" href="#checklist">
+                  {actor.role === 'doctor' ? 'Review daily guidance' : 'View today’s steps'}
+                </a>
               </div>
-              <span className="welcome-end">
-                <Leaf size={42} />
-              </span>
+              <img src="/images/coastal-dunes.jpg" alt="" className="welcome-photo" />
             </section>
             <section id="care-spaces" className="care-spaces">
               <div className="section-title">
@@ -287,7 +330,7 @@ function Companion() {
                   <h2>
                     Your care spaces <span className="count">{spaces.length}</span>
                   </h2>
-                  <p>Different parts of recovery. One connected care team.</p>
+                  <p>A place for each part of your recovery.</p>
                 </div>
                 {actor.role === 'doctor' ? (
                   <button
@@ -335,16 +378,11 @@ function Companion() {
                     (p) => p.spaceId === s.id && p.status === 'approved',
                   );
                   return (
-                    <button
-                      className={`care-card card-${s.tone}`}
-                      key={s.id}
-                      onClick={() => open(s)}
-                    >
+                    <button className="care-card" key={s.id} onClick={() => open(s)}>
                       <div className="card-top">
-                        <span className={`space-symbol ${s.tone}`}>
+                        <span className="space-symbol">
                           <Icon size={24} />
                         </span>
-                        <ArrowRight size={19} />
                       </div>
                       <h3>{s.name}</h3>
                       <p>{s.description}</p>
@@ -443,7 +481,6 @@ function Companion() {
                 <section className="companion-panel">
                   <span className="companion-icon">
                     <MessageCircle size={24} />
-                    <Sparkles size={13} />
                   </span>
                   <h2>Questions along the way?</h2>
                   <p>Your companion can help you find answers in your clinician-approved plan.</p>
@@ -469,8 +506,8 @@ function Companion() {
             </footer>
             <p className="demo-disclosure">
               Demonstration only. All people and instructions are fictional. Records are stored in
-              this browser; role switching is not authentication. Andrew’s Supabase integration is
-              pending. Do not enter real patient information.
+              this browser; role switching is not authentication. Do not enter real patient
+              information.
             </p>
           </main>
         </div>
