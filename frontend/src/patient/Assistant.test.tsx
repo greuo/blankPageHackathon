@@ -4,7 +4,7 @@ import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import Assistant from './Assistant';
 import { patientStore } from './store';
-import { EdgeError, ensureDoctor, notifyDoctor, sendChat } from '../data/supabase';
+import { EdgeError, ensureDoctor, notifyDoctor, sendChat, syncCareNotes } from '../data/supabase';
 
 // The live backend is mocked: tests verify the contract binding, not the service.
 vi.mock('../data/supabase', () => {
@@ -21,6 +21,7 @@ vi.mock('../data/supabase', () => {
   return {
     EdgeError,
     ensureSession: vi.fn(async () => {}),
+    syncCareNotes: vi.fn(async () => {}),
     sendChat: vi.fn(),
     notifyDoctor: vi.fn(),
     ensureDoctor: vi.fn(),
@@ -91,6 +92,16 @@ it('shows the live bot reply and offers Send to my doctor when suggested', async
   });
   await click('Review my tasks');
   expect(vi.mocked(sendChat)).toHaveBeenCalledWith('Review my tasks');
+  // The notes reached the server before the question was asked.
+  const seed = patientStore.getSnapshot();
+  expect(vi.mocked(syncCareNotes)).toHaveBeenCalledWith({
+    doctor: seed.doctor,
+    email: seed.email,
+    instructions: seed.instructions,
+  });
+  expect(Math.min(...vi.mocked(syncCareNotes).mock.invocationCallOrder)).toBeLessThan(
+    Math.min(...vi.mocked(sendChat).mock.invocationCallOrder),
+  );
   const log = host.querySelector('[role=log]');
   expect(log?.textContent).toContain('keep the wound dry');
   expect(patientStore.getSnapshot().messages.at(-1)).toMatchObject({
@@ -129,4 +140,15 @@ it('asks guests to add an email when notify-doctor answers guest_must_sign_up', 
   expect(host.querySelector('.assistant-notify [role=alert]')?.textContent).toContain(
     'Add an email',
   );
+});
+
+it('does not ask the bot when the notes could not reach the server', async () => {
+  vi.mocked(syncCareNotes).mockRejectedValue(
+    new EdgeError('Could not update your care notes. Try again.', 0),
+  );
+  const before = patientStore.getSnapshot().messages.length;
+  await click('Review my tasks');
+  expect(vi.mocked(sendChat)).not.toHaveBeenCalled();
+  expect(host.querySelector('[role=alert]')?.textContent).toContain('care notes');
+  expect(patientStore.getSnapshot().messages.length).toBe(before);
 });

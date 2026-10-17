@@ -82,22 +82,51 @@ export function notifyDoctor(doctorId: string, content: string): Promise<NotifyD
   return invokeEdge<NotifyDoctorResponse>('notify-doctor', { doctor_id: doctorId, content });
 }
 
-/** The signed-in patient's doctor row id, created from the locally saved doctor on first use. */
+/** The signed-in patient's doctor row id, created from the locally saved doctor on first use
+ * and kept in step with it afterwards (the bot quotes this row for "who is my doctor?"). */
 export async function ensureDoctor(name: string, email: string): Promise<string> {
+  const wanted = { name: name.trim(), email: email.trim() || null };
   const existing = await supabase
     .from('doctors')
-    .select('id')
+    .select('id, name, email')
     .order('created_at')
     .limit(1)
     .maybeSingle();
   if (existing.error) throw new EdgeError('Could not look up your doctor. Try again.', 0);
-  if (existing.data) return existing.data.id as string;
-  const created = await supabase
-    .from('doctors')
-    .insert({ name, email: email || null })
-    .select('id')
-    .single();
+  if (existing.data) {
+    if (existing.data.name !== wanted.name || (existing.data.email ?? null) !== wanted.email) {
+      const updated = await supabase.from('doctors').update(wanted).eq('id', existing.data.id);
+      if (updated.error) throw new EdgeError('Could not update your doctor. Try again.', 0);
+    }
+    return existing.data.id as string;
+  }
+  const created = await supabase.from('doctors').insert(wanted).select('id').single();
   if (created.error || !created.data)
     throw new EdgeError('Could not save your doctor. Try again.', 0);
   return created.data.id as string;
+}
+
+export type CareNoteSync = { doctor: string; email: string; instructions: string };
+
+/** The bot answers only from the care notes stored on the server (current_care_notes), not from
+ * the app's local copy. Keep the server's latest version in step with the locally saved
+ * instructions: insert a new version when the text or the doctor link changed. Notes entered
+ * elsewhere with structure beyond `instructions` (normal, warning_signs, …) are richer than the
+ * app's free text, so they are left alone. */
+export async function syncCareNotes({ doctor, email, instructions }: CareNoteSync): Promise<void> {
+  const text = instructions.trim();
+  if (!text) return;
+  const current = await supabase
+    .from('current_care_notes')
+    .select('content, doctor_id')
+    .maybeSingle();
+  if (current.error) throw new EdgeError('Could not read your care notes. Try again.', 0);
+  const content = (current.data?.content ?? null) as Record<string, unknown> | null;
+  if (content && Object.keys(content).some((key) => key !== 'instructions')) return;
+  const doctorId = doctor.trim() ? await ensureDoctor(doctor, email) : null;
+  if (content?.instructions === text && (current.data?.doctor_id ?? null) === doctorId) return;
+  const inserted = await supabase
+    .from('care_notes')
+    .insert({ doctor_id: doctorId, content: { instructions: text } });
+  if (inserted.error) throw new EdgeError('Could not update your care notes. Try again.', 0);
 }

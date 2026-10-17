@@ -5,7 +5,14 @@ import PromptBar from '../components/PromptBar';
 import { Tooltip } from '../components/Tooltip';
 import { Skeleton, errorText } from '../components/ui';
 import { useSurfaceEntrance } from '../components/motion';
-import { EdgeError, ensureDoctor, ensureSession, notifyDoctor, sendChat } from '../data/supabase';
+import {
+  EdgeError,
+  ensureDoctor,
+  ensureSession,
+  notifyDoctor,
+  sendChat,
+  syncCareNotes,
+} from '../data/supabase';
 import { isEmergency, type ChatMessage, type PatientState } from './model';
 import { patientStore } from './store';
 
@@ -90,6 +97,12 @@ export default function Assistant({
     setError('');
     try {
       await ensureSession();
+      // The bot reads notes from the server, so give it the instructions saved in this app.
+      await syncCareNotes({
+        doctor: state.doctor,
+        email: state.email,
+        instructions: state.instructions,
+      });
       const response = await sendChat(content);
       if (request.current !== sequence) return;
       patientStore.update((s) => {
