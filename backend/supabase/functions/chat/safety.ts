@@ -5,9 +5,10 @@
 // Two layers, both fail closed:
 //   1. redFlag(): a keyword screen that runs before the model. A match sends the patient to 911 (or
 //      the clinic phone), whatever the model would have said. Never by email (PLAN.md).
-//   2. decide(): checks the model's verdict in code. The bot only answers when the model says the
-//      doctor's notes fully cover the question, cites note items that really exist, and the question
-//      doesn't touch symptoms or treatment changes. Anything else refers the patient to their doctor.
+//   2. decide(): checks the model's verdict in code. The bot answers only when the notes state the
+//      answer or it follows directly from them, the answer cites note items that really exist, and the
+//      patient isn't asking to change a treatment. Symptom answers and warning-sign replies always get
+//      a fixed "contact your doctor / 911" footer. Anything else refers the patient to their doctor.
 
 export type Urgency = "low" | "medium" | "high";
 
@@ -60,25 +61,43 @@ export const SMALL_TALK_REPLY =
   "Happy to help. Ask me anything about the notes your doctor left you, and if I can't answer it for " +
   "certain I'll tell you to check with your doctor.";
 
+// Added to the end of every answer about a symptom, and every warning-sign reply. Fixed text, so
+// the "contact your doctor / 911" safety net never depends on the model remembering it.
+export const symptomFooter = (c: Clinic) =>
+  "If it gets worse, or you notice any of the warning signs in your notes, contact your doctor" +
+  (c?.clinic_phone ? ` (${c.clinic ?? "your clinic"}: ${c.clinic_phone})` : "") + ". If it feels like an emergency, call 911.";
+
+export const warningFooter = (c: Clinic) =>
+  `You can also tap "Send to my doctor" to message them.${clinicLine(c)} If it feels serious or is getting worse, call 911.`;
+
 // What the model returns (schema in bot.ts).
 export type Verdict = {
-  action: "answer" | "small_talk" | "refer";
+  action: "answer" | "warning_sign" | "small_talk" | "refer";
   answer: string;
   cited_note_ids: string[];
-  fully_covered_by_notes: boolean;
-  involves_symptoms_or_treatment_change: boolean;
+  // How the notes support the answer: they say it outright, it follows from them with no
+  // assumptions, or they don't cover it.
+  support: "stated" | "direct_implication" | "not_covered";
+  mentions_symptom: boolean;
+  // Starting, stopping, skipping or changing a medicine or treatment beyond what the notes say.
+  asks_to_change_treatment: boolean;
   refer_reason: string;
   urgency: Urgency;
 };
 
 export type Decision =
-  | { action: "answered"; reply: string; cited: string[]; reason: string }
+  | { action: "answered"; reply: string; cited: string[]; symptom: boolean; reason: string }
+  | { action: "warning_sign"; reply: string; cited: string[]; urgency: Urgency; reason: string }
   | { action: "small_talk"; reply: string; reason: string }
   | { action: "referred"; reason: string; urgency: Urgency };
 
 const atLeastMedium = (u: Urgency): Urgency => (u === "low" ? "medium" : u);
 
 // `verdict` is null when the model call failed, was refused, or returned something unparseable.
+//
+// The bot may now answer symptom questions ("is some redness normal?") and clear implications of the
+// notes ("no swimming" from "don't soak it in a pool"), but only with a citation to a real note item.
+// Treatment changes, uncovered questions and anything uncited still go to the doctor.
 export function decide(verdict: Verdict | null, noteIds: Set<string>): Decision {
   if (!verdict) {
     return { action: "referred", reason: "The bot could not process this message.", urgency: "medium" };
@@ -87,21 +106,24 @@ export function decide(verdict: Verdict | null, noteIds: Set<string>): Decision 
   if (verdict.action === "refer") {
     return { action: "referred", reason: reason || "The bot was not sure how to answer.", urgency: verdict.urgency };
   }
-  if (verdict.involves_symptoms_or_treatment_change) {
+  if (verdict.asks_to_change_treatment) {
     return {
       action: "referred",
-      reason: reason || "The message involves symptoms or a change in treatment.",
+      reason: reason || "The patient asked to change a medicine or treatment.",
       urgency: atLeastMedium(verdict.urgency),
     };
   }
   if (verdict.action === "small_talk") {
+    if (verdict.mentions_symptom) {
+      return { action: "referred", reason: "Small talk that mentions a symptom.", urgency: atLeastMedium(verdict.urgency) };
+    }
     return { action: "small_talk", reply: SMALL_TALK_REPLY, reason: "Greeting or thanks, no question." };
   }
 
   const answer = verdict.answer?.trim();
   const cited = [...new Set(verdict.cited_note_ids ?? [])];
-  const doubt = !verdict.fully_covered_by_notes
-    ? "The notes don't fully cover the question."
+  const doubt = verdict.support === "not_covered"
+    ? "The notes don't cover the question."
     : !answer
     ? "The bot produced an empty answer."
     : cited.length === 0
@@ -109,7 +131,32 @@ export function decide(verdict: Verdict | null, noteIds: Set<string>): Decision 
     : cited.some((id) => !noteIds.has(id))
     ? "The answer cited a note that doesn't exist."
     : null;
-  if (doubt) return { action: "referred", reason: reason ? `${doubt} ${reason}` : doubt, urgency: verdict.urgency };
+  if (doubt) {
+    const urgency = verdict.mentions_symptom ? atLeastMedium(verdict.urgency) : verdict.urgency;
+    return { action: "referred", reason: reason ? `${doubt} ${reason}` : doubt, urgency };
+  }
 
-  return { action: "answered", reply: answer!, cited, reason: "Answered from the doctor's notes." };
+  if (verdict.action === "warning_sign") {
+    return {
+      action: "warning_sign",
+      reply: answer!,
+      cited,
+      urgency: atLeastMedium(verdict.urgency),
+      reason: "The patient described a warning sign from the notes.",
+    };
+  }
+  return {
+    action: "answered",
+    reply: answer!,
+    cited,
+    symptom: verdict.mentions_symptom,
+    reason: verdict.support === "stated" ? "Answered from the doctor's notes." : "Answered from a direct implication of the notes.",
+  };
+}
+
+// The text the patient sees for a decision that carries model text.
+export function patientReply(decision: Decision & { reply: string }, c: Clinic): string {
+  if (decision.action === "warning_sign") return `${decision.reply}\n\n${warningFooter(c)}`;
+  if (decision.action === "answered" && decision.symptom) return `${decision.reply}\n\n${symptomFooter(c)}`;
+  return decision.reply;
 }

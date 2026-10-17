@@ -124,6 +124,10 @@ insert into public.care_notes (id, patient_id, doctor_id, entered_via, content) 
   '00000000-0000-0000-0000-000000000201', 'qr',
   $json${
     "reason": "High blood pressure (hypertension). Your home readings on 10 mg averaged 142/90, still above the goal of under 130/80, so we are raising the dose.",
+    "normal": [
+      "Feeling a little more tired than usual for the first week on the higher dose.",
+      "A mild headache in the first few days, if it eases with acetaminophen (Tylenol)."
+    ],
     "medications": [
       {"name": "Lisinopril", "dose": "20 mg (1 tablet)", "when": "Once a day, in the morning", "until": "Ongoing. Don't stop unless Dr. Okafor tells you to."}
     ],
@@ -154,6 +158,11 @@ insert into public.care_notes (id, patient_id, doctor_id, entered_via, content) 
   '00000000-0000-0000-0000-000000000202', 'patient_phone',
   $json${
     "reason": "A 3 cm cut on the palm of your left hand from a kitchen knife. It was cleaned and closed with 5 stitches. The tendons and nerves are fine. You also had a tetanus booster today.",
+    "normal": [
+      "Some soreness, mild swelling and slight pinkness right along the stitches for the first 2 to 3 days.",
+      "A little clear or slightly pink fluid on the bandage on the first day.",
+      "Itching around the stitches as the cut heals."
+    ],
     "medications": [
       {"name": "Ibuprofen", "dose": "400 mg (2 tablets of 200 mg)", "when": "Every 6 to 8 hours with food, only if you need it for pain", "until": "Up to 5 days"},
       {"name": "Acetaminophen (Tylenol)", "dose": "500 mg (1 tablet)", "when": "Every 6 hours if you need more pain relief. No more than 6 tablets (3,000 mg) a day.", "until": "Up to 5 days"}

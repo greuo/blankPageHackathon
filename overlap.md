@@ -21,6 +21,10 @@ Things both sides rely on: API base URL, ports, data shapes, auth, env vars. Eit
 
 ## Backend → Frontend
 
+- [ ] 2026-10-17 · Andrew: **`chat` now refers to the doctor less, and has a new `action`.**
+  - New `action: "warning_sign"`: the patient described one of the warning signs in their notes. The reply says what the notes say to do; `suggest_notify_doctor` is true, so show "Send to my doctor" (same as `referred`).
+  - Care notes can have an optional `normal` list: what's expected after the visit ("slight pinkness along the stitches for 2-3 days"). Please add a **What's normal** field to Doctor mode / the instructions page. With it the bot can answer "is this normal?"; without it, those questions go to the doctor.
+
 - [ ] 2026-10-17 · Andrew: **`chat` is live for the patient-only tables, and guest sign-in is on hosted.**
   - Call `supabase.functions.invoke('chat', { body: { content } })` instead of inserting into `messages` yourself. It saves the patient message and the bot reply (both also arrive by realtime). Response: `{ patient_message, reply, action, suggest_notify_doctor }`, `action` is `answered` | `small_talk` | `referred` | `emergency`. When `suggest_notify_doctor` is true, offer "Send to my doctor". 429 means too many messages (20 per 10 minutes).
   - Care notes: saving your free-text instructions as `{ "instructions": "…" }` works today; the bot reads it line by line. See `PLAN.md` → Care-notes content shape.

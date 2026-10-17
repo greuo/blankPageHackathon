@@ -1,17 +1,19 @@
 // POST /functions/v1/chat  (any signed-in patient: guest or email account)
 // Body: { content }
-// Saves the patient's message, then the bot answers from the patient's current care notes or
-// tells them to check with their doctor. See safety.ts for the rules. The bot never emails anyone;
+// Saves the patient's message, then the bot answers from the patient's current care notes (including
+// clear implications and "is this normal?" when the notes say), points out a matching warning sign,
+// or tells them to check with their doctor. See safety.ts for the rules. The bot never emails anyone;
 // "Send to my doctor" is the patient's choice (suggest_notify_doctor tells the UI to offer it).
 //
 // Response 201: { patient_message, reply, action, suggest_notify_doctor }
 //   reply   – the bot's message row (also delivered by realtime on `messages`)
-//   action  – "answered" | "small_talk" | "referred" | "emergency"
+//   action  – "answered" | "warning_sign" | "small_talk" | "referred" | "emergency"
+//             (suggest_notify_doctor is true for "warning_sign" and "referred")
 // Response 429: { error, retry_after_seconds } when the patient sends too many messages.
 import { callerClient, corsHeaders, getCaller, json, serviceClient } from "../_shared/http.ts";
 import { askClaude, type Turn } from "./bot.ts";
 import { doctorNote, flattenNotes } from "./notes.ts";
-import { decide, emergencyNotice, redFlag, referNotice } from "./safety.ts";
+import { decide, emergencyNotice, patientReply, redFlag, referNotice } from "./safety.ts";
 
 const MAX_LENGTH = 4000;
 const HISTORY_LIMIT = 40;
@@ -109,7 +111,7 @@ Deno.serve(async (req) => {
     if (decision.action === "referred") {
       return await reply(referNotice(doctor, decision.urgency), "referred", true);
     }
-    return await reply(decision.reply, decision.action, false);
+    return await reply(patientReply(decision, doctor), decision.action, decision.action === "warning_sign");
   } catch (e) {
     console.error("chat:", e);
     try {

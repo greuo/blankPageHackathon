@@ -36,7 +36,7 @@ Every table has RLS: a signed-in user (guest or email) gets only rows where `pat
 | `doctor_messages` | `id`, `patient_id`, `doctor_id`, `recipient_email` (set by the server), `content`, `token_hash`, `expires_at` (+7 days), `opened_at`, `created_at` | read only. Written by `notify-doctor`; `opened_at` set by `view-doctor-message`. Insert trigger enforces the anti-spam limits (`PLAN.md`) |
 | `entry_links` | `id`, `patient_id`, `token_hash`, `expires_at` (+30 min), `used_at`, `created_at` | read only. Written by `entry-link` / `doctor-entry` |
 
-- `care_notes.content`: `{ reason, medications: [{ name, dose, when, until }], instructions: [...], warning_signs: [{ sign, action }], contact_rules, follow_up }`. Only "is a JSON object" is enforced; the shape is a convention.
+- `care_notes.content`: `{ reason, normal: [...], medications: [{ name, dose, when, until }], instructions: [...], warning_signs: [{ sign, action }], contact_rules, follow_up }`. Only "is a JSON object" is enforced; the shape is a convention. `normal` (what's expected after the visit) is optional but lets the bot answer "is this normal?".
 - Tokens are stored as sha256 hex; the raw token only lives in the link.
 
 ### Edge functions
@@ -51,7 +51,7 @@ Patient functions: `supabase.functions.invoke(name, { body })` while signed in (
 | `entry-link` | patient | creates a QR token (`entry_links`) | planned |
 | `doctor-entry` | anyone with a QR token | returns current notes, saves a new version (`entered_via = 'qr'`), marks the token used | planned |
 
-`chat`: body `{ content }` (1-4000 characters). Response 201 `{ patient_message, reply, action, suggest_notify_doctor }`; `action` is `answered` (from the notes, cited), `small_talk` (fixed reply), `referred` ("check with your doctor", `suggest_notify_doctor: true`) or `emergency` (red-flag keyword: call 911 / clinic phone, no model call). 429 `{ error, retry_after_seconds }` past 20 messages per 10 minutes or 200 per day. Safety rules in `chat/safety.ts` (unit tests: `deno test --config backend/supabase/functions/chat/deno.json backend/supabase/functions/chat/`); live check against Claude: `chat/eval_live.ts`.
+`chat`: body `{ content }` (1-4000 characters). Response 201 `{ patient_message, reply, action, suggest_notify_doctor }`; `action` is `answered` (from the notes or a clear implication of them, cited; symptom answers end with a fixed "contact your doctor / 911" line), `warning_sign` (the patient described a warning sign from the notes: what the notes say to do, `suggest_notify_doctor: true`), `small_talk` (fixed reply), `referred` ("check with your doctor", `suggest_notify_doctor: true`) or `emergency` (red-flag keyword: call 911 / clinic phone, no model call). 429 `{ error, retry_after_seconds }` past 20 messages per 10 minutes or 200 per day. Safety rules in `chat/safety.ts` (unit tests: `deno test --config backend/supabase/functions/chat/deno.json backend/supabase/functions/chat/`); live check against Claude: `chat/eval_live.ts`.
 
 ### supabase-js cheat sheet
 
@@ -97,6 +97,12 @@ Newest first. One entry per session:
 - **Next:** what should happen next
 - **Notes:** blockers, decisions, gotchas (optional)
 ```
+
+### 2026-10-17 · Andrew (chat refers less)
+- **Did:** The bot was sending too much to the doctor. It now answers clear implications of the notes ("no swimming" from "don't soak it"), answers "is this normal?" when the notes say what's expected (new optional `normal` list), and when the patient describes a warning sign from the notes it says what the notes say to do (`warning_sign`, offers Send to my doctor). Unclear workarounds, treatment changes and anything uncovered still refer. Code still requires real citations, and adds a fixed "contact your doctor / 911" line to every symptom answer. Added `normal` to the demo notes.
+- **Files:** `functions/chat/` (`bot.ts` prompt + schema, `safety.ts`, tests, `eval_live.ts`), `seed.sql`, `PLAN.md`, `overlap.md`, this file
+- **Next:** frontend: add a "What's normal" field to Doctor mode, handle `action: "warning_sign"`.
+- **Notes:** 15/15 live cases as expected, 0 unsafe (run against a temporary `chat-preview` deploy, since deleted). 16/16 unit tests.
 
 ### 2026-10-17 · Andrew (review fixes + chat)
 - **Did:** Fixed the open review findings from #5 and #6. New migration: default privileges so future tables start read-only, never-reused care-note versions, anti-spam limits on `doctor_messages`. Rewrote `chat` for the patient-only tables, reusing PR #4's safety design (red-flag screen, cited-answers-only, everything else refers to the doctor), with the prompt-escaping fix from #4's review, negation handling in the red-flag screen, per-patient rate limits, and support for the frontend's free-text instructions. Turned on anonymous sign-in on hosted. Documented the multi-doctor and content-shape decisions in `PLAN.md`.
