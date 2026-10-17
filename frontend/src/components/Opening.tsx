@@ -50,7 +50,7 @@ export default function Opening({ onEnter }: { onEnter: () => void }) {
       </button>
       <div className="splash-composition">
         <svg className="splash-symbol" viewBox="0 0 120 120" aria-hidden="true">
-          <path className="splash-line blue-line" d="M18 102V21a3 3 0 0 1 3-3h81" />
+          <path className="splash-line sage-line" d="M18 102V21a3 3 0 0 1 3-3h81" />
           <path className="splash-line green-line" d="M102 18v81a3 3 0 0 1-3 3H18" />
           <text className="splash-monogram" x="59" y="79" textAnchor="middle">
             dc

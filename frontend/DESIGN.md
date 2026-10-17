@@ -1,32 +1,36 @@
 # Care companion design
 
-Current direction: a light patient recovery workspace with clear blue and mint regions, rounded Nunito typography and flat surfaces. Ranveer's two original desktop compositions define the product structure. His newer healthcare mobile references inform hierarchy, navigation and grouping. They are inspiration rather than a booking/doctor-directory feature request.
+Current direction: a light patient recovery workspace with sage and leaf-green regions, rounded Nunito typography and flat surfaces. Ranveer's two original desktop compositions define the product structure. His newer healthcare mobile references inform hierarchy, navigation and grouping. They are inspiration rather than a booking/doctor-directory feature request.
 
 ## Tokens and typography
 
-| Token       | Value     | Role                                          |
-| ----------- | --------- | --------------------------------------------- |
-| Canvas      | `#F2F7FA` | Cool off-white page                           |
-| Surface     | `#F9FCFE` | Task rows, forms and dialogs                  |
-| Blue        | `#DCEFFF` | Welcome, navigation and assistant context     |
-| Mint        | `#D9F3E9` | Support and confirmation                      |
-| Action      | `#246DBB` | Primary actions                               |
-| Green       | `#167660` | Add instructions, reported state and timeline |
-| Ink         | `#183A4B` | Text and icons                                |
-| Muted       | `#4F6878` | Supporting copy                               |
-| Line        | `#CDDFE8` | Structural dividers                           |
-| Strong line | `#809CAB` | Control boundaries                            |
-| Danger      | `#9A453D` | Urgent and destructive actions                |
+| Token | Value | Role |
+| --- | --- | --- |
+| Canvas | `#F2F6EF` | Light sage page |
+| Surface | `#FAFCF7` | Green-tinted task rows, forms and dialogs |
+| Sage | `#E4EEDC` | Navigation and soft icon surfaces |
+| Mint | `#DCEBD8` | Support and confirmation |
+| Panel | `#E8F0E2` | Guidance and source text |
+| Strong panel | `#DFEBD6` | Greeting, assistant header and timeline |
+| Action | `#286642` | Primary actions and focus |
+| Green | `#326F4D` | Add instructions and reported state |
+| Ink | `#203E2F` | Text and icons |
+| Muted | `#536A58` | Supporting copy |
+| Line | `#CBDAC4` | Structural dividers |
+| Strong line | `#788E70` | Control boundaries |
+| Urgency | `#123B22` | Deep-green urgent and destructive actions |
+| Urgent surface | `#163D28` | Inverse emergency panel, distinct from pale routine surfaces |
+| Urgent text | `#F0F6E7` | High-contrast emergency copy and filled primary control |
 
-The blue/mint relationship was adapted from [Color Hunt](https://colorhunt.co/palette/3674b5578fcaa1e3f9d1f8ef) and refined against readable foregrounds. Palette names and design-process text stay out of the app.
+The October 17 green-only request supersedes the earlier blue/mint palette. Shared color roles live in `src/styles.css`; the patient UI inherits them. Pale sage and leaf tints provide separation, with forest text and actions. Emergency guidance uses a dark inverse panel, light text, a filled primary action and an outlined secondary action. Its words and phone icon remain explicit. Destructive controls use the deepest green, heavier type and a stronger border. Notification markers use a diamond shape. First-paint HTML and the favicon use matching values. Palette names and design-process text stay out of the app.
 
 One self-hosted Latin **Nunito Variable** WOFF2 asset supplies the interface. Main headings use 800; controls 700–750; body 400. Desktop greeting is 32–41px according to breakpoint; mobile is 30px. Sections are 21–24px; task titles 17–18px; editable fields and most care text stay 15–16px. Headings balance short lines, care text wraps naturally and numeric progress uses tabular figures. Font license is distributed at `public/fonts/Nunito-LICENSE.txt`.
 
 ## Layout and shape
 
-Desktop uses an 82px horizontal header, a 1440px maximum page and two working columns with a 28px gap. Home, My instructions and Progress connect to real existing flows. The blue greeting includes the actual local date and Add action. To-Do remains the exact requested heading; freestanding rows show patient report state. Provided guidance uses a blue region. A mint timeline shows elapsed plan time and the next actual milestone. It never claims healing percentage.
+Desktop uses an 82px horizontal header, a 1440px maximum page and two working columns with a 28px gap. Home, My instructions and Progress connect to real existing flows. The sage greeting includes the actual local date and Add action. To-Do remains the exact requested heading; freestanding rows show titles and patient report state without secondary descriptions. Provided guidance uses a light sage region. A leaf-green timeline shows elapsed plan time and the next actual milestone. It never claims healing percentage.
 
-The assistant has a blue header, quiet transcript, exact-instructions shortcut, report control and a stable composer. Its message log scrolls independently and preserves older-message reading position. Expanded mode fills the viewport with narrow gutters and one title. Native dialog focus containment, Escape, explicit close and return focus remain.
+The assistant has a sage header, quiet transcript, exact-instructions shortcut, report control and a stable composer. Its message log scrolls independently and preserves older-message reading position. Expanded mode fills the viewport with narrow gutters and one title. Native dialog focus containment, Escape, explicit close and return focus remain.
 
 Below 850px the dashboard stacks and a fixed Home/My plan/Companion dock connects to existing navigation. Space is reserved below content and focus targets have a bottom scroll margin. At 390px, task icons recede to preserve text width; native checkboxes and action labels remain clear. The assistant becomes an in-page panel and can expand to a nearly full viewport.
 
