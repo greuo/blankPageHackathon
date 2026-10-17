@@ -7,7 +7,15 @@ export type CheckIn = {
   feeling: string;
   notes: string;
 };
-export type ChatMessage = { id: string; role: 'patient' | 'assistant'; text: string };
+export type ChatMessage = {
+  id: string;
+  role: 'patient' | 'assistant';
+  text: string;
+  /** The live bot suggested sending this exchange to the doctor (chat contract). */
+  suggestNotifyDoctor?: boolean;
+  /** The patient question behind this reply, used by "Send to my doctor". */
+  patientText?: string;
+};
 export type Emergency = {
   id: string;
   at: string;
@@ -228,7 +236,9 @@ export function parseState(raw: string): PatientState {
       (m) =>
         typeof m.id === 'string' &&
         ['patient', 'assistant'].includes(m.role) &&
-        typeof m.text === 'string',
+        typeof m.text === 'string' &&
+        (m.suggestNotifyDoctor === undefined || typeof m.suggestNotifyDoctor === 'boolean') &&
+        (m.patientText === undefined || typeof m.patientText === 'string'),
     ) ||
     !Array.isArray(s.checkIns) ||
     !Array.isArray(s.attachments) ||
