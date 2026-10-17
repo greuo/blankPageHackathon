@@ -1,5 +1,14 @@
 # blankPageHackathon
 
+A patient-only care companion. At a visit the doctor enters care notes on the patient's phone; a chatbot answers the patient's questions from those notes, flags warning signs, sends emergencies to 911, and "Send to my doctor" emails the doctor a secure link. The full idea is in [`PLAN.md`](PLAN.md).
+
+## Start here
+
+- What we're building and why: `PLAN.md`
+- Backend (Supabase): `backend_progress.md`. "Start here: next session" lists what to build next.
+- Frontend (React + Vite in `frontend/`): `frontend_progress.md`
+- What's left: `todo.md`. Notes between the sides: `overlap.md`.
+
 ## How to contribute
 
 `main` is protected: nobody (admins included) can push to it directly.

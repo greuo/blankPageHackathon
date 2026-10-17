@@ -101,8 +101,19 @@ The `chat` function is also rate-limited (20 messages per 10 minutes, 200 per da
 
 ## What changes from current code
 
-- **Backend:** the hospital / admin / nurse / care-team / escalation model gets replaced by a new migration. The `admin-create-user` and `escalate` functions go away; `escalate`'s logic becomes `notify-doctor`. `chat` keeps PR #4's safety design (red-flag screen before the model, answers only when they cite the notes, everything else refers to the doctor).
+- **Backend:** the hospital / admin / nurse / care-team / escalation model gets replaced by a new migration. The `admin-create-user` and `escalate` functions go away; `escalate`'s logic becomes `notify-doctor`. `chat` keeps PR #4's red-flag screen and citation check, but answers clear implications, "is this normal?" and warning signs from the notes instead of referring everything.
 - **Frontend:** the clinician builder (draft, preview, publish) maps onto Doctor mode; the role switcher becomes "patient app + Doctor mode". Frontend decides what happens to family access.
+
+## Build status (2026-10-17)
+
+| Piece | Status |
+| --- | --- |
+| Tables, RLS, guest + email sign-in | Live on hosted |
+| `chat` (Claude answers from the notes) | Live; 15/15 on the live eval |
+| Anti-spam limits for doctor emails | Live in the database |
+| `notify-doctor` + `view-doctor-message` | Next (needs an email provider) |
+| `entry-link` + `doctor-entry` (QR) | After that |
+| Frontend | Patient dashboard, instructions page and companion as a browser-local demo; not yet bound to Supabase |
 
 ## Open questions
 
