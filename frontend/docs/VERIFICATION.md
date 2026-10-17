@@ -106,3 +106,17 @@ This pass preserves the current patient-only information and flows, replaces the
 Screenshot evidence is local and ignored from Git: `output/playwright/bits-desktop.png`, `bits-mobile.png`, `bits-chat-mobile.png`, `bits-intake-mobile.png`, `bits-report.png`, `bits-splash.png`. Source/adaptation notes are in `UI-REVAMP-REFERENCES.md`.
 
 Backend integration, live inference, email delivery and hosted doctor links remain deferred. Current repository backend code exists independently, but this frontend patch does not connect or certify it. Claude/conflict CI results must be checked against the newly pushed revision before reporting approval.
+
+
+## 2026-10-17 · Cobalt interface and five React Bits interactions
+
+- `npm --prefix frontend run build`: pass. Final JS 518.62 KB / gzip 171.75 KB; CSS 73.73 KB / gzip 14.43 KB. Vite's advisory 500 KB chunk warning remains; no build error.
+- `npm --prefix frontend test`: **75 tests / 10 files passed**, including 7 React Bits behavior tests and 6 feedback/audio tests. Tests cover parent-owned completion, unmatched navigation, required radio values, swipe cancellation, stale confirmation exits, actual accessible progress, live reduced-motion count changes, one action per click, transform preservation, optional audio, mute and disposal.
+- Browser: production preview at 5190. Actual layout viewport widths verified at **390, 768 and 1440px**. Requested 320px override remained at 390px internally, so this pass does not claim a new 320px verification. No horizontal overflow at the verified sizes.
+- Browser flows: Space toggles/undoes Daily movement; radio arrow keys retain correct selection; check-in saves and shows confirmation; toast dismisses by keyboard close and downward pointer drag; sound toggle updates and survives reload. Native Escape closes the report and returns focus. Added instructions save exact text. Fullscreen draft survives minimization. Report switch and prepare status reflect the existing local preview. LightTunnel replay enters automatically and focuses main.
+- Visual review: blue first paint/splash, pill actions, circular controls, 14px form fields, 20–24px panels and navy assistant header. Corrected fullscreen header's stale light background after independent review. Task descriptions and trailing arrows remain absent.
+- Contrast: targeted DOM scan clear for phone, tablet fullscreen and report. Its desktop navigation warning was a false positive caused by the positioned sibling pill: visually verified blue pill; actual surface/action ratio **5.61:1**. Sky/navy supporting text **9.29:1**; muted/canvas **5.45:1**. This is not a new full axe/WCAG audit.
+- Reduced motion verified with component tests and source review. Browser tools did not expose preference emulation for a new OS-level reduced-motion run. No claim of independently hearing the audio through automation; WebAudio lifecycle tests and browser toggle behavior pass.
+- Browser error/warning log: empty after opening, navigation and report checks.
+- Independent ECC-informed React/TypeScript review: approve, no unresolved findings. No clinical data changes, new network behavior or backend contract changes.
+- Screenshot: `output/playwright/blue-react-bits-desktop.png` (local ignored artifact). Exact sources/prompts and attribution: `docs/REACT-BITS-ANIMATION-PROMPTS.md`.

@@ -174,7 +174,6 @@ export default function PromptBar({
             className="care-prompt-send"
             aria-label={busy ? 'Stop response' : 'Send question'}
             disabled={!busy && !value.trim()}
-            whileTap={reduce ? undefined : { scale: 0.96 }}
             transition={{ duration: 0.12 }}
             onClick={busy ? onStop : undefined}
           >

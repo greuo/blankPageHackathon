@@ -6,14 +6,22 @@ Owned by the frontend side (Ranveer, Marcus). Only frontend sessions edit this f
 
 - **Stack:** React + TypeScript, Vite, semantic token CSS, Google Sans / Funnel Display / EB Garamond variable fonts, GSAP/useGSAP, Motion for React, Lucide, Vitest. Isolated under `frontend/`; fonts self-hosted with complete OFL licenses.
 - **Run:** `npm --prefix frontend run dev -- --port 5188`; `npm --prefix frontend run build`; production preview on 5190; `npm --prefix frontend test`.
-- **Current UI:** Patient-only green dashboard and Add instructions page; title-only To-Do rows without trailing arrows; daily task/dose reporting; check-in/trend; read-only roadmap; reminders; demo emergency/call flow; original progress report and TXT download. No reachable doctor/family/admin account screens.
+- **Current UI:** Patient-only cobalt/sky/navy dashboard and Add instructions page; title-only To-Do rows without trailing arrows; daily task/dose reporting; check-in/trend; read-only roadmap; reminders; demo emergency/call flow; original progress report and TXT download. No reachable doctor/family/admin account screens.
+- **New React Bits:** SpringCheck for To-Do, RubberSegment navigation, JellyRadio check-in, SwipeToast saves and CountUp timeline. GSAP click feedback throughout enabled controls, with an optional remembered soft click sound. Five exact upstream prompts plus app-specific instructions under `frontend/docs/REACT-BITS-ANIMATION-PROMPTS.md`.
 - **Companion and motion:** Embedded/full-screen assistant with shared draft, PromptBar shortcuts, send/stop control and focus/hover tooltips. 1.8-second LightTunnel/GSAP opening with Skip, static fallback and reduced-motion bypass. SquishSwitch and StatusMark demonstrate an optional-instructions email draft preview. Skeletons reflect actual pending work.
 - **Data:** Typed browser-local patient adapter in `frontend/src/patient/`, fictional records only. Existing information and source wording preserved. Legacy shared-care modules remain reference source and regression tests. Local assistant remains deterministic.
-- **Validation:** Production build and 62 tests pass; independent ECC-informed review approved. Real-browser layout checks at 320/390/768/1024/1440px, keyboard focus/menu handling, intake, full-screen chat and report preview passed. Targeted text-contrast checks found no issues; final browser logs were clean. Vite reports an advisory 507 KB JS chunk. Details: `frontend/docs/VERIFICATION.md`.
+- **Validation:** Latest production build and 75 tests pass; independent ECC-informed React/TypeScript review approved after fixing fullscreen header contrast. Current browser checks cover 390/768/1440px, keyboard task/radio/save controls, swipe dismissal, sound preference, intake, fullscreen chat, report preview and splash replay. Browser error/warning logs clean. Vite retains a 519 KB JS chunk advisory. Details: `frontend/docs/VERIFICATION.md`.
 - **Integration next:** Andrew's documented Supabase patient-only tables, guest auth and live `chat` contract are available. Frontend binding is still deferred at Ranveer's request. Live inference, doctor input verification, extraction, email delivery and secure doctor links are not connected in this UI. No live privacy/security claim.
 - **Delivery:** Current revamp is PR #13 on `codex/patient-ui-motion`; initial Claude/conflict checks approved. Latest main documentation was merged cleanly and frontend handoff notes added to the same PR. Final exact revision/check status is recorded in the local continuity checkpoint. No merge performed.
 
 ## Session log
+
+### 2026-10-17 · Blue palette and five React Bits interactions / Gold M for Ranveer
+
+- **Did:** Replaced the green palette with cobalt, sky and navy; pill primary actions, circular icon controls, rounded panels/forms; navy assistant header including fullscreen. Preserved all existing patient information and behaviors.
+- **Motion:** Integrated five actual React Bits adaptations with source prompts/attribution. Added scoped GSAP press feedback and a persistent sound toggle; trusted gestures only, no autoplay. Earlier PromptBar, SquishSwitch, StatusMark and LightTunnel remain integrated.
+- **Validation:** Build + 75 tests pass. Real-browser keyboard, save/swipe, mobile, fullscreen draft, local report and opening checks pass. Independent review approved after a fullscreen contrast fix. Current browser viewport bottoms out at 390px; 320px was requested but not verified as a true 320px layout in this pass.
+- **Delivery:** Update existing PR #13, leave merge/review gates intact. No backend/API changes; binding is still deferred. Exact latest check status is in the local checkpoint.
 
 ### 2026-10-17 · To-Do arrow removal / Gold M for Ranveer
 

@@ -3,6 +3,7 @@ import { HeartPulse } from 'lucide-react';
 import { errorText } from './components/ui';
 import { patientStore } from './patient/store';
 import PatientApp from './patient/PatientApp';
+import { InteractionFeedback } from './components/InteractionFeedback';
 class ErrorBoundary extends Component<
   { children: ReactNode },
   { error: boolean; resetError: string }
@@ -51,7 +52,9 @@ class ErrorBoundary extends Component<
 export default function App() {
   return (
     <ErrorBoundary>
-      <PatientApp />
+      <InteractionFeedback>
+        <PatientApp />
+      </InteractionFeedback>
     </ErrorBoundary>
   );
 }

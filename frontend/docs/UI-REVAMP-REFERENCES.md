@@ -30,3 +30,10 @@ This establishes CLI access. The 21st MCP server is not configured or exposed in
 - Existing GSAP + `@gsap/react` remain responsible for scoped opening/entrance timelines, with cleanup and readable defaults.
 
 Historical Nunito license remains as an archive asset; Nunito is no longer a runtime dependency.
+
+
+## Blue interaction revision
+
+The latest request replaces the green palette. Inspected Color Hunt's [navy/blue/sky palette](https://colorhunt.co/palette/0915401b2cc17692ffabd2fa) and [bright-blue/sky palette](https://colorhunt.co/palette/2373f4578ef565d0f4f2f7a0), adapting their relationships into accessible UI roles.
+
+Browsed React Bits and used each actual Copy for AI → Copy prompt control for SpringCheck, RubberSegment, JellyRadio, SwipeToast and CountUp. Full unchanged prompts are in `react-bits-prompts/`; integration instructions and exact usage are in [REACT-BITS-ANIMATION-PROMPTS.md](REACT-BITS-ANIMATION-PROMPTS.md). These are GSAP adaptations of the sources' defining mechanics. No claim that React.dev supplies these components: React.dev documents React, while ReactBits.dev is the selected component source.

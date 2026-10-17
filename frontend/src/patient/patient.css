@@ -94,7 +94,7 @@
   color: var(--action);
   display: grid;
   place-items: center;
-  border-radius: 10px;
+  border-radius: 50%;
 }
 .patient-brand-name {
   font-family: var(--font-heading);
@@ -107,33 +107,13 @@
   color: var(--green);
 }
 .patient-header nav {
-  height: 100%;
   display: flex;
   align-items: center;
-  gap: 8px;
-}
-.patient-header nav button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  border: 0;
-  border-radius: 7px;
-  background: none;
-  color: var(--muted);
-  padding: 11px 15px;
-  font-size: 14px;
-  font-weight: 700;
-  min-height: 43px;
-}
-.patient-header nav .current {
-  background: var(--sage);
-  color: var(--ink);
 }
 .patient-header-actions {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 10px;
 }
 .patient-profile {
   width: 40px;
@@ -152,7 +132,7 @@
   width: 36px;
   height: 36px;
   border: 0;
-  border-radius: 6px;
+  border-radius: 50%;
   padding: 6px;
   background: transparent;
   color: var(--ink);
@@ -168,8 +148,7 @@
   width: 7px;
   height: 7px;
   background: var(--danger);
-  border-radius: 1px;
-  transform: rotate(45deg);
+  border-radius: 50%;
 }
 .patient-home {
   max-width: 1440px;
@@ -215,7 +194,7 @@
   min-height: 46px;
   padding: 11px 18px;
   gap: 8px;
-  border-radius: 7px;
+  border-radius: var(--radius-pill);
   font-size: 14px;
   font-weight: 600;
   line-height: 1.4;
@@ -247,7 +226,7 @@
 .patient-panel {
   border: 1px solid var(--line);
   background: var(--surface);
-  border-radius: 6px;
+  border-radius: var(--radius);
   padding: 22px;
   margin-bottom: 22px;
 }
@@ -269,7 +248,7 @@
   padding: 6px 10px;
   background: var(--mint);
   color: var(--green);
-  border-radius: 5px;
+  border-radius: var(--radius-pill);
   font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
@@ -298,7 +277,7 @@
   display: grid;
   gap: 0;
   border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: var(--radius);
   overflow: hidden;
 }
 .patient-task {
@@ -333,7 +312,7 @@
   place-items: center;
   width: 44px;
   height: 44px;
-  border-radius: 6px;
+  border-radius: 50%;
   background: var(--sage);
   color: var(--green);
   flex-shrink: 0;
@@ -396,7 +375,7 @@
   height: 38px;
   background: var(--accent-soft);
   color: var(--action);
-  border-radius: 9px;
+  border-radius: 50%;
   flex-shrink: 0;
 }
 .precaution-row {
@@ -421,7 +400,7 @@
   height: 32px;
   background: var(--selected);
   color: var(--action);
-  border-radius: 7px;
+  border-radius: 50%;
 }
 .recovery-progress {
   background: var(--panel);
@@ -439,7 +418,7 @@
   color: var(--action);
   background: var(--selected);
   padding: 5px 8px;
-  border-radius: 5px;
+  border-radius: var(--radius-pill);
 }
 .progress-heading > .text-button {
   margin-left: auto;
@@ -455,7 +434,7 @@
   width: 100%;
   height: 10px;
   border: 0;
-  border-radius: 3px;
+  border-radius: 999px;
   background: var(--track);
   accent-color: var(--progress);
   overflow: hidden;
@@ -466,7 +445,7 @@
 }
 .recovery-progress progress::-webkit-progress-value {
   background: var(--progress);
-  border-radius: 3px;
+  border-radius: 999px;
   transition: width 240ms ease-out;
 }
 .recovery-progress progress::-moz-progress-bar {
@@ -546,7 +525,7 @@
 .patient-demo-footer details button {
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 4px;
+  border-radius: var(--radius-pill);
   color: var(--ink);
   font-size: 12px;
   padding: 7px 10px;
@@ -570,7 +549,7 @@
   max-height: 1050px;
   min-width: 0;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 24px;
   background: var(--panel);
   overflow: hidden;
 }
@@ -579,13 +558,13 @@
   align-items: center;
   gap: 10px;
   padding: 22px 18px;
-  background: var(--panel);
-  border-bottom: 1px solid var(--line);
+  background: var(--navy);
+  border-bottom: 1px solid var(--navy);
 }
 .assistant-heading > .patient-icon {
   width: 43px;
   height: 43px;
-  border-radius: 11px;
+  border-radius: 50%;
   background: var(--selected);
   color: var(--action);
 }
@@ -594,17 +573,18 @@
   min-width: 0;
 }
 .assistant-heading h2 {
+  color: var(--surface);
   font-size: 21px;
 }
 .assistant-heading p {
   font-size: 12px;
   margin-top: 4px;
-  color: var(--muted);
+  color: var(--sky);
 }
 .assistant-heading .icon-btn {
   width: 40px;
   height: 40px;
-  color: var(--action);
+  color: var(--surface);
 }
 .assistant-heading .icon-btn svg {
   width: 19px;
@@ -639,7 +619,7 @@
   place-items: center;
   width: 27px;
   height: 27px;
-  border-radius: 7px;
+  border-radius: 50%;
   background: var(--sage);
   color: var(--action);
   margin-top: 5px;
@@ -650,7 +630,7 @@
   background: var(--surface);
   color: var(--ink);
   padding: 14px 15px;
-  border-radius: 2px 8px 8px;
+  border-radius: 6px 20px 20px;
   font-size: 16px;
   line-height: 1.6;
   white-space: pre-wrap;
@@ -664,7 +644,7 @@
   max-width: 87%;
   background: var(--message-patient);
   color: var(--ink);
-  border-radius: 9px 3px 9px 9px;
+  border-radius: 20px 6px 20px 20px;
 }
 .assistant-prompts {
   display: flex;
@@ -678,7 +658,7 @@
   align-items: center;
   gap: 6px;
   border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: var(--radius-pill);
   background: var(--panel);
   color: var(--action);
   padding: 8px 10px;
@@ -699,7 +679,7 @@
   font-size: 13px;
 }
 .patient-app .modal {
-  border-radius: 10px;
+  border-radius: 24px;
   border: 1px solid var(--line);
   background: var(--surface);
 }
@@ -740,11 +720,11 @@
   min-height: 0;
   max-height: none;
   border: 0;
-  border-radius: 0;
+  border-radius: 24px;
 }
 .fullscreen-assistant .assistant-heading {
   padding: 12px 25px;
-  background: var(--surface);
+  background: var(--navy);
 }
 .fullscreen-assistant .assistant-heading > .patient-icon {
   display: none;
@@ -810,7 +790,7 @@
   width: 100%;
   padding: 12px 14px;
   border: 1px solid var(--line-strong);
-  border-radius: 6px;
+  border-radius: var(--radius-control);
   background: var(--surface);
   color: var(--ink);
   font-size: 16px;
@@ -843,7 +823,7 @@
   gap: 20px !important;
   background: var(--panel);
   border: 1px dashed var(--line-strong);
-  border-radius: 7px;
+  border-radius: var(--radius-control);
   padding: 25px;
   margin: 11px 0;
   color: var(--action);
@@ -905,7 +885,7 @@
   color: var(--green) !important;
   font-size: 14px;
   background: var(--mint);
-  border-radius: 6px;
+  border-radius: var(--radius-control);
   padding: 12px 15px;
   margin-bottom: 20px !important;
 }
@@ -925,7 +905,7 @@
   background: var(--panel);
   border: 1px solid var(--line);
   padding: 18px;
-  border-radius: 6px;
+  border-radius: var(--radius-control);
   margin: 18px 0;
   max-height: 48dvh;
   overflow: auto;
@@ -957,7 +937,7 @@
 .patient-warning {
   background: var(--warning-surface);
   padding: 15px;
-  border-radius: 6px;
+  border-radius: var(--radius-control);
   color: var(--earth) !important;
   font-size: 14px;
   margin-top: 12px !important;
@@ -994,7 +974,7 @@
   align-items: center;
   gap: 8px;
   border: 1px solid var(--line-strong);
-  border-radius: 6px;
+  border-radius: var(--radius-control);
   padding: 11px 20px;
 }
 .feeling-options input {
@@ -1003,7 +983,7 @@
 .checkin-trend {
   background: var(--sage);
   padding: 16px;
-  border-radius: 6px;
+  border-radius: var(--radius-control);
 }
 .checkin-trend p {
   display: flex;
@@ -1057,7 +1037,7 @@
   place-items: center;
   width: 64px;
   height: 64px;
-  border-radius: 12px;
+  border-radius: var(--radius-control);
 }
 .emergency-panel blockquote {
   margin: 0;
@@ -1337,7 +1317,7 @@
     min-height: 43px;
     min-width: 105px;
     border: 0;
-    border-radius: 7px;
+    border-radius: var(--radius-pill);
     background: none;
     color: var(--muted);
     font-size: 13px;
@@ -1367,7 +1347,7 @@
   .patient-brand-symbol {
     width: 35px;
     height: 35px;
-    border-radius: 8px;
+    border-radius: 50%;
   }
   .patient-brand-symbol svg {
     width: 21px;
@@ -1398,7 +1378,7 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 19px;
-    border-radius: 10px;
+    border-radius: var(--radius-control);
   }
   .patient-greeting h1 {
     font-size: 30px;
@@ -1453,7 +1433,7 @@
   }
   .patient-panel {
     padding: 20px 16px;
-    border-radius: 9px;
+    border-radius: var(--radius);
   }
   .important-instructions .patient-section-heading {
     gap: 10px;
@@ -1527,7 +1507,7 @@
   }
   .patient-assistant {
     height: 650px;
-    border-radius: 10px;
+    border-radius: 24px;
   }
   .assistant-heading {
     padding: 19px 15px;
@@ -1617,7 +1597,7 @@
   }
   .patient-app .modal {
     max-width: calc(100vw - 24px);
-    border-radius: 9px;
+    border-radius: 24px;
   }
   .patient-app .dialog-header {
     padding: 17px;
@@ -1704,7 +1684,7 @@
   }
 }
 
-/* Patient workspace: editorial welcome, precise lists, quiet green surfaces. */
+/* Patient workspace: editorial welcome, precise lists, cobalt and sky surfaces. */
 .patient-greeting h1 {
   font-family: var(--font-editorial);
   font-size: clamp(36px, 3.5vw, 50px);
@@ -1726,8 +1706,8 @@
   border: 1px solid var(--line);
 }
 .patient-app .icon-btn {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
 }
 .assistant-heading > div:not(.tooltip-anchor) {
   min-width: 0;
@@ -1736,8 +1716,8 @@
   flex: 0 0 auto;
 }
 .patient-app .assistant-heading .icon-btn {
-  width: 36px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
 }
 .patient-app .assistant-heading h2 {
   font-size: 20px;
@@ -1803,5 +1783,21 @@
   }
   .patient-home {
     padding-inline: 18px;
+  }
+}
+
+@media (max-width: 380px) {
+  .patient-header {
+    padding-inline: 12px;
+    gap: 8px;
+  }
+  .patient-brand-symbol {
+    display: none;
+  }
+  .patient-brand-name {
+    font-size: 18px;
+  }
+  .patient-header-actions {
+    gap: 4px;
   }
 }

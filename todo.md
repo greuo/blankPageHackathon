@@ -8,6 +8,8 @@ Shared list for both sides.
 
 ## Frontend
 
+- [x] Replace green palette with cobalt/sky/navy, round controls, integrate five more React Bits interactions and GSAP click/sound feedback; preserve information and publish original prompts (2026-10-17, Gold M for Ranveer).
+
 - [x] Remove trailing arrows from To-Do rows (2026-10-17, Gold M for Ranveer).
 - [x] Build and verify care-space/conversation frontend pair in fictional demo (2026-10-17, Gold M for Ranveer).
 - [x] Build and verify clinician-builder/checklist frontend pair with provenance and approval (2026-10-17, Gold M for Ranveer).

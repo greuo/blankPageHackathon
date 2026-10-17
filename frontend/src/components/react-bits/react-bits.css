@@ -1,0 +1,244 @@
+/* React Bits mechanics, adapted to the Care companion token system. */
+.rb-spring-check {
+  display: grid;
+  place-items: center;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 7px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--action);
+  cursor: pointer;
+}
+.rb-spring-check__box {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+}
+.rb-spring-check__ring {
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--line-strong);
+  border-radius: inherit;
+}
+.rb-spring-check__fill {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--action);
+  transform-origin: center;
+  transform: scale(0);
+}
+.rb-spring-check[aria-checked='true'] .rb-spring-check__fill {
+  transform: scale(1);
+}
+.rb-spring-check__tick {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: var(--surface);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.rb-spring-check__tick path {
+  stroke-dashoffset: 1;
+}
+.rb-spring-check[aria-checked='true'] .rb-spring-check__tick path {
+  stroke-dashoffset: 0;
+}
+.rb-spring-check:focus-visible {
+  outline: 2px solid var(--action);
+  outline-offset: 3px;
+}
+
+.rb-rubber-segment {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: stretch;
+  gap: 4px;
+  max-width: 100%;
+  padding: 5px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--rail);
+}
+.rb-rubber-segment__thumb {
+  position: absolute;
+  z-index: -1;
+  top: 5px;
+  bottom: 5px;
+  left: 0;
+  right: 0;
+  background: var(--action);
+  pointer-events: none;
+}
+.rb-rubber-segment__item {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 9px 17px;
+  border: 0;
+  border-radius: 999px;
+  color: var(--muted);
+  background: transparent;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.rb-rubber-segment__item[aria-current='page'] {
+  color: var(--surface);
+}
+.rb-rubber-segment__icon {
+  display: grid;
+  place-items: center;
+}
+.rb-rubber-segment__icon svg {
+  width: 17px;
+  height: 17px;
+}
+.rb-rubber-segment__item:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.rb-jelly-radio {
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+.rb-jelly-radio legend {
+  margin-bottom: 8px;
+  padding: 0;
+  font-weight: 600;
+  color: var(--ink);
+}
+.rb-jelly-radio__choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 4px;
+}
+.rb-jelly-radio__choice {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  cursor: pointer;
+}
+.rb-jelly-radio__choice input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 1;
+  margin: 0;
+}
+.rb-jelly-radio__skin {
+  display: grid;
+  place-items: center;
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 500;
+}
+.rb-jelly-radio__choice input:checked + .rb-jelly-radio__skin {
+  background: var(--action);
+  color: var(--surface);
+  border-color: var(--action);
+}
+.rb-jelly-radio__choice input:focus-visible + .rb-jelly-radio__skin {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.rb-swipe-toast {
+  width: 100%;
+  margin-block: 12px;
+}
+.rb-swipe-toast__card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 8px 8px 20px;
+  border: 1px solid var(--line-strong);
+  border-radius: 20px;
+  background: var(--accent-soft);
+  color: var(--ink);
+  touch-action: pan-x;
+}
+.rb-swipe-toast__message {
+  flex: 1;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+.rb-swipe-toast__close {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+}
+.rb-swipe-toast__close:focus-visible {
+  outline: 2px solid var(--action);
+  outline-offset: 3px;
+}
+.rb-count-up {
+  font-variant-numeric: tabular-nums;
+}
+.rb-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .rb-rubber-segment {
+    gap: 2px;
+    padding: 4px;
+  }
+  .rb-rubber-segment__thumb {
+    top: 4px;
+    bottom: 4px;
+  }
+  .rb-rubber-segment__item {
+    padding-inline: 10px;
+    gap: 5px;
+    font-size: 0.8rem;
+  }
+  .rb-jelly-radio__choices {
+    gap: 10px 8px;
+  }
+  .rb-jelly-radio__skin {
+    padding-inline: 13px;
+  }
+}

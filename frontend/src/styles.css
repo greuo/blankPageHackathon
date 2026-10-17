@@ -9,36 +9,40 @@
   font-weight: 400;
   font-size: 16px;
   line-height: 1.55;
-  --canvas: #f1f5ee;
-  --surface: #f9fbf5;
-  --ink: #193c2b;
-  --muted: #536957;
-  --green: #386e4b;
-  --mint: #dfedcf;
-  --sage: #e8efdf;
-  --action: #285e3e;
-  --rail: #eaf0e3;
-  --selected: #d7e8c8;
-  --line-strong: #778d70;
-  --line: #d0dcc8;
-  --earth: #4b5f31;
-  --danger: #123b22;
-  --panel: #eaf1e3;
-  --panel-strong: #e0ecd5;
-  --accent-soft: #cee2ba;
-  --track: #c4d5b8;
-  --progress: #3b7650;
-  --message-assistant: #edf3e8;
-  --message-patient: #dfedcf;
-  --warning-surface: #e8ecd9;
-  --urgent-surface: #163d28;
-  --urgent-inset: #234b34;
-  --urgent-ink: #f0f6e7;
-  --urgent-border: #a0bf86;
-  --overlay: #193c2b70;
+  --canvas: #eef3fa;
+  --surface: #f7f9fd;
+  --ink: #14284b;
+  --muted: #506384;
+  --green: #245bd7;
+  --mint: #dceaff;
+  --sage: #e4edfc;
+  --action: #245bd7;
+  --rail: #e8effb;
+  --selected: #d3e3fc;
+  --line-strong: #7488a7;
+  --line: #ccd9eb;
+  --earth: #66522a;
+  --danger: #943c48;
+  --panel: #e4edfb;
+  --panel-strong: #c9ddfa;
+  --accent-soft: #bad7fc;
+  --track: #bdd0ec;
+  --progress: #245bd7;
+  --message-assistant: #edf3fc;
+  --message-patient: #dceaff;
+  --warning-surface: #fbefd4;
+  --urgent-surface: #432336;
+  --urgent-inset: #573245;
+  --urgent-ink: #fff5f5;
+  --urgent-border: #d7a9b4;
+  --overlay: #14284b70;
   --white: var(--surface);
   --shadow: none;
-  --radius: 3px;
+  --radius: 20px;
+  --radius-control: 14px;
+  --radius-pill: 999px;
+  --navy: #14284b;
+  --sky: #abd2fa;
   --space: 24px;
   --motion-quick: 140ms;
   --motion-view: 240ms;
@@ -2252,10 +2256,7 @@ h4 {
     background-color var(--motion-quick),
     border-color var(--motion-quick);
 }
-button:active:not(:disabled),
-.btn:active {
-  transform: scale(0.98);
-}
+/* Press feedback is owned by the scoped GSAP InteractionFeedback provider. */
 .field input,
 .field textarea,
 .field select {
