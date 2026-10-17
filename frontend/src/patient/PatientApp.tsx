@@ -377,7 +377,6 @@ export default function PatientApp() {
                         >
                           <span>
                             <strong>{task.title}</strong>
-                            <small>{done(task) ? 'Reported today' : task.detail}</small>
                           </span>
                           <ChevronRight size={19} />
                         </button>
