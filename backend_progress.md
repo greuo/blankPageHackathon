@@ -6,21 +6,89 @@ Owned by the backend side (Andrew, Sharon). Only backend sessions edit this file
 
 Snapshot of what exists right now. Rewrite it each session; don't append.
 
-- **Stack:** Supabase (Postgres + Supabase Auth + Row Level Security + Edge Functions). Hosted project `blankPageHackathon` (ref `repvtuxyszlqdjzciojx`, us-east-1). Code in `backend/supabase/`.
-- **How to run:** nothing to run for the frontend: use the hosted project (URL and key in `overlap.md` → Agreed). Local stack: `cd backend && supabase start && supabase db reset` (needs Docker; seeds the demo patients with password `local-demo-only`). Schema changes: add a file under `backend/supabase/migrations/`, apply it, rerun `backend/supabase/tests/access.sql`.
-- **Working:**
-  - Patient-only model from `PLAN.md` (`migrations/20261017154913_patient_only.sql`); the hospital model is gone. Every signed-in user (anonymous guest or email) is a patient and sees and edits only their own rows. 94/94 checks in `tests/access.sql` pass on the hosted project.
-  - Review fixes (`migrations/20261017170000_patient_only_hardening.sql`): new tables start read-only for API roles; care-note versions come from a per-patient counter (`patients.last_note_version`) so they're never reused; `doctor_messages` insert trigger enforces the anti-spam limits in `PLAN.md` (email account only, 5/hour + 20/day per patient, 10/day per recipient address, doctor must have an email).
-  - Anonymous sign-in is on, locally and on hosted.
-  - Sign-up trigger creates the `patients` row for every new user, guest or email. A guest who adds an email keeps the same user id, so keeps their data.
-  - Realtime on `messages` and `care_notes` (so notes saved from the doctor's own phone show up live).
-  - Demo data on the hosted project: Alex Rivera (`alex@demo.example.com`; password in Andrew's `backend/.env.local`, ask him) and a guest "Sam" (anonymous, can't be logged into). Each has a doctor, care notes (Alex: v1 + v2) and chat messages; Alex has a sent doctor message, Sam a used QR link. The old hospital demo logins are deleted.
-  - Edge functions: `chat` (below) and the shared helper `functions/_shared/http.ts` (CORS, `json`, `serviceClient`, `callerClient`, `getCaller` → `{ user }`). `admin-create-user` and `escalate` are deleted from the repo and the hosted project.
-- **In progress:** nothing. Next: set `ANTHROPIC_API_KEY`, then `notify-doctor` / `view-doctor-message`, then `entry-link` / `doctor-entry` (see `todo.md`).
+- **Stack:** Supabase (Postgres + Supabase Auth + Row Level Security + Edge Functions). Hosted project `blankPageHackathon` (ref `repvtuxyszlqdjzciojx`, us-east-1). Code in `backend/supabase/`. Chat model: Claude Opus 5.5 (`claude-opus-5-5`) through `@anthropic-ai/sdk`.
+- **Working on hosted (all merged to `main` and deployed):**
+  - Patient-only model from `PLAN.md` (`migrations/20261017154913_patient_only.sql`). Every signed-in user, anonymous guest or email, is a patient and sees and edits only their own rows.
+  - Hardening (`migrations/20261017170000_patient_only_hardening.sql`):
+    - new tables start read-only for the API roles
+    - care-note versions are never reused (`patients.last_note_version`)
+    - the `doctor_messages` insert trigger enforces the anti-spam limits: email account only, 5/hour and 20/day per patient, 10/day per recipient address (stored in `recipient_email`), and the doctor must have an email
+  - Anonymous (guest) sign-in is on, locally and on hosted. The sign-up trigger creates the `patients` row for every new user; a guest who adds an email keeps the same id and data.
+  - Realtime on `messages` and `care_notes`.
+  - `chat` edge function, deployed, with `ANTHROPIC_API_KEY` set:
+    - answers from the current care notes, including clear implications and "is this normal?" when the notes have a `normal` list
+    - flags warning signs from the notes, refers everything unclear to the doctor, and sends red-flag emergencies to 911 / the clinic phone
+    - rate-limited per patient
+    - contract below
+  - Demo data:
+    - Alex Rivera, `alex@demo.example.com`. Password in Andrew's `backend/.env.local`.
+    - a guest "Sam" (anonymous, can't be logged into)
+    - each has a doctor, care notes with a `normal` list (Alex v1 + v2, Sam v1) and a short chat. Alex has a sent doctor message, Sam a used QR link.
+- **Tests (all passing):**
+  - `tests/access.sql`: 94/94 on hosted.
+  - `chat` unit tests: 19/19.
+  - Live run of the bot against Claude: 15/15 cases as expected, 0 unsafe.
+- **How to run / deploy:**
+  - Frontend: nothing to run, use the hosted project (URL and key in `overlap.md` → Agreed).
+  - Local stack: `cd backend && supabase start && supabase db reset`. Needs Docker; seeds the demo patients with password `local-demo-only`.
+  - Unit tests: `deno test --config backend/supabase/functions/chat/deno.json backend/supabase/functions/chat/`
+  - Deploy a function: `cd backend && supabase functions deploy <name> --project-ref repvtuxyszlqdjzciojx --use-api`. `--use-api` means no Docker.
+  - Schema change:
+    1. Add `migrations/<timestamp>_<name>.sql`.
+    2. Dry-run it on hosted together with `tests/access.sql` in one transaction that ends in an error, so it rolls back.
+    3. Apply it for real and insert the matching `supabase_migrations.schema_migrations` row (version = filename timestamp), so `supabase migration list` stays in step.
+    4. Rerun `tests/access.sql`.
+    - Use the Supabase MCP, the SQL editor, or the Management API `POST /v1/projects/<ref>/database/query` with the CLI's token.
+  - Bot behaviour change: deploy the branch as a temporary `chat-preview` function, run the cases in `chat/eval_live.ts` through it, then delete it. That way the live `chat` is never touched before merge.
+- **In progress:** nothing. **Next: see "Start here: next session" below.**
 - **Known issues:**
-  - **`ANTHROPIC_API_KEY` is not set on hosted.** Until it is, `chat` still works but tells the patient to check with their doctor for every question (red flags still get the 911 notice).
-  - PR #4 is closed as superseded; its migration `20261017152104_chatbot.sql` stays in `migrations/` so the repo matches the hosted history (its tables are dropped again by the patient-only migration).
   - Supabase advisor: leaked-password protection is off (dashboard setting).
+  - Supabase limits anonymous sign-ups to 30/hour per IP. Turn on captcha if that's not enough.
+  - PR #4 (hospital-model chatbot) is closed. Its migration `20261017152104_chatbot.sql` stays in `migrations/` so the repo matches the hosted history; the patient-only migration drops its tables again.
+
+## Start here: next session
+
+**State at handoff (2026-10-17):**
+- No open PRs.
+- `main` is deployed.
+- All tests pass.
+- Frontend (#7, #8, #10) is a browser-local demo, not yet bound to Supabase (`frontend_progress.md`).
+
+Today's work, in order (details in the session log):
+1. hospital access model (#2)
+2. pivot to patient-only (#5, #6), hospital chatbot #4 closed
+3. review fixes and the `chat` rewrite (#9)
+4. guest sign-in turned on
+5. API key set
+6. bot refers less (#11)
+
+Backend features to build next, in this order. Each one goes in its own PR with tests and a contract added to the tables above:
+
+1. **Email provider.** Pick one (Resend is quickest from an edge function), verify a sending domain, and add secrets `RESEND_API_KEY`, `EMAIL_FROM` and `APP_URL` (the frontend's public URL, for links).
+2. **`notify-doctor`** (patient, signed in).
+   - Body `{ doctor_id, content }`.
+   - Make a 32-byte random token and store its sha256 in `doctor_messages.token_hash` (service role). The insert trigger already enforces the limits; map its `hint` (`guest_must_sign_up`, `patient_rate_limited`, `recipient_rate_limited`, `doctor_has_no_email`) to 4xx errors the UI can show.
+   - Email **`recipient_email`** (not `doctors.email`) with fixed text: "Your patient <first name, escaped, ≤40 chars> sent you a message", the link `APP_URL/doctor-message#<token>`, and "not for emergencies".
+   - Return `{ id, expires_at }`.
+   - Decide what happens if the email fails: delete the row, or keep it with a status column.
+3. **`view-doctor-message`** (anyone with the link, `verify_jwt = false`).
+   - Body `{ token }`. Hash it, look it up and check `expires_at`.
+   - Set `opened_at` the first time.
+   - Return `{ content, created_at, patient_first_name, doctor_name, care_notes }`.
+   - Add a simple per-IP rate limit against token guessing.
+4. **`entry-link`** (patient): create an `entry_links` token (30 minutes, one use) and return `{ url: APP_URL/doctor-entry#<token>, expires_at }` for the QR code.
+5. **`doctor-entry`** (anyone with a QR token, `verify_jwt = false`).
+   - `{ token }` returns the current notes, so the form opens pre-filled (`PLAN.md` → multi-doctor rule).
+   - `{ token, content, doctor? }` saves a new version with `entered_via = 'qr'` and marks `used_at` in the same transaction, so the token works once.
+6. **Optional:** let the doctor reply from the message page, with the reply showing in the patient's chat (needs a `doctor` sender or a separate table).
+
+Frontend needs for these:
+- two public pages, `/doctor-message` and `/doctor-entry`, that read the token from the URL hash
+- a "Send to my doctor" button wired to `notify-doctor`
+- a QR screen for `entry-link`
+- the "What's normal" field and the `warning_sign` chat action (already requested in `overlap.md`)
+
+Agree the routes with frontend in `overlap.md` before building 2-5.
 
 ### Data model
 
@@ -45,8 +113,8 @@ Patient functions: `supabase.functions.invoke(name, { body })` while signed in (
 
 | Function | Who calls it | What it does | Status |
 | --- | --- | --- | --- |
-| `chat` | patient | message + current care notes → Claude; stores and returns the bot reply; flags "should notify doctor" | deployed (needs `ANTHROPIC_API_KEY`) |
-| `notify-doctor` | patient | creates a `doctor_messages` row, emails the doctor a link | planned |
+| `chat` | patient | message + current care notes → Claude; stores and returns the bot reply; flags "should notify doctor" | deployed, live |
+| `notify-doctor` | patient (email account) | creates a `doctor_messages` row, emails the doctor a link | next (limits already in the DB) |
 | `view-doctor-message` | anyone with the link | checks the token; returns the message, patient first name, current notes | planned |
 | `entry-link` | patient | creates a QR token (`entry_links`) | planned |
 | `doctor-entry` | anyone with a QR token | returns current notes, saves a new version (`entered_via = 'qr'`), marks the token used | planned |
@@ -59,7 +127,7 @@ RLS filters everything to the caller, so no permission `where` is needed (update
 
 ```js
 // Sign in
-await supabase.auth.signInAnonymously()                // guest (hosted: needs the dashboard toggle)
+await supabase.auth.signInAnonymously()                // guest
 await supabase.auth.signUp({ email, password, options: { data: { display_name } } })
 await supabase.auth.signInWithPassword({ email, password })
 
@@ -97,6 +165,11 @@ Newest first. One entry per session:
 - **Next:** what should happen next
 - **Notes:** blockers, decisions, gotchas (optional)
 ```
+
+### 2026-10-17 · Andrew (docs + handoff)
+- **Did:** Brought every backend and shared doc up to date for a fresh session. Rewrote "Current state", added "Start here: next session" (next features in order, with contracts), recorded how to apply migrations, deploy and test the bot safely. Ticked finished to-dos and added the next ones. Replied to stale `overlap.md` notes. Updated `PLAN.md` build status, `README.md` and the stale "no code yet" line in `CLAUDE.md` (user asked to update all docs).
+- **Files:** this file, `todo.md`, `overlap.md`, `PLAN.md`, `README.md`, `CLAUDE.md`
+- **Next:** see "Start here: next session".
 
 ### 2026-10-17 · Andrew (chat refers less)
 - **Did:** The bot was sending too much to the doctor. It now answers clear implications of the notes ("no swimming" from "don't soak it"), answers "is this normal?" when the notes say what's expected (new optional `normal` list), and when the patient describes a warning sign from the notes it says what the notes say to do (`warning_sign`, offers Send to my doctor). Unclear workarounds, treatment changes and anything uncovered still refer. Code still requires real citations, and adds a fixed "contact your doctor / 911" line to every symptom answer. Added `normal` to the demo notes.
