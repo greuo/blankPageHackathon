@@ -321,7 +321,7 @@ export default function PatientApp() {
               <section className="patient-panel today-tasks">
                 <div className="patient-section-heading">
                   <div>
-                    <h2>Today’s to-do</h2>
+                    <h2>To-Do</h2>
                     <p>Daily steps from your prepared plan</p>
                   </div>
                   <span>
