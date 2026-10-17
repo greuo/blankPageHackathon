@@ -1,0 +1,305 @@
+.builder {
+  max-width: 1040px;
+  margin: 0 auto;
+}
+.builder .builder-heading {
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 22px;
+}
+.builder .builder-heading h2 {
+  margin: 8px 0 10px;
+  max-width: 650px;
+  font-size: clamp(1.6rem, 3.5vw, 2.25rem);
+  letter-spacing: -0.045em;
+  line-height: 1.18;
+}
+.builder .builder-heading p {
+  margin-bottom: 0;
+}
+.builder .builder-steps {
+  list-style: none;
+  padding: 18px 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid #dce7e3;
+  border-bottom: 1px solid #dce7e3;
+  gap: 14px;
+}
+.builder .builder-steps li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #526861;
+  font-size: 0.86rem;
+}
+.builder .builder-steps li > span {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid #c8d8d2;
+  border-radius: 50%;
+  font-weight: 650;
+}
+.builder .builder-steps li[aria-current] {
+  color: #165e4e;
+}
+.builder .builder-steps li[aria-current] > span {
+  background: #165e4e;
+  color: white;
+  border-color: #165e4e;
+}
+.builder .builder-status-row {
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 17px 0 6px;
+  font-size: 0.78rem;
+}
+.builder .builder-fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.builder .builder-stage-title {
+  font-size: 1.1rem;
+  margin: 24px 0 16px;
+}
+.builder .builder-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(260px, 1fr);
+  align-items: start;
+  gap: 20px;
+}
+.builder .panel {
+  padding: 22px;
+  min-width: 0;
+}
+.builder .stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.builder h4 {
+  margin: 0 0 7px;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.builder p {
+  line-height: 1.55;
+  margin: 0;
+}
+.builder .field {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 7px;
+  font-size: 0.8rem;
+  font-weight: 550;
+  min-width: 0;
+}
+.builder .field input,
+.builder .field textarea,
+.builder .field select {
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+  background: #fff;
+  border: 1px solid #b7cbc3;
+  color: #19392f;
+  border-radius: 9px;
+  padding: 11px 12px;
+  font: inherit;
+  font-size: 0.87rem;
+  line-height: 1.5;
+}
+.builder textarea {
+  resize: vertical;
+}
+.builder .field input[type='file'] {
+  padding: 9px;
+}
+.builder .field input[type='file']::file-selector-button {
+  background: #edf5f1;
+  border: 0;
+  color: #244a3d;
+  padding: 7px 10px;
+  margin-right: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.builder .field input:focus-visible,
+.builder .field textarea:focus-visible,
+.builder .field select:focus-visible,
+.builder details summary:focus-visible {
+  outline: 3px solid #4c9b85;
+  outline-offset: 3px;
+}
+.builder .builder-template {
+  background: #eff8f3;
+}
+.builder .builder-template-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: #d9eee2;
+  color: #2d6650;
+  display: grid;
+  place-items: center;
+}
+.builder .builder-instruction-header {
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.builder .builder-instruction-header h4 {
+  margin: 0;
+}
+.builder .builder-instruction-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr 1fr;
+  gap: 12px;
+}
+.builder .source-box {
+  background: #f1f6f9;
+  border-radius: 11px;
+  padding: 16px;
+  display: flex;
+  gap: 12px;
+  font-size: 0.85rem;
+}
+.builder .source-box > svg {
+  flex-shrink: 0;
+  color: #42697a;
+}
+.builder .source-box.stack {
+  gap: 12px;
+}
+.builder .muted {
+  font-size: 0.82rem;
+  font-weight: 400;
+}
+.builder .builder-footer {
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 24px;
+  margin-top: 22px;
+  border-top: 1px solid #dce7e3;
+}
+.builder .builder-footer > .row {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.builder .builder-preview-item {
+  border-top: 1px solid #dce7e3;
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 9px;
+}
+.builder .builder-preview-item h5 {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+.builder .builder-preview-item details {
+  font-size: 0.82rem;
+  width: 100%;
+}
+.builder .builder-preview-item summary {
+  cursor: pointer;
+  padding: 7px 0;
+  color: #28634f;
+}
+.builder blockquote {
+  margin: 10px 0 0;
+  border-left: 1px solid #b7d7c8;
+  padding: 5px 0 5px 12px;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+.builder .builder-publish-panel {
+  background: #f0f7f4;
+}
+.builder .builder-publish-panel > svg {
+  color: #23664e;
+}
+.builder .builder-approval {
+  display: flex;
+  gap: 11px;
+  align-items: flex-start;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  padding: 16px 0;
+  border-top: 1px solid #ccded5;
+  border-bottom: 1px solid #ccded5;
+  cursor: pointer;
+}
+.builder .builder-approval input {
+  width: 20px;
+  height: 20px;
+  margin: 3px 0 0;
+  flex-shrink: 0;
+  accent-color: #24664f;
+}
+.builder .builder-published {
+  align-items: center;
+  text-align: center;
+  padding: 48px 20px;
+  max-width: 600px;
+  margin: auto;
+}
+.builder .builder-published-icon {
+  color: #23664e;
+  background: #dff1e6;
+  border-radius: 50%;
+  padding: 22px;
+  display: grid;
+  place-items: center;
+}
+.builder .builder-published h3 {
+  font-size: 1.75rem;
+  margin: 0;
+}
+.builder .alert {
+  margin-top: 14px;
+}
+.builder progress {
+  width: 100%;
+  accent-color: #24664f;
+}
+@media (max-width: 700px) {
+  .builder .builder-grid {
+    grid-template-columns: 1fr;
+  }
+  .builder .builder-steps {
+    gap: 8px;
+  }
+  .builder .builder-steps li {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 7px;
+    font-size: 0.72rem;
+  }
+  .builder .builder-instruction-grid {
+    grid-template-columns: 1fr;
+  }
+  .builder .panel {
+    padding: 17px;
+  }
+  .builder .builder-footer {
+    align-items: flex-start;
+  }
+  .builder .builder-heading {
+    gap: 8px;
+  }
+}
