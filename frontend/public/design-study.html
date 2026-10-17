@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Discharge Companion · Design study</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        background: #f2f0e7;
+        color: #283d38;
+        margin: 0;
+        font:
+          16px/1.6 'Trebuchet MS',
+          sans-serif;
+      }
+      main {
+        max-width: 1160px;
+        margin: auto;
+        padding: 56px 32px;
+      }
+      h1,
+      h2,
+      h3 {
+        font-family: Georgia, serif;
+        font-weight: 400;
+        line-height: 1.15;
+      }
+      h1 {
+        font-size: 64px;
+        letter-spacing: -0.035em;
+        max-width: 13ch;
+        margin: 25px 0;
+      }
+      h2 {
+        font-size: 36px;
+        margin: 60px 0 24px;
+      }
+      h3 {
+        font-size: 25px;
+        margin: 18px 0 8px;
+      }
+      p {
+        max-width: 65ch;
+        color: #53665e;
+      }
+      a {
+        color: #355c4c;
+        text-underline-offset: 5px;
+      }
+      header {
+        border-bottom: 1px solid #c6cec3;
+        padding-bottom: 38px;
+      }
+      .palettes {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 36px 28px;
+      }
+      article {
+        min-width: 0;
+        border-bottom: 1px solid #c6cec3;
+        padding-bottom: 24px;
+      }
+      article p {
+        font-size: 14px;
+        min-height: 45px;
+      }
+      .swatches {
+        display: flex;
+        height: 180px;
+      }
+      .swatches > div {
+        flex: 1;
+        position: relative;
+      }
+      .swatches span {
+        position: absolute;
+        bottom: 10px;
+        left: 8px;
+        font:
+          12px 'Trebuchet MS',
+          sans-serif;
+        padding: 5px;
+        background: #f2f0e7;
+        color: #283d38;
+      }
+      .chosen {
+        background: #dce3d6;
+        padding: 28px;
+      }
+      .chosen .swatches {
+        height: 140px;
+      }
+      .chosen h2 {
+        margin: 0 0 22px;
+      }
+      .chosen p {
+        color: #355c4c;
+      }
+      .photos {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr;
+        gap: 24px;
+      }
+      .photos figure {
+        margin: 0;
+      }
+      .photos figure:first-child {
+        grid-row: span 2;
+      }
+      .photos img {
+        width: 100%;
+        height: 230px;
+        object-fit: cover;
+        display: block;
+      }
+      .photos figure:first-child img {
+        height: 514px;
+      }
+      .photos figcaption {
+        font-size: 13px;
+        margin-top: 10px;
+      }
+      .notes {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+      }
+      .notes section {
+        border-top: 1px solid #c6cec3;
+      }
+      footer {
+        border-top: 1px solid #c6cec3;
+        margin-top: 50px;
+        padding-top: 24px;
+        font-size: 13px;
+      }
+      @media (max-width: 700px) {
+        main {
+          padding: 30px 22px;
+        }
+        h1 {
+          font-size: 48px;
+        }
+        .palettes,
+        .photos,
+        .notes {
+          grid-template-columns: 1fr;
+        }
+        .photos figure:first-child img {
+          height: 300px;
+        }
+        .swatches {
+          height: 140px;
+        }
+        .swatches span {
+          font-size: 10px;
+          left: 3px;
+        }
+        .chosen {
+          padding: 18px;
+        }
+        .chosen .swatches {
+          height: 100px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <a href="/">Open Discharge Companion</a>
+        <h1>Quiet care, in color.</h1>
+        <p>
+          A visual study for a recovery companion. Mineral blue, sage, warm ivory and a little room
+          to breathe. These are research alternatives, followed by the selected working system.
+        </p>
+      </header>
+      <h2>The selected system</h2>
+      <section class="chosen">
+        <h2>Coastal care notebook</h2>
+        <div class="swatches">
+          <div style="background: #f2f0e7; color: #283d38"><span>#F2F0E7</span></div>
+          <div style="background: #d4e0e6; color: #283d38"><span>#D4E0E6</span></div>
+          <div style="background: #dce3d6; color: #283d38"><span>#DCE3D6</span></div>
+          <div style="background: #355c4c; color: #f8f6ee"><span>#355C4C</span></div>
+          <div style="background: #283d38; color: #f8f6ee"><span>#283D38</span></div>
+        </div>
+        <p>
+          Adapted from the coastal Color Hunt palette. Less yellow, less sugar, more contrast. Warm
+          ivory carries the interface; blue and sage create calm zones. Forest and ink carry every
+          meaningful action and instruction.
+        </p>
+      </section>
+      <h2>Seven palettes worth considering</h2>
+      <div class="palettes">
+        <article>
+          <div class="swatches">
+            <div style="background: #80a1ba"><span>#80A1BA</span></div>
+            <div style="background: #91c4c3"><span>#91C4C3</span></div>
+            <div style="background: #b4debd"><span>#B4DEBD</span></div>
+            <div style="background: #fff7dd"><span>#FFF7DD</span></div>
+          </div>
+          <h3>Coastal mineral</h3>
+          <p>Best starting point. Blue, sea glass, sage and cream.</p>
+          <a
+            href="https://colorhunt.co/palette/80a1ba91c4c3b4debdfff7dd"
+            target="_blank"
+            rel="noreferrer"
+            >View source palette</a
+          >
+        </article>
+        <article>
+          <div class="swatches">
+            <div style="background: #f5efe6"><span>#F5EFE6</span></div>
+            <div style="background: #e8dfca"><span>#E8DFCA</span></div>
+            <div style="background: #6d94c5"><span>#6D94C5</span></div>
+            <div style="background: #cbdceb"><span>#CBDCEB</span></div>
+          </div>
+          <h3>Blue linen</h3>
+          <p>Useful warm foundation; the blue needs darker text.</p>
+          <a
+            href="https://colorhunt.co/palette/f5efe6e8dfca6d94c5cbdceb"
+            target="_blank"
+            rel="noreferrer"
+            >View source palette</a
+          >
+        </article>
+        <article>
+          <div class="swatches">
+            <div style="background: #f6f0d7"><span>#F6F0D7</span></div>
+            <div style="background: #c5d89d"><span>#C5D89D</span></div>
+            <div style="background: #9cab84"><span>#9CAB84</span></div>
+            <div style="background: #89986d"><span>#89986D</span></div>
+          </div>
+          <h3>Sage paper</h3>
+          <p>Quiet green family. Too yellow for the main canvas.</p>
+          <a
+            href="https://colorhunt.co/palette/f6f0d7c5d89d9cab8489986d"
+            target="_blank"
+            rel="noreferrer"
+            >View source palette</a
+          >
+        </article>
+        <article>
+          <div class="swatches">
+            <div style="background: #a6aebf"><span>#A6AEBF</span></div>
+            <div style="background: #c5d3e8"><span>#C5D3E8</span></div>
+            <div style="background: #d0e8c5"><span>#D0E8C5</span></div>
+            <div style="background: #fff8de"><span>#FFF8DE</span></div>
+          </div>
+          <h3>Cloud garden</h3>
+          <p>Good blue-green balance; original colors are sweeter than our final system.</p>
+          <a
+            href="https://colorhunt.co/palette/a6aebfc5d3e8d0e8c5fff8de"
+            target="_blank"
+            rel="noreferrer"
+            >View source palette</a
+          >
+        </article>
+        <article>
+          <div class="swatches">
+            <div style="background: #789dbc"><span>#789DBC</span></div>
+            <div style="background: #ffe3e3"><span>#FFE3E3</span></div>
+            <div style="background: #fef9f2"><span>#FEF9F2</span></div>
+            <div style="background: #c9e9d2"><span>#C9E9D2</span></div>
+          </div>
+          <h3>Recovery notebook</h3>
+          <p>Strong blue, cream and sage. Leave the pink out.</p>
+          <a
+            href="https://colorhunt.co/palette/789dbcffe3e3fef9f2c9e9d2"
+            target="_blank"
+            rel="noreferrer"
+            >View source palette</a
+          >
+        </article>
+        <article>
+          <div class="swatches">
+            <div style="background: #d2e0fb"><span>#D2E0FB</span></div>
+            <div style="background: #f9f3cc"><span>#F9F3CC</span></div>
+            <div style="background: #d7e5ca"><span>#D7E5CA</span></div>
+            <div style="background: #8eaccd"><span>#8EACCD</span></div>
+          </div>
+          <h3>Linen and sky</h3>
+          <p>A useful muted blue. Reduce the lemon and periwinkle.</p>
+          <a
+            href="https://colorhunt.co/palette/d2e0fbf9f3ccd7e5ca8eaccd"
+            target="_blank"
+            rel="noreferrer"
+            >View source palette</a
+          >
+        </article>
+        <article>
+          <div class="swatches">
+            <div style="background: #ecf4e8"><span>#ECF4E8</span></div>
+            <div style="background: #cbf3bb"><span>#CBF3BB</span></div>
+            <div style="background: #abe7b2"><span>#ABE7B2</span></div>
+            <div style="background: #93bfc7"><span>#93BFC7</span></div>
+          </div>
+          <h3>Botanical air</h3>
+          <p>Good blue-green relationship. Original greens are too bright for this app.</p>
+          <a
+            href="https://colorhunt.co/palette/ecf4e8cbf3bbabe7b293bfc7"
+            target="_blank"
+            rel="noreferrer"
+            >View source palette</a
+          >
+        </article>
+      </div>
+      <h2>A photographic direction</h2>
+      <p>
+        Natural film color and an open horizon. A single photograph leads the opening screen.
+        Clinical instructions stay on plain, readable surfaces.
+      </p>
+      <div class="photos">
+        <figure>
+          <img src="/images/coastal-dunes.jpg" alt="Film photograph of quiet dunes and sea" />
+          <figcaption>
+            Selected: Memories on 35mm.
+            <a href="https://unsplash.com/photos/landscape-photo-of-a-gray-sandy-beach-rCVcMJqOuuM"
+              >Source photograph</a
+            >
+          </figcaption>
+        </figure>
+        <figure>
+          <img src="/images/coastal-grass-study.jpg" alt="Dune grass above a blue sea" />
+          <figcaption>
+            Alternative: Christian Loch.
+            <a href="https://unsplash.com/photos/Q-wwaD0UVr4">Source photograph</a>
+          </figcaption>
+        </figure>
+        <figure>
+          <img src="/images/coastal-hills-study.jpg" alt="Green coastal hills beside the ocean" />
+          <figcaption>
+            Alternative: Jonathan Borba.
+            <a href="https://unsplash.com/photos/8cEhivA0A5c">Source photograph</a>
+          </figcaption>
+        </figure>
+      </div>
+      <h2>The references and the decisions</h2>
+      <div class="notes">
+        <section>
+          <h3>Typography & structure</h3>
+          <p>
+            Newsreader gives the welcome and major headings an unhurried editorial voice. Source
+            Sans 3 is a humanist face for controls and care instructions. Care spaces use separated
+            rows; daily tasks sit alongside them on wide screens.
+          </p>
+          <p>
+            <a href="https://godly.design/website/superpower/">Godly: Superpower</a> informed image
+            scale and deliberate hierarchy. Its commercial claims and visual effects are excluded.
+          </p>
+          <p>
+            <a href="https://www.deck.gallery/holographik-quantum-spa-brand/"
+              >Deck Gallery: Quantum Wellness</a
+            >
+            is a reference for consistent application across surfaces. Its gradients, type choices
+            and motifs conflict with this brief.
+          </p>
+        </section>
+        <section>
+          <h3>Interaction & readability</h3>
+          <p>
+            <a href="https://transitions.dev/">Transitions.dev</a> offers useful panel and checkbox
+            state ideas. This app keeps state changes short, has no hover animation, and respects
+            reduced motion. No artificial loading delay.
+          </p>
+          <p>
+            <a href="https://service-manual.nhs.uk/design-system/styles/typography"
+              >NHS typography guidance</a
+            >
+            informs consistent hierarchy, legible care copy and underlined text links. This is an
+            independent prototype with its own identity.
+          </p>
+          <p>
+            Animus.app redirected to a domain-sale page during research on October 17, 2026, so it
+            provided no design reference.
+          </p>
+        </section>
+      </div>
+      <footer>
+        Research for a fictional hackathon prototype. Photos from Unsplash;
+        <a href="https://unsplash.com/license">license</a>. Palette names on this page are
+        descriptive names chosen for this study.
+      </footer>
+    </main>
+  </body>
+</html>

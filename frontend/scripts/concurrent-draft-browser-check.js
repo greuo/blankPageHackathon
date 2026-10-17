@@ -1,0 +1,15 @@
+async (page) => {
+  const opening = page.getByRole('button', { name: 'Open my companion', exact: true });
+  if (await opening.isVisible()) await opening.click();
+
+ const assert=(value,message)=>{if(!value)throw new Error(message)};
+ if(await page.locator('dialog[open]').count())await page.getByRole('button',{name:'Close dialog',exact:true}).click();
+ await page.getByRole('button',{name:'Reset fictional demo'}).click();await page.getByRole('button',{name:'Reset demo',exact:true}).click();
+ await page.getByRole('combobox',{name:'Demo role'}).selectOption('doctor');await page.getByRole('button',{name:/^Everyday recovery Jamie/}).click();await page.getByRole('button',{name:'Build care plan'}).click();await page.getByRole('button',{name:'Review instructions',exact:true}).click();await page.getByRole('button',{name:'Save draft & preview'}).click();
+ await page.evaluate(()=>{const key='discharge-companion:fictional-demo:v1';const s=JSON.parse(localStorage.getItem(key));const draft=s.plans.find(p=>p.spaceId==='recovery'&&p.status==='draft');draft.title='Parallel draft content';const raw=JSON.stringify(s);localStorage.setItem(key,raw);window.dispatchEvent(new StorageEvent('storage',{key,newValue:raw}))});
+ await page.getByRole('checkbox',{name:/I have reviewed every instruction/}).check();await page.getByRole('button',{name:'Approve & publish v2'}).click();assert((await page.getByRole('alert').textContent()).includes('Another session changed this draft'),'Unseen concurrent draft was published');
+ await page.getByRole('button',{name:'Close dialog',exact:true}).click();
+ await page.evaluate(()=>{const key='discharge-companion:fictional-demo:v1';const s=JSON.parse(localStorage.getItem(key));const approved=structuredClone(s.plans.find(p=>p.spaceId==='recovery'&&p.status==='approved'));approved.id='parallel-approved-v2';approved.version=2;approved.approvedAt=new Date().toISOString();s.plans.push(approved);const raw=JSON.stringify(s);localStorage.setItem(key,raw);window.dispatchEvent(new StorageEvent('storage',{key,newValue:raw}))});
+ await page.getByRole('button',{name:/^Everyday recovery Jamie/}).click();await page.getByRole('button',{name:'Build care plan'}).click();assert(await page.getByText('Version 3 · Draft',{exact:true}).count()===1,'Stale draft did not reopen as next version');assert(await page.getByLabel('Plan title',{exact:true}).inputValue()==='Parallel draft content','Stale draft content was lost');await page.getByRole('button',{name:'Review instructions',exact:true}).click();await page.getByRole('button',{name:'Save draft & preview'}).click();assert(await page.getByRole('button',{name:'Approve & publish v3'}).isDisabled(),'Rebased draft bypassed fresh approval');
+ await page.getByRole('button',{name:'Close dialog',exact:true}).click();await page.getByRole('button',{name:'Reset fictional demo'}).click();await page.getByRole('button',{name:'Reset demo',exact:true}).click();return {passed:['Concurrent unseen content blocks publication','Stale parallel draft reopens as next version, preserves content and requires fresh approval']};
+}
