@@ -2502,3 +2502,85 @@ details[open] > :not(summary) {
     scroll-behavior: auto !important;
   }
 }
+
+/* Public doctor-link page (/doctor-message#<token>) */
+.doctor-message-page {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: clamp(20px, 5vw, 48px) 16px 48px;
+  background: var(--canvas);
+}
+.doctor-message-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-heading);
+  font-size: 20px;
+  color: var(--navy);
+}
+.doctor-message-brand svg {
+  width: 24px;
+  height: 24px;
+  color: var(--green);
+}
+.doctor-message-card {
+  width: min(680px, 100%);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: clamp(22px, 4vw, 36px);
+}
+.doctor-message-card h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(24px, 4vw, 32px);
+  margin: 0 0 6px;
+}
+.doctor-message-card h2,
+.doctor-message-card h3 {
+  font-family: var(--font-heading);
+  margin: 24px 0 8px;
+}
+.doctor-message-muted {
+  color: var(--muted);
+  margin: 4px 0 0;
+}
+.doctor-message-content {
+  margin: 18px 0 0;
+  padding: 16px 18px;
+  background: var(--message-patient);
+  border-radius: var(--radius-control);
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+.doctor-notes-text {
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  margin: 8px 0;
+}
+.doctor-notes-extra {
+  background: var(--panel);
+  border-radius: var(--radius-control);
+  padding: 12px 14px;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  font-size: 14px;
+}
+.doctor-message-privacy {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin-top: 28px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 14px;
+}
+.doctor-message-privacy svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+}

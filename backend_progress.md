@@ -45,7 +45,7 @@ Snapshot of what exists right now. Rewrite it each session; don't append.
     4. Rerun `tests/access.sql`.
     - Use the Supabase MCP, the SQL editor, or the Management API `POST /v1/projects/<ref>/database/query` with the CLI's token.
   - Bot behaviour change: deploy the branch as a temporary `chat-preview` function, run the cases in `chat/eval_live.ts` through it, then delete it. That way the live `chat` is never touched before merge.
-- **In progress:** set `RESEND_API_KEY` and send one real email end to end; the frontend's `/doctor-message` page is still to build. **Next: see "Start here: next session" below.**
+- **In progress:** set `RESEND_API_KEY` and send one real email end to end. The frontend's `/doctor-message` page is merged (#17); redeploy the frontend (`cd frontend && npm run deploy`) so it's live. **Next: see "Start here: next session" below.**
 - **Known issues:**
   - Leftovers from the doctor-message live test, still on hosted (the SQL cleanup was declined): one expired test message from Alex (`content` starts with `LIVE TEST`) and one anonymous test guest with doctor "Dr Test". Harmless; delete with `delete from public.doctor_messages where content like 'LIVE TEST%'; delete from auth.users where id = '7eba3d3a-d255-4809-9d93-6046f65d2d84';`
   - Supabase advisor: leaked-password protection is off (dashboard setting).
@@ -167,10 +167,16 @@ Newest first. One entry per session:
 - **Notes:** blockers, decisions, gotchas (optional)
 ```
 
+### 2026-10-17 · Andrew (remove the Claude PR review)
+- **Did:** Removed the broken Claude review from CI: deleted the `claude-review` job from `.github/workflows/pr-checks.yml` (the deterministic conflict check stays), updated `README.md` and the two `CLAUDE.md` lines that described it. `@claude` PR/issue comments (`claude.yml`) and `conflict-watch.yml` are untouched. No backend code changed.
+- **Files:** `.github/workflows/pr-checks.yml`, `README.md`, `CLAUDE.md`, `overlap.md`, this file
+- **Next:** "Claude review" must also be removed from `main`'s required status checks (repo settings → branch protection) or no PR can merge; Andrew is doing that by hand since sessions can't.
+- **Notes:** PRs now merge on the conflict check alone — review each other's PRs manually, or ask `@claude review this PR` in a comment when wanted.
+
 ### 2026-10-17 · Andrew (email domain + hosting on foredge.me)
 - **Did:** Verified `mail.foredge.me` in Resend and added its DKIM/SPF/DMARC records in Cloudflare. Removed the old `www` → Vercel record and hosted the frontend on Cloudflare at `foredge.me` + `www` (Worker `foredge`, SPA fallback). Set `APP_URL`/`EMAIL_FROM`, deployed `notify-doctor` and `view-doctor-message` (smoke: 400 bad token, 401 not signed in).
 - **Files:** `frontend/wrangler.jsonc`, `frontend/package.json` (wrangler + `deploy` script), `frontend/.gitignore`, docs.
-- **Next:** set `RESEND_API_KEY`, send one real email end to end; frontend builds `/doctor-message`.
+- **Next:** set `RESEND_API_KEY`, redeploy the frontend so `/doctor-message` (#17) is live, send one real email end to end.
 - **Notes:** Resend free plan allows one domain and the account already had `tidyweek.app`; adding `mail.foredge.me` worked anyway. The old Vercel project still exists (not signed in there); delete it from the Vercel dashboard.
 
 ### 2026-10-17 · Andrew (secure-link doctor emails)
