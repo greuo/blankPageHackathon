@@ -79,9 +79,9 @@ Deno.serve(async (req) => {
     return json({ patient_message: patientMessage, reply: botMessage, action, suggest_notify_doctor }, 201);
   };
 
+  // 1. Red flags: 911 / clinic phone, without asking the model.
+  const flag = redFlag(content);
   try {
-    // 1. Red flags: 911 / clinic phone, without asking the model.
-    const flag = redFlag(content);
     if (flag) {
       console.log(`chat: red flag (${flag}) for patient ${patient_id}`);
       return await reply(emergencyNotice(doctor), "emergency", false);
@@ -113,7 +113,10 @@ Deno.serve(async (req) => {
   } catch (e) {
     console.error("chat:", e);
     try {
-      return await reply(referNotice(doctor, "medium"), "referred", true);
+      // Never downgrade an emergency to a referral on retry.
+      return flag
+        ? await reply(emergencyNotice(doctor), "emergency", false)
+        : await reply(referNotice(doctor, "medium"), "referred", true);
     } catch {
       return json({ error: "Your message was saved, but the bot failed. Please contact your doctor directly." }, 500);
     }

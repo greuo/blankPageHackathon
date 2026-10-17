@@ -24,10 +24,11 @@ const RED_FLAGS: [RegExp, string][] = [
   [/\bemergency\b(?! contact)|\b911\b/i, "patient mentions an emergency"],
 ];
 
-// "no chest pain", "not short of breath", "without fainting" etc. The negation must come at most two
-// words before the match with no punctuation between, so "no chest pain, but I can't breathe" and
-// "no idea why I have chest pain" still flag. Errs towards flagging.
-const NEGATION = /\b(no|not|never|without|don'?t have|do not have|haven'?t had|denies|free of)\s+([\w'-]+\s+){0,2}$/i;
+// "no chest pain", "not short of breath", "haven't had any fainting" etc. Only a negation that attaches
+// directly to the symptom counts (optionally "any" / "more" in between). So "no chest pain, but I
+// can't breathe", "No I can't breathe", "I'm not ok I can't breathe" and "I've never had chest pain
+// like this" all still flag. Errs towards flagging.
+const NEGATION = /(\b(no|not|without|denies|free of)|\b(don'?t|do not|haven'?t|have not|hasn'?t|has not) (have|had))\s+(any\s+|more\s+)?$/i;
 
 export function redFlag(text: string): string | null {
   const normalized = text.replace(/[‘’]/g, "'"); // phone keyboards type curly apostrophes

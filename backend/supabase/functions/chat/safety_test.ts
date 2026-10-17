@@ -28,6 +28,9 @@ Deno.test("red flags catch emergencies, including curly apostrophes", () => {
       "this is an emergency",
       "No chest pain, but I cannot breathe",
       "no idea why I have chest pain",
+      "I've never had chest pain like this before",
+      "No I can't breathe",
+      "I'm not ok I can't breathe",
     ]
   ) assertEquals(redFlag(text) !== null, true, text);
 });

@@ -79,7 +79,7 @@ Guests are free to create, and the patient types in the doctor's email, so witho
 
 - Only a patient with an email account can send. A guest is asked to add an email first (same account, data kept).
 - At most 5 doctor messages per patient per hour and 20 per day.
-- At most 10 messages per recipient address per day, across all patients.
+- At most 10 messages per recipient address per day, across all patients. The address is saved on each message, so editing or deleting the doctor afterwards doesn't reset the count.
 - The email body is fixed text. The only patient-controlled part is the first name, which `notify-doctor` must escape and cut to 40 characters.
 
 The `chat` function is also rate-limited (20 messages per 10 minutes, 200 per day per patient), since each message can cost a Claude call. Supabase limits anonymous sign-ups to 30 per hour per IP; turn on captcha if that's not enough.

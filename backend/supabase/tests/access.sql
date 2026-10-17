@@ -292,6 +292,28 @@ select pg_temp.try_write('Limits: an 11th message that day to the same address i
             now() - interval '2 hours'
      from generate_series(1, 11) i$q$);
 
+select pg_temp.try_value('Limits: the recipient address is stored on the message', 1,
+  $q$insert into doctor_messages (patient_id, doctor_id, content, token_hash)
+     values ('00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000201', 'hi', 'addr-1')
+     returning (recipient_email = 'maya.okafor@example.com')::int$q$);
+-- Editing the doctor's email and re-adding the address as a new doctor must not reset the count.
+create or replace function pg_temp.recipient_cap_bypass() returns bigint language plpgsql as $$
+declare d uuid;
+begin
+  insert into public.doctor_messages (patient_id, doctor_id, content, token_hash, created_at)
+  select '00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000201', 'hi', 'bypass-' || i,
+         now() - interval '2 hours'
+  from generate_series(1, 10) i;
+  update public.doctors set email = 'someone.else@example.com' where id = '00000000-0000-0000-0000-000000000201';
+  insert into public.doctors (patient_id, name, email)
+  values ('00000000-0000-0000-0000-000000000101', 'Dr. Again', 'Maya.Okafor@example.com') returning id into d;
+  insert into public.doctor_messages (patient_id, doctor_id, content, token_hash)
+  values ('00000000-0000-0000-0000-000000000101', d, 'hi', 'bypass-11');
+  return 1;
+end $$;
+select pg_temp.try_value('Limits: editing the doctor row doesn''t reset the per-address cap (-1 = blocked)', -1,
+  $q$select pg_temp.recipient_cap_bypass()$q$);
+
 -- ---------------------------------------------------------------- Default privileges
 insert into results (check_name, expected, actual)
 select 'Future public tables: no write grants for anon/authenticated by default', 0, count(*)

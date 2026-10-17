@@ -11,6 +11,9 @@
 --      - at most 5 doctor messages per patient per hour, and 20 per day
 --      - at most 10 doctor messages per recipient email address per day, across all patients
 --      - the doctor must have an email address
+--    The address is stored on the message (recipient_email), so editing or deleting the doctor row
+--    afterwards doesn't take earlier sends out of the count, and notify-doctor emails exactly the
+--    address that was counted.
 
 -- ---------------------------------------------------------------------------
 -- 1. Default privileges
@@ -50,7 +53,13 @@ end $$;
 -- 3. Doctor-message limits
 -- ---------------------------------------------------------------------------
 
-create index doctor_messages_created_at_idx on public.doctor_messages (created_at desc);
+-- Set by the trigger below; notify-doctor sends to this address.
+alter table public.doctor_messages add column recipient_email text;
+update public.doctor_messages m
+set recipient_email = lower(trim(d.email))
+from public.doctors d
+where d.id = m.doctor_id and m.recipient_email is null;
+create index doctor_messages_recipient_idx on public.doctor_messages (recipient_email, created_at desc);
 
 create function private.limit_doctor_messages()
 returns trigger
@@ -71,6 +80,7 @@ begin
     raise exception 'This doctor has no email address'
       using errcode = 'check_violation', hint = 'doctor_has_no_email';
   end if;
+  new.recipient_email := recipient;
 
   -- Serialise sends per patient so the counts below can't race.
   perform 1 from public.patients where id = new.patient_id for update;
@@ -83,9 +93,10 @@ begin
       using errcode = 'check_violation', hint = 'patient_rate_limited';
   end if;
 
+  -- Serialise sends per address too, across patients.
+  perform pg_advisory_xact_lock(hashtext('doctor_messages:' || recipient));
   if (select count(*) from public.doctor_messages m
-      join public.doctors d on d.id = m.doctor_id
-      where lower(trim(d.email)) = recipient and m.created_at > now() - interval '1 day') >= 10 then
+      where m.recipient_email = recipient and m.created_at > now() - interval '1 day') >= 10 then
     raise exception 'This doctor has received too many messages today. Please call the clinic instead.'
       using errcode = 'check_violation', hint = 'recipient_rate_limited';
   end if;
