@@ -96,6 +96,24 @@ Deno.test("anything doubtful refers the patient to their doctor", () => {
   for (const [name, verdict] of cases) assertEquals(decide(verdict, notes).action, "referred", name);
 });
 
+Deno.test("a symptom answer backed only by an unrelated note refers, when the notes cover symptoms", () => {
+  const d = decide({ ...answer, answer: "That's normal.", cited_note_ids: [NOTE], mentions_symptom: true }, notes);
+  assertEquals(d.action, "referred");
+  const w = decide({ ...answer, action: "warning_sign", answer: "Call the clinic.", cited_note_ids: [NOTE], mentions_symptom: true }, notes);
+  assertEquals(w.action, "referred");
+});
+
+Deno.test("free-text notes (no normal / warning-sign items) can still answer a symptom question, with the footer", () => {
+  const d = decide({ ...answer, answer: "Your notes say to rest it.", cited_note_ids: ["instructions.2"], mentions_symptom: true }, new Set(["instructions.1", "instructions.2"]));
+  assertEquals(d.action, "answered");
+  assertEquals(d.action === "answered" && patientReply(d, clinic).includes("911"), true);
+});
+
+Deno.test("citing a normal / warning-sign item adds the footer even if the model forgot the symptom flag", () => {
+  const d = decide({ ...answer, answer: "Some pinkness is expected.", cited_note_ids: ["normal.1"], mentions_symptom: false }, notes);
+  assertEquals(d.action === "answered" && patientReply(d, clinic).includes("911"), true);
+});
+
 Deno.test("referrals about symptoms are at least medium urgency", () => {
   const d = decide({ ...answer, support: "not_covered", mentions_symptom: true, urgency: "low" }, notes);
   assertEquals(d.action === "referred" && d.urgency, "medium");

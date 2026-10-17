@@ -93,6 +93,10 @@ export type Decision =
 
 const atLeastMedium = (u: Urgency): Urgency => (u === "low" ? "medium" : u);
 
+// Note items that speak to symptoms: what's expected after the visit, and the warning signs.
+const SYMPTOM_KEYS = ["normal.", "warning_signs."];
+const isSymptomNote = (id: string) => SYMPTOM_KEYS.some((k) => id === k.slice(0, -1) || id.startsWith(k));
+
 // `verdict` is null when the model call failed, was refused, or returned something unparseable.
 //
 // The bot may now answer symptom questions ("is some redness normal?") and clear implications of the
@@ -131,9 +135,18 @@ export function decide(verdict: Verdict | null, noteIds: Set<string>): Decision 
     : cited.some((id) => !noteIds.has(id))
     ? "The answer cited a note that doesn't exist."
     : null;
-  if (doubt) {
-    const urgency = verdict.mentions_symptom ? atLeastMedium(verdict.urgency) : verdict.urgency;
-    return { action: "referred", reason: reason ? `${doubt} ${reason}` : doubt, urgency };
+  // When the notes have "what's normal" / warning-sign items, a symptom answer or warning-sign reply
+  // must be backed by one of them, not by some unrelated note. (Free-text notes have neither, so
+  // this check can't apply to them; the footer below still does.)
+  const symptomRelated = verdict.mentions_symptom || verdict.action === "warning_sign";
+  const notesCoverSymptoms = [...noteIds].some(isSymptomNote);
+  const unbacked = !doubt && symptomRelated && notesCoverSymptoms && !cited.some(isSymptomNote)
+    ? "A symptom answer didn't cite the notes' normal or warning-sign items."
+    : null;
+  if (doubt || unbacked) {
+    const why = (doubt ?? unbacked)!;
+    const urgency = symptomRelated ? atLeastMedium(verdict.urgency) : verdict.urgency;
+    return { action: "referred", reason: reason ? `${why} ${reason}` : why, urgency };
   }
 
   if (verdict.action === "warning_sign") {
@@ -149,7 +162,9 @@ export function decide(verdict: Verdict | null, noteIds: Set<string>): Decision 
     action: "answered",
     reply: answer!,
     cited,
-    symptom: verdict.mentions_symptom,
+    // Footer if the model says it's about a symptom OR it cites a normal / warning-sign item, so a
+    // missing flag can't drop the safety line.
+    symptom: verdict.mentions_symptom || cited.some(isSymptomNote),
     reason: verdict.support === "stated" ? "Answered from the doctor's notes." : "Answered from a direct implication of the notes.",
   };
 }
