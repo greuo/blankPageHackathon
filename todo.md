@@ -8,6 +8,8 @@ Shared list for both sides.
 
 ## Frontend
 
+- [x] Publish the complete current frontend as Ranveer’s final draft in a new PR replacing #13 (2026-10-17, Gold M for Ranveer).
+
 - [x] Replace green palette with cobalt/sky/navy, round controls, integrate five more React Bits interactions and GSAP click/sound feedback; preserve information and publish original prompts (2026-10-17, Gold M for Ranveer).
 
 - [x] Remove trailing arrows from To-Do rows (2026-10-17, Gold M for Ranveer).

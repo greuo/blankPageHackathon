@@ -12,9 +12,15 @@ Owned by the frontend side (Ranveer, Marcus). Only frontend sessions edit this f
 - **Data:** Typed browser-local patient adapter in `frontend/src/patient/`, fictional records only. Existing information and source wording preserved. Legacy shared-care modules remain reference source and regression tests. Local assistant remains deterministic.
 - **Validation:** Latest production build and 75 tests pass; independent ECC-informed React/TypeScript review approved after fixing fullscreen header contrast. Current browser checks cover 390/768/1440px, keyboard task/radio/save controls, swipe dismissal, sound preference, intake, fullscreen chat, report preview and splash replay. Browser error/warning logs clean. Vite retains a 519 KB JS chunk advisory. Details: `frontend/docs/VERIFICATION.md`.
 - **Integration next:** Andrew's documented Supabase patient-only tables, guest auth and live `chat` contract are available. Frontend binding is still deferred at Ranveer's request. Live inference, doctor input verification, extraction, email delivery and secure doctor links are not connected in this UI. No live privacy/security claim.
-- **Delivery:** Current revamp is PR #13 on `codex/patient-ui-motion`; initial Claude/conflict checks approved. Latest main documentation was merged cleanly and frontend handoff notes added to the same PR. Final exact revision/check status is recorded in the local continuity checkpoint. No merge performed.
+- **Delivery:** Ranveer designated the complete current UI as the final draft. Published on `codex/final-patient-ui` in a new PR replacing #13, retaining the entire reviewed implementation and prompts. Latest application code is unchanged from `06202ee`; only publication notes were updated. Required Claude/conflict checks remain in place; no merge performed. The local continuity checkpoint records the new PR and exact checks.
 
 ## Session log
+
+### 2026-10-17 · Final-draft publication / Gold M for Ranveer
+
+- **Did:** Packaged every current frontend source, animation, font, test and copied React Bits prompt into a new final-draft PR from `codex/final-patient-ui`, replacing PR #13 at Ranveer's explicit request. Application code is identical to the tested `06202ee` snapshot.
+- **Validation:** Verified the branch contains current `main`, all prior UI commits and no outstanding source edits. Existing build, 75 tests, browser checks and independent review apply to the unchanged application. macOS `.DS_Store` is excluded.
+- **Next:** Complete repository review before merge. Backend connection remains deferred; teammate backend PRs retain separate ownership.
 
 ### 2026-10-17 · Blue palette and five React Bits interactions / Gold M for Ranveer
 
