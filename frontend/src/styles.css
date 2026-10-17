@@ -6,20 +6,30 @@
   font-weight: 400;
   font-size: 16px;
   line-height: 1.55;
-  --canvas: #f2f7fa;
-  --surface: #f9fcfe;
-  --ink: #183a4b;
-  --muted: #4f6878;
-  --green: #167660;
-  --mint: #d9f3e9;
-  --blue: #dcefff;
-  --action: #246dbb;
-  --rail: #eaf2f6;
-  --selected: #d7e8f2;
-  --line-strong: #809cab;
-  --line: #cddfe8;
-  --earth: #805d2a;
-  --danger: #9a453d;
+  --canvas: #f2f6ef;
+  --surface: #fafcf7;
+  --ink: #203e2f;
+  --muted: #536a58;
+  --green: #326f4d;
+  --mint: #dcebd8;
+  --sage: #e4eedc;
+  --action: #286642;
+  --rail: #eaf0e5;
+  --selected: #d2e3c8;
+  --line-strong: #788e70;
+  --line: #cbdac4;
+  --earth: #4b5f31;
+  --danger: #294b35;
+  --panel: #e8f0e2;
+  --panel-strong: #dfebd6;
+  --accent-soft: #d1e3c7;
+  --track: #c3d7b8;
+  --progress: #37764e;
+  --message-assistant: #edf3e8;
+  --message-patient: #dcebd3;
+  --warning-surface: #e8ecd9;
+  --urgent-surface: #e0ead8;
+  --overlay: #203e2f70;
   --white: var(--surface);
   --shadow: none;
   --radius: 3px;
@@ -163,7 +173,7 @@ a {
   flex-shrink: 0;
 }
 .avatar[title*='Chen'] {
-  background: var(--blue);
+  background: var(--sage);
   color: var(--ink);
 }
 .avatar[title*='Alex'] {
@@ -551,7 +561,7 @@ legend {
   max-width: min(1120px, calc(100vw - 48px));
 }
 .modal::backdrop {
-  background: #183a4b70;
+  background: var(--overlay);
 }
 .dialog-header {
   padding: 20px 26px;
@@ -729,7 +739,7 @@ legend {
   overflow-wrap: anywhere;
 }
 .own .bubble {
-  background: var(--blue);
+  background: var(--sage);
   border-radius: 3px;
 }
 .bubble .btn {
@@ -1359,7 +1369,7 @@ a {
   font-size: 28px;
 }
 .modal::backdrop {
-  background: #183a4b7a;
+  background: var(--overlay);
 }
 .brand {
   display: inline-flex;
@@ -1510,7 +1520,7 @@ a {
 }
 .avatar:nth-child(2n),
 .avatar:nth-child(3n) {
-  background: #ddebf7;
+  background: var(--panel);
   color: var(--ink);
 }
 .main-shell {
@@ -1618,7 +1628,7 @@ a {
   grid-column: 1 / -1;
   display: grid;
   grid-template-columns: 1.05fr 1fr;
-  background: var(--blue);
+  background: var(--sage);
   color: var(--ink);
   margin-bottom: 36px;
   min-height: 184px;
@@ -2170,7 +2180,7 @@ a {
 .companion-state {
   margin: 16px 24px;
   padding: 18px;
-  background: var(--blue);
+  background: var(--sage);
   border: 1px solid var(--line);
   border-radius: 3px;
 }
@@ -2270,7 +2280,7 @@ details[open] > :not(summary) {
 .care-image {
   position: relative;
   overflow: hidden;
-  background: var(--blue);
+  background: var(--sage);
 }
 .care-image > img {
   display: block;
@@ -2285,7 +2295,7 @@ details[open] > :not(summary) {
 .image-skeleton {
   position: absolute;
   inset: 0;
-  background: var(--blue);
+  background: var(--sage);
   display: grid;
   align-content: center;
   gap: 10px;
@@ -2296,7 +2306,7 @@ details[open] > :not(summary) {
   display: block;
   width: 66%;
   height: 12px;
-  background: #b8d8ed;
+  background: var(--track);
   animation: loading-breathe 900ms ease-in-out infinite alternate;
 }
 .image-skeleton > span:last-child {
@@ -2319,11 +2329,11 @@ details[open] > :not(summary) {
 .skeletons.conversation .skeleton {
   padding: 12px 16px;
   min-height: 68px;
-  background: var(--blue);
+  background: var(--sage);
 }
 .skeletons.conversation .skeleton span {
   height: 8px;
-  background: #b8d8ed;
+  background: var(--track);
   margin: 8px 0;
 }
 .splash-screen {
@@ -2354,7 +2364,7 @@ details[open] > :not(summary) {
   stroke-linecap: round;
   stroke-dasharray: 168;
 }
-.blue-line {
+.sage-line {
   stroke: var(--action);
 }
 .green-line {

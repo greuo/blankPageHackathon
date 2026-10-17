@@ -1,14 +1,4 @@
 .patient-app {
-  --canvas: #f2f7fa;
-  --surface: #f9fcfe;
-  --ink: #183a4b;
-  --muted: #4f6878;
-  --blue: #dcefff;
-  --mint: #d9f3e9;
-  --action: #246dbb;
-  --green: #167660;
-  --line: #cddfe8;
-  --line-strong: #809cab;
   min-height: 100dvh;
   background: var(--canvas);
   color: var(--ink);
@@ -65,7 +55,7 @@
   outline-offset: 4px;
 }
 .patient-app ::selection {
-  background: #bedff4;
+  background: var(--selected);
   color: var(--ink);
 }
 .patient-app input,
@@ -74,7 +64,7 @@
 }
 .patient-app input::placeholder,
 .patient-app textarea::placeholder {
-  color: #506c7b;
+  color: var(--muted);
   opacity: 1;
 }
 .patient-header {
@@ -100,7 +90,7 @@
 .patient-brand-symbol {
   width: 43px;
   height: 43px;
-  background: var(--blue);
+  background: var(--sage);
   color: var(--action);
   display: grid;
   place-items: center;
@@ -136,7 +126,7 @@
   min-height: 43px;
 }
 .patient-header nav .current {
-  background: var(--blue);
+  background: var(--sage);
   color: var(--ink);
 }
 .patient-header-actions {
@@ -197,7 +187,7 @@
   padding: 27px 28px;
   margin-bottom: 30px;
   border-radius: 12px;
-  background: #dfedfa;
+  background: var(--panel-strong);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -205,13 +195,13 @@
 }
 .patient-greeting p {
   font-size: 17px;
-  color: #395c73;
+  color: var(--muted);
 }
 .greeting-date {
   display: flex;
   gap: 7px;
   align-items: center;
-  color: #395c73;
+  color: var(--muted);
   font-size: 12px;
   margin-top: 20px;
   font-weight: 650;
@@ -275,7 +265,7 @@
 .patient-section-heading > .task-count {
   padding: 6px 10px;
   background: var(--mint);
-  color: #256b56;
+  color: var(--green);
   border-radius: 5px;
   font-size: 12px;
   font-weight: 750;
@@ -289,7 +279,7 @@
   background: none;
   padding: 0;
   min-height: 32px;
-  color: #245f96;
+  color: var(--action);
   font-size: 14px;
   font-weight: 750;
   text-decoration: none;
@@ -337,17 +327,17 @@
   width: 44px;
   height: 44px;
   border-radius: 11px;
-  background: #e4f3ef;
-  color: #26765f;
+  background: var(--sage);
+  color: var(--green);
   flex-shrink: 0;
 }
 .patient-task:nth-child(2) > .patient-icon {
-  background: #e1effb;
-  color: #2e6ca3;
+  background: var(--sage);
+  color: var(--action);
 }
 .patient-task:nth-child(3) > .patient-icon {
-  background: #e4f3ef;
-  color: #26765f;
+  background: var(--sage);
+  color: var(--green);
 }
 .task-open {
   display: flex;
@@ -375,29 +365,29 @@
   margin-top: 3px;
 }
 .is-done .task-open strong {
-  color: #3d6c60;
+  color: var(--muted);
 }
 .is-done .task-open small {
-  color: #28644e;
+  color: var(--green);
 }
 .is-done .task-check svg {
   stroke-width: 2.5;
 }
 .patient-task.is-done {
-  border-color: #b5d8c9;
-  background: #edf7f2;
+  border-color: var(--line);
+  background: var(--panel);
 }
 .important-instructions {
-  background: #e9f3fb;
-  border-color: #c6ddea;
+  background: var(--panel);
+  border-color: var(--line);
 }
 .guidance-icon {
   display: grid;
   place-items: center;
   width: 38px;
   height: 38px;
-  background: #d2e9fb;
-  color: #275f91;
+  background: var(--accent-soft);
+  color: var(--action);
   border-radius: 9px;
   flex-shrink: 0;
 }
@@ -411,7 +401,7 @@
   padding: 12px 0;
   background: transparent;
   border: 0;
-  border-top: 1px solid #cbdfe9;
+  border-top: 1px solid var(--line);
   color: var(--ink);
   font-size: 15px;
 }
@@ -421,13 +411,13 @@
 .precaution-row > .patient-icon {
   width: 32px;
   height: 32px;
-  background: #daebf6;
-  color: #33688c;
+  background: var(--selected);
+  color: var(--action);
   border-radius: 7px;
 }
 .recovery-progress {
-  background: #e3f2eb;
-  border-color: #c4dfd1;
+  background: var(--panel-strong);
+  border-color: var(--line);
 }
 .progress-heading {
   display: flex;
@@ -438,8 +428,8 @@
 .timeline-percent {
   font-size: 12px;
   font-weight: 750;
-  color: #245e4d;
-  background: #cee8dc;
+  color: var(--action);
+  background: var(--selected);
   padding: 5px 8px;
   border-radius: 5px;
 }
@@ -448,7 +438,7 @@
 }
 .recovery-progress > p {
   font-size: 14px;
-  color: #3f6659;
+  color: var(--muted);
   margin-top: 7px;
 }
 .recovery-progress progress {
@@ -458,33 +448,33 @@
   height: 10px;
   border: 0;
   border-radius: 3px;
-  background: #c5dfd3;
-  accent-color: #27836a;
+  background: var(--track);
+  accent-color: var(--progress);
   overflow: hidden;
   margin-top: 16px;
 }
 .recovery-progress progress::-webkit-progress-bar {
-  background: #c5dfd3;
+  background: var(--track);
 }
 .recovery-progress progress::-webkit-progress-value {
-  background: #27836a;
+  background: var(--progress);
   border-radius: 3px;
   transition: width 240ms ease-out;
 }
 .recovery-progress progress::-moz-progress-bar {
-  background: #27836a;
+  background: var(--progress);
 }
 .progress-scale {
   display: flex;
   justify-content: space-between;
   margin-top: 5px;
-  color: #3f6659;
+  color: var(--muted);
   font-size: 11px;
   font-variant-numeric: tabular-nums;
 }
 .recovery-progress > small {
   display: block;
-  color: #3f6659;
+  color: var(--muted);
   font-size: 12px;
   margin-top: 6px;
 }
@@ -494,8 +484,8 @@
   gap: 12px;
   margin-top: 20px;
   padding-top: 16px;
-  border-top: 1px solid #bfdccc;
-  color: #28664f;
+  border-top: 1px solid var(--line);
+  color: var(--green);
 }
 .next-milestone > div {
   flex: 1;
@@ -508,7 +498,7 @@
 .next-milestone span {
   display: block;
   font-size: 12px;
-  color: #3f6659;
+  color: var(--muted);
   margin-top: 2px;
 }
 .patient-lower {
@@ -571,7 +561,7 @@
   min-height: 600px;
   max-height: 1050px;
   min-width: 0;
-  border: 1px solid #bed7e8;
+  border: 1px solid var(--line);
   border-radius: 12px;
   background: var(--surface);
   overflow: hidden;
@@ -581,15 +571,15 @@
   align-items: center;
   gap: 10px;
   padding: 21px 19px;
-  background: #e2f0fc;
-  border-bottom: 1px solid #c6dfef;
+  background: var(--panel-strong);
+  border-bottom: 1px solid var(--line);
 }
 .assistant-heading > .patient-icon {
   width: 43px;
   height: 43px;
   border-radius: 11px;
-  background: #c6e4fa;
-  color: #235f95;
+  background: var(--selected);
+  color: var(--action);
 }
 .assistant-heading > div {
   flex: 1;
@@ -601,19 +591,19 @@
 .assistant-heading p {
   font-size: 12px;
   margin-top: 4px;
-  color: #3d637e;
+  color: var(--muted);
 }
 .assistant-heading .icon-btn {
   width: 30px;
   height: 32px;
-  color: #285b7d;
+  color: var(--action);
 }
 .assistant-heading .icon-btn svg {
   width: 19px;
   height: 19px;
 }
 .assistant-about {
-  background: #e9f4fb;
+  background: var(--panel);
   padding: 16px 20px;
   font-size: 13px;
   border-bottom: 1px solid var(--line);
@@ -642,15 +632,15 @@
   width: 27px;
   height: 27px;
   border-radius: 7px;
-  background: #e0eef8;
-  color: #34698d;
+  background: var(--sage);
+  color: var(--action);
   margin-top: 5px;
   flex-shrink: 0;
 }
 .patient-message p {
   max-width: 92%;
-  background: #eaf2f8;
-  color: #23465d;
+  background: var(--message-assistant);
+  color: var(--ink);
   padding: 14px 15px;
   border-radius: 3px 9px 9px;
   font-size: 16px;
@@ -664,8 +654,8 @@
 }
 .patient-message.patient p {
   max-width: 87%;
-  background: #daeee5;
-  color: #255843;
+  background: var(--message-patient);
+  color: var(--ink);
   border-radius: 9px 3px 9px 9px;
 }
 .assistant-prompts {
@@ -679,10 +669,10 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid #b6d3e7;
+  border: 1px solid var(--line);
   border-radius: 6px;
-  background: #edf5fc;
-  color: #285f88;
+  background: var(--panel);
+  color: var(--action);
   padding: 8px 10px;
   font-size: 12px;
   font-weight: 700;
@@ -701,9 +691,9 @@
   grid-template-columns: minmax(0, 1fr) 40px;
   align-items: center;
   gap: 8px;
-  border: 1px solid #aac8db;
+  border: 1px solid var(--line);
   border-radius: 8px;
-  background: #f1f7fb;
+  background: var(--canvas);
   margin: 0 18px 18px;
   padding: 10px;
 }
@@ -748,7 +738,7 @@
   background: var(--surface);
 }
 .patient-app .dialog-header {
-  background: #edf5fb;
+  background: var(--panel);
   border-color: var(--line);
   padding: 19px 24px;
 }
@@ -885,12 +875,12 @@
   justify-content: center;
   align-items: center;
   gap: 20px !important;
-  background: #e9f4fb;
-  border: 1px dashed #81a9c1;
+  background: var(--panel);
+  border: 1px dashed var(--line-strong);
   border-radius: 7px;
   padding: 25px;
   margin: 11px 0;
-  color: #275e84;
+  color: var(--action);
   min-height: 108px;
   cursor: pointer;
   font-weight: 650 !important;
@@ -946,7 +936,7 @@
   display: flex;
   align-items: center;
   gap: 9px;
-  color: #255d45 !important;
+  color: var(--green) !important;
   font-size: 14px;
   background: var(--mint);
   border-radius: 6px;
@@ -966,7 +956,7 @@
   font: inherit;
   font-size: 15px;
   line-height: 1.65;
-  background: #edf5fa;
+  background: var(--panel);
   border: 1px solid var(--line);
   padding: 18px;
   border-radius: 6px;
@@ -999,7 +989,7 @@
   display: block;
 }
 .patient-warning {
-  background: #f6efd9;
+  background: var(--warning-surface);
   padding: 15px;
   border-radius: 6px;
   color: var(--earth) !important;
@@ -1045,7 +1035,7 @@
   accent-color: var(--green);
 }
 .checkin-trend {
-  background: var(--blue);
+  background: var(--sage);
   padding: 16px;
   border-radius: 6px;
 }
@@ -1066,7 +1056,7 @@
   margin-bottom: 20px;
 }
 .milestone > span {
-  color: #236389;
+  color: var(--action);
   font-size: 13px;
   font-weight: 750;
   display: block;
@@ -1086,12 +1076,12 @@
   gap: 20px;
 }
 .emergency-panel h2 {
-  color: #86382f;
+  color: var(--danger);
   font-size: 30px;
 }
 .emergency-symbol {
-  background: #f6e2dc;
-  color: #8b3a30;
+  background: var(--urgent-surface);
+  color: var(--danger);
   display: grid;
   place-items: center;
   width: 64px;
@@ -1100,14 +1090,14 @@
 }
 .emergency-panel blockquote {
   margin: 0;
-  background: #f6ebe6;
+  background: var(--urgent-surface);
   padding: 14px;
   border: 0;
   font-size: 15px;
   overflow-wrap: anywhere;
 }
 .emergency-panel .emergency-demo-label {
-  color: #86382f;
+  color: var(--danger);
   font-weight: 750;
 }
 .emergency-panel > a {
@@ -1118,7 +1108,7 @@
   align-items: center;
   gap: 14px;
   padding: 16px;
-  background: #f6e2dc;
+  background: var(--urgent-surface);
   animation: demo-call 1.5s ease-in-out 1;
 }
 @keyframes patient-arrive {
@@ -1347,8 +1337,8 @@
     right: 0;
     justify-content: space-around;
     gap: 12px;
-    background: #f3f9fc;
-    border-top: 1px solid #bfd4df;
+    background: var(--surface);
+    border-top: 1px solid var(--line);
     padding: 9px 20px calc(9px + env(safe-area-inset-bottom));
   }
   .patient-mobile-nav button {
@@ -1361,13 +1351,13 @@
     border: 0;
     border-radius: 7px;
     background: none;
-    color: #42647a;
+    color: var(--muted);
     font-size: 13px;
     font-weight: 750;
   }
   .patient-mobile-nav button.current {
-    background: #d8ebf9;
-    color: #245f94;
+    background: var(--selected);
+    color: var(--action);
   }
   .instructions-page {
     max-width: 740px;
