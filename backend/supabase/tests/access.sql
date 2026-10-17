@@ -127,6 +127,79 @@ select 'Reyes: sees no Blank Page General hospital', 0, count(*) from hospitals 
 select pg_temp.try_write('Reyes: cannot claim other hospital''s escalation', false,
   $q$update escalations set status = 'claimed' where id = '00000000-0000-0000-0000-0000000000e1'$q$);
 
+-- ================================================================ Chatbot: notes, decisions, alerts
+-- Seed: notes b1-b3 for Alex, b4 for Jordan; one bot decision in Alex's chat; alerts for Kim (e1)
+-- and Reyes (e2).
+
+set request.jwt.claims = '{"sub":"00000000-0000-0000-0000-000000000041","role":"authenticated"}';
+insert into results (check_name, expected, actual)
+select 'Alex: reads no bot notes', 0, count(*) from bot_knowledge union all
+select 'Alex: reads no bot decisions', 0, count(*) from bot_decisions union all
+select 'Alex: reads no alerts', 0, count(*) from alerts union all
+select 'Alex: own chat not handed off', 0, conversation_handed_off('00000000-0000-0000-0000-0000000000c1')::int;
+select pg_temp.try_write('Alex: cannot write bot notes', false,
+  $q$insert into bot_knowledge (patient_id, title, content) values ('00000000-0000-0000-0000-000000000041', 'x', 'y')$q$);
+
+set request.jwt.claims = '{"sub":"00000000-0000-0000-0000-000000000042","role":"authenticated"}';
+insert into results (check_name, expected, actual)
+select 'Jordan: own escalated chat is handed off', 1, conversation_handed_off('00000000-0000-0000-0000-0000000000c2')::int union all
+select 'Jordan: no handoff status for Casey''s chat', 0, conversation_handed_off('00000000-0000-0000-0000-0000000000c4')::int;
+
+set request.jwt.claims = '{"sub":"00000000-0000-0000-0000-000000000021","role":"authenticated"}';
+insert into results (check_name, expected, actual)
+select 'Kim: reads Alex + Jordan notes', 4, count(*) from bot_knowledge union all
+select 'Kim: reads Alex''s bot decision', 1, count(*) from bot_decisions union all
+select 'Kim: has the Jordan escalation alert', 1, count(*) from alerts where escalation_id = '00000000-0000-0000-0000-0000000000e1';
+select pg_temp.try_write('Kim: can add a note for Alex', true,
+  $q$insert into bot_knowledge (patient_id, title, content) values ('00000000-0000-0000-0000-000000000041', 'Diet', 'No restrictions.')$q$);
+select pg_temp.try_write('Kim: cannot add a note for Sam (not on team)', false,
+  $q$insert into bot_knowledge (patient_id, title, content) values ('00000000-0000-0000-0000-000000000043', 'x', 'y')$q$);
+select pg_temp.try_write('Kim: can mark own alert read', true,
+  $q$update alerts set read_at = now() where recipient_id = '00000000-0000-0000-0000-000000000021'$q$);
+select pg_temp.try_write('Kim: cannot reassign an alert', false,
+  $q$update alerts set recipient_id = '00000000-0000-0000-0000-000000000022' where recipient_id = '00000000-0000-0000-0000-000000000021'$q$);
+select pg_temp.try_write('Kim: cannot write bot decisions', false,
+  $q$insert into bot_decisions (conversation_id, message_id, action)
+     select conversation_id, id, 'answered' from messages where conversation_id = '00000000-0000-0000-0000-0000000000c1' limit 1$q$);
+
+set request.jwt.claims = '{"sub":"00000000-0000-0000-0000-000000000022","role":"authenticated"}';
+insert into results (check_name, expected, actual)
+select 'Patel: reads Jordan''s note (escalated) only', 1, count(*) from bot_knowledge union all
+select 'Patel: no alerts (not Jordan''s doctor)', 0, count(*) from alerts union all
+select 'Patel: no bot decisions (Alex not his)', 0, count(*) from bot_decisions;
+select pg_temp.try_write('Patel: cannot add a note for Jordan (escalated, not on team)', false,
+  $q$insert into bot_knowledge (patient_id, title, content) values ('00000000-0000-0000-0000-000000000042', 'x', 'y')$q$);
+select pg_temp.try_write('Patel: cannot edit Jordan''s note', false,
+  $q$update bot_knowledge set title = 'x' where id = '00000000-0000-0000-0000-0000000000b4'$q$);
+select pg_temp.try_write('Patel: cannot mark Kim''s alert read', false,
+  $q$update alerts set read_at = now() where recipient_id = '00000000-0000-0000-0000-000000000021'$q$);
+
+set request.jwt.claims = '{"sub":"00000000-0000-0000-0000-000000000031","role":"authenticated"}';
+insert into results (check_name, expected, actual)
+select 'Lee: reads Alex''s 3 notes', 3, count(*) from bot_knowledge union all
+select 'Lee: reads Alex''s bot decision', 1, count(*) from bot_decisions union all
+select 'Lee: no alerts (nurse)', 0, count(*) from alerts;
+select pg_temp.try_write('Lee: can add a note for Alex', true,
+  $q$insert into bot_knowledge (patient_id, title, content) values ('00000000-0000-0000-0000-000000000041', 'Ice', 'Ice 20 minutes at a time.')$q$);
+select pg_temp.try_write('Lee: can deactivate Alex''s note', true,
+  $q$update bot_knowledge set active = false where id = '00000000-0000-0000-0000-0000000000b1'$q$);
+select pg_temp.try_write('Lee: cannot add a note for Jordan', false,
+  $q$insert into bot_knowledge (patient_id, title, content) values ('00000000-0000-0000-0000-000000000042', 'x', 'y')$q$);
+select pg_temp.try_write('Lee: cannot set a note''s author', false,
+  $q$insert into bot_knowledge (patient_id, title, content, author_id)
+     values ('00000000-0000-0000-0000-000000000041', 'x', 'y', '00000000-0000-0000-0000-000000000021')$q$);
+
+set request.jwt.claims = '{"sub":"00000000-0000-0000-0000-000000000011","role":"authenticated"}';
+insert into results (check_name, expected, actual)
+select 'Admin: reads no bot notes', 0, count(*) from bot_knowledge union all
+select 'Admin: reads no bot decisions', 0, count(*) from bot_decisions union all
+select 'Admin: reads no alerts', 0, count(*) from alerts;
+
+set request.jwt.claims = '{"sub":"00000000-0000-0000-0000-000000000051","role":"authenticated"}';
+insert into results (check_name, expected, actual)
+select 'Reyes: has the Casey escalation alert', 1, count(*) from alerts where escalation_id = '00000000-0000-0000-0000-0000000000e2' union all
+select 'Reyes: reads no Blank Page General notes', 0, count(*) from bot_knowledge;
+
 -- ---------------------------------------------------------------- Not signed in
 reset request.jwt.claims;
 set role anon;
@@ -148,6 +221,40 @@ begin
   exception when raise_exception then null;
   end;
   insert into results (check_name, expected, actual) values ('Reopening clears resolved_at', 0, stale::int);
+end $$;
+
+do $$
+declare
+  sam_escalation uuid;
+  sam_alerts bigint;
+  unread_after_resolve bigint;
+  moved boolean := true;
+begin
+  begin
+    -- Sam: primary doctor and only care-team doctor is Patel.
+    insert into escalations (conversation_id, reason) values ('00000000-0000-0000-0000-0000000000c3', 'test')
+    returning id into sam_escalation;
+    select count(*) into sam_alerts from alerts
+    where escalation_id = sam_escalation and recipient_id = '00000000-0000-0000-0000-000000000022';
+    raise exception using errcode = 'P0001', message = 'undo';
+  exception when raise_exception then null;
+  end;
+  insert into results (check_name, expected, actual) values ('New escalation alerts the patient''s doctor', 1, sam_alerts);
+
+  begin
+    update escalations set status = 'resolved' where id = '00000000-0000-0000-0000-0000000000e1';
+    select count(*) into unread_after_resolve from alerts
+    where escalation_id = '00000000-0000-0000-0000-0000000000e1' and read_at is null;
+    raise exception using errcode = 'P0001', message = 'undo';
+  exception when raise_exception then null;
+  end;
+  insert into results (check_name, expected, actual) values ('Resolving clears the escalation''s alerts', 0, unread_after_resolve);
+
+  begin
+    update bot_knowledge set patient_id = '00000000-0000-0000-0000-000000000042' where id = '00000000-0000-0000-0000-0000000000b1';
+  exception when raise_exception then moved := false;
+  end;
+  insert into results (check_name, expected, actual) values ('A note can''t move to another patient', 0, moved::int);
 end $$;
 
 select n, check_name, expected, actual, expected = actual as pass from results order by n;

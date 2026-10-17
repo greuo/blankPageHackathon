@@ -17,6 +17,8 @@
 -- Conversations: Alex (no escalation), Jordan (escalated → Dr. Kim; Dr. Patel, not on Jordan's
 -- team, replied), Sam (no escalation),
 -- Casey (escalated → Dr. Reyes).
+-- Bot notes: three for Alex, one for Jordan. Escalations raise alerts for Dr. Kim (Jordan) and
+-- Dr. Reyes (Casey) through the escalations_alert trigger.
 
 insert into public.hospitals (id, name) values
   ('00000000-0000-0000-0000-0000000000a1', 'Blank Page General'),
@@ -93,5 +95,23 @@ insert into public.messages (conversation_id, sender_type, sender_id, content, c
 insert into public.escalations (id, conversation_id, reason, urgency) values
   ('00000000-0000-0000-0000-0000000000e1', '00000000-0000-0000-0000-0000000000c2', 'Possible wound infection: redness, swelling, fever.', 'high'),
   ('00000000-0000-0000-0000-0000000000e2', '00000000-0000-0000-0000-0000000000c4', 'Prescription refill request.', 'low');
+
+-- Care-team notes the chatbot answers from. author_id is normally filled from the signed-in
+-- user, so it's set by hand here.
+insert into public.bot_knowledge (id, patient_id, author_id, title, content) values
+  ('00000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-000000000041', '00000000-0000-0000-0000-000000000021',
+   'Wound care', 'Alex had knee arthroscopy on 2026-10-14. Keep the dressing dry for 48 hours after surgery. After that Alex can shower; pat the incisions dry. No baths, pools or hot tubs until the stitches are out.'),
+  ('00000000-0000-0000-0000-0000000000b2', '00000000-0000-0000-0000-000000000041', '00000000-0000-0000-0000-000000000031',
+   'Pain medication', 'Ibuprofen 400 mg every 6 hours with food, as needed for pain, for up to 7 days. No more than 4 doses in 24 hours.'),
+  ('00000000-0000-0000-0000-0000000000b3', '00000000-0000-0000-0000-000000000041', '00000000-0000-0000-0000-000000000021',
+   'Follow-up', 'Stitch removal and follow-up with Dr. Kim on 2026-10-24 at 10:30, Orthopedics clinic, 2nd floor. Bring the knee brace.'),
+  ('00000000-0000-0000-0000-0000000000b4', '00000000-0000-0000-0000-000000000042', '00000000-0000-0000-0000-000000000021',
+   'Follow-up', 'Wound check with Dr. Kim on 2026-10-20 at 09:00, General Surgery clinic.');
+
+-- One audit row, so staff-side screens have something to show.
+insert into public.bot_decisions (conversation_id, message_id, action, reason)
+select conversation_id, id, 'small_talk', 'Greeting or thanks, no question.'
+from public.messages
+where conversation_id = '00000000-0000-0000-0000-0000000000c1' and content = 'Thanks, that helps.';
 
 drop table demo_users;

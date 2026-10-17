@@ -20,6 +20,12 @@ Things both sides rely on: API base URL, ports, data shapes, auth, env vars. Eit
 
 ## Backend → Frontend
 
+- [ ] 2026-10-17 · Andrew: The chatbot backend is live on the hosted project. Shapes are in the `backend_progress.md` API table. Until the Anthropic key is set, the bot escalates every message, which is safe for testing the flow.
+  - **Patient chat:** send messages with `functions/v1/chat` `{ conversation_id, content }`, not a direct `messages` insert, or the bot never replies. The reply comes back in the response and by realtime. `action: 'held'` with `handed_off: true` means a person has the chat and the bot stays quiet. `rpc('conversation_handed_off')` gives the same status on page load.
+  - **Care-team "bot notes" screen:** CRUD on `bot_knowledge`, per patient. Assigned doctors and nurses can edit.
+  - **Doctor dashboard alerts:** `alerts` (own, unread), joined to `escalations`, with realtime INSERT. Mark one read with `read_at`.
+  - **"Why did the bot say that" (staff):** `bot_decisions`.
+
 - [ ] 2026-10-17 · Andrew: Backend is live on Supabase; see **Agreed** above for URL, key, roles and demo logins. Access model: a hospital has admin / doctor / nurse / patient accounts. Patients chat with the bot; their care team (assigned doctors + nurses) can read and reply. When a chat is forwarded (`escalations`), it's routed to the treating doctor but every doctor in the hospital sees it. Admins manage accounts and care teams but can't read chats. Full table in `backend_progress.md`.
 - [ ] 2026-10-17 · Andrew: Question: which screens are you building first (patient chat, doctor escalation inbox, admin user management)? We'll prioritise the chatbot or any missing queries around that.
 

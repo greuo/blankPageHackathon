@@ -1,9 +1,10 @@
 // POST /functions/v1/escalate  (the patient who owns the conversation)
 // Body: { conversation_id, reason, urgency?: "low" | "medium" | "high" }
 // Forwards the conversation to the hospital: creates an escalation routed to the patient's
-// primary doctor (visible to every doctor in the hospital) and posts a bot message saying so.
-// The chatbot will call this when it decides a human needs to look; the UI can also offer a
-// "send to my care team" button.
+// primary doctor (visible to every doctor in the hospital, alerts the patient's doctors) and posts
+// a bot message saying so. This is the patient's "send to my care team" button; the `chat`
+// function escalates on its own when the bot can't answer.
+import { openEscalation, type Urgency } from "../_shared/escalation.ts";
 import { callerClient, corsHeaders, getCaller, json, serviceClient } from "../_shared/http.ts";
 
 const URGENCIES = ["low", "medium", "high"];
@@ -33,19 +34,15 @@ Deno.serve(async (req) => {
     return json({ error: "Conversation not found" }, 404);
   }
 
-  // patient_id, hospital_id and routed_to are filled in by the escalations_fill trigger.
-  const { data: escalation, error } = await admin
-    .from("escalations")
-    .insert({ conversation_id, reason, urgency })
-    .select()
-    .single();
-  if (error) return json({ error: error.message }, 400);
-
-  await admin.from("messages").insert({
-    conversation_id,
-    sender_type: "bot",
-    content: "I've forwarded this to your care team. A doctor will follow up here.",
-  });
-
-  return json(escalation, 201);
+  try {
+    const { escalation } = await openEscalation(admin, {
+      conversation_id,
+      reason,
+      urgency: urgency as Urgency,
+      source: "patient",
+    });
+    return json(escalation, 201);
+  } catch (e) {
+    return json({ error: (e as Error).message }, 400);
+  }
 });

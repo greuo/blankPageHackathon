@@ -13,9 +13,16 @@ Snapshot of what exists right now. Rewrite it each session; don't append.
   - Edge functions `admin-create-user` and `escalate` deployed; both reject unauthenticated calls.
   - Demo data seeded on the hosted project (2 hospitals, 9 users). The demo password is in Andrew's `backend/.env.local` (not committed); ask him.
   - Realtime on `messages` and `escalations`.
+- **Chatbot:** live on hosted. Migration `20261017152104_chatbot.sql` is applied, demo notes are seeded, and `chat` is deployed along with the updated `escalate`. **The `ANTHROPIC_API_KEY` secret is still needed** (dashboard → Edge Functions → Secrets). Until it's set, every non-red-flag message escalates, which is safe but not useful.
+  - The care team (assigned doctors + nurses) writes per-patient notes in `bot_knowledge`. The bot answers **only** from those notes.
+  - `functions/v1/chat`: saves the patient's message, then either answers or escalates. Escalation happens on a red-flag keyword (911 notice, high urgency), when the model is unsure, when the message touches symptoms or a treatment change, when the answer has no or invalid note citations, or when the model errors or refuses. Model: `claude-opus-5-5`. While an escalation is open or claimed, the bot stays quiet.
+  - Every bot turn is logged in `bot_decisions` (staff only).
+  - Each escalation creates one `alerts` row per responsible doctor: the routed-to doctor plus care-team doctors, or every doctor in the hospital if there are none. Resolving the escalation clears its alerts. Realtime is on.
+  - Tests: 85/85 checks in `tests/access.sql` pass on the hosted project (and on local Postgres), and 6/6 in `chat/safety_test.ts`. The bot hasn't been run against Claude yet (`chat/eval_live.ts` does that).
 - **In progress:** nothing
 - **Known issues:**
-  - The chatbot itself doesn't exist yet: bot messages in the seed are hard-coded.
+  - The seed's hard-coded bot messages predate the chatbot.
+  - Supabase advisor flags `conversation_handed_off` (SECURITY DEFINER, callable by signed-in users). That's intended: it returns false for conversations the caller can't read.
   - Edge function role checks (admin vs doctor, owner vs other patient) are written but not yet exercised with real logins.
   - Supabase advisor: leaked-password protection is off (dashboard setting).
 
@@ -28,6 +35,9 @@ Snapshot of what exists right now. Rewrite it each session; don't append.
 | Conversations / messages | own: read + send | assigned: read + reply | assigned or escalated: read + reply | none |
 | Escalations | none | assigned patients': read | whole hospital: read, claim, resolve | none |
 | Care assignments | own | own | own | whole hospital: add / remove / toggle |
+| Bot notes (`bot_knowledge`) | none | assigned: read + write | assigned: read + write; escalated: read | none |
+| Bot decisions | none | assigned: read | assigned or escalated: read | none |
+| Alerts | none | none | own: read + mark read | none |
 
 "Assigned" = active row in `care_assignments`. Escalations route to the patient's `primary_doctor_id` (the treating doctor) via `routed_to`, but every doctor in the hospital sees them. Nobody ever sees another hospital's data.
 
@@ -50,6 +60,17 @@ What the frontend can call. Use `supabase-js` with the anon key; RLS filters eve
 | POST | `functions/v1/admin-create-user` | admin; `{ email, password, full_name, role, date_of_birth?, mrn?, primary_doctor_id?, care_team?: uuid[] }` | `{ id, email, role, full_name, hospital_id }` 201 | done |
 | POST | `functions/v1/escalate` | patient; `{ conversation_id, reason, urgency?: low\|medium\|high }` | escalation 201 (+ a bot message in the chat) | done |
 | realtime | `channel().on('postgres_changes', { table: 'messages' \| 'escalations' })` | – | inserts/updates the user can see | done |
+| POST | `functions/v1/chat` | patient; `{ conversation_id, content }` (1-4000 chars). Use this instead of inserting patient messages directly, or the bot won't reply | `{ patient_message, reply: message\|null, action: answered\|small_talk\|escalated\|held, handed_off: bool }` 201; both messages also arrive by realtime | done |
+| RPC | `rpc('conversation_handed_off', { p_conversation })` | patient or staff who can read the chat | `true` while a person has it (open/claimed escalation), so the patient UI can show "with your care team" | done |
+| GET | `from('bot_knowledge').select().eq('patient_id', id).order('updated_at', { ascending: false })` | care team (+ escalated doctors, read only) | `{ id, patient_id, hospital_id, author_id, title, content, active, created_at, updated_at }[]` | done |
+| POST | `from('bot_knowledge').insert({ patient_id, title, content })` | patient's care team; author and hospital fill in | note | done |
+| PATCH/DELETE | `from('bot_knowledge').update({ title?, content?, active? }).eq('id', id)` / `.delete()` | patient's care team. `active: false` hides a note from the bot | note | done |
+| GET | `from('bot_decisions').select().eq('conversation_id', id)` | staff who can read the chat | `{ id, conversation_id, message_id, reply_id, escalation_id, action: answered\|small_talk\|escalated\|held, reason, cited_knowledge_ids, model, created_at }[]` | done |
+| GET | `from('alerts').select('*, escalation:escalations(*)').is('read_at', null).order('created_at', { ascending: false })` | doctors: own alerts | `{ id, recipient_id, hospital_id, kind: 'escalation', escalation_id, read_at, created_at }[]` | done |
+| PATCH | `from('alerts').update({ read_at: new Date().toISOString() }).eq('id', id)` | own alerts | alert | done |
+| realtime | `channel().on('postgres_changes', { table: 'alerts', event: 'INSERT' })` | doctors | new alerts for the dashboard | done |
+
+`escalations` also gained `source: patient|bot` and `message_id` (the patient message that triggered it).
 
 ## Session log
 
@@ -62,6 +83,20 @@ Newest first. One entry per session:
 - **Next:** what should happen next
 - **Notes:** blockers, decisions, gotchas (optional)
 ```
+
+### 2026-10-17 · Andrew (chatbot)
+- **Did:**
+  - Built the chatbot backend: care-team notes (`bot_knowledge`), the `chat` edge function (Claude Opus 5.5, escalates on any doubt), the `bot_decisions` audit trail, and doctor `alerts` raised by escalations.
+  - Moved the escalation insert into `_shared/escalation.ts`, which both `escalate` and `chat` use.
+  - Added 36 RLS and trigger checks plus unit tests for the safety rules. Applied and deployed on hosted (85/85 checks pass there).
+- **Files:** `migrations/20261017152104_chatbot.sql`, `functions/chat/`, `functions/_shared/escalation.ts`, `functions/escalate/index.ts`, `seed.sql`, `tests/access.sql`
+- **Next:**
+  - Set `ANTHROPIC_API_KEY`, then run `chat/eval_live.ts` and send a test message as a demo patient.
+  - Frontend: patient chat via `chat`, care-team notes screen, doctor alerts.
+- **Notes:**
+  - The bot only answers from notes and never from general medical knowledge.
+  - Small talk gets a canned reply, so model text only reaches patients when it cites notes.
+  - Alerts go to doctors only; nurses still see their patients' escalations.
 
 ### 2026-10-17 · Andrew
 - **Did:** Picked Supabase. Built the hospital access model (schema, RLS, triggers), seeded demo data, deployed `admin-create-user` and `escalate` edge functions, wrote and ran RLS tests. Fixed two PR review findings in a second migration: patients can see the profile of a non-care-team doctor who replied after an escalation, and reopening an escalation clears `resolved_at` (49/49 pass).
