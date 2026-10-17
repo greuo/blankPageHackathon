@@ -1,6 +1,7 @@
 async (page) => {
-  const opening = page.getByRole('button', { name: 'Open my companion', exact: true });
+  const opening = page.getByRole('button', { name: 'Skip intro', exact: true });
   if (await opening.isVisible()) await opening.click();
+  await page.getByRole('combobox', { name: 'Demo role' }).waitFor({ state: 'visible' });
 
   const assert = (value, message) => {
     if (!value) throw new Error(message);
