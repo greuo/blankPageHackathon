@@ -1,8 +1,24 @@
 @font-face {
-  font-family: 'Nunito Variable';
+  font-family: 'Google Sans Variable';
   font-style: normal;
-  font-weight: 200 1000;
+  font-weight: 400 700;
   font-display: swap;
-  src: url('../node_modules/@fontsource-variable/nunito/files/nunito-latin-wght-normal.woff2')
+  src: url('../node_modules/@fontsource-variable/google-sans/files/google-sans-latin-wght-normal.woff2')
+    format('woff2');
+}
+@font-face {
+  font-family: 'Funnel Display Variable';
+  font-style: normal;
+  font-weight: 300 800;
+  font-display: swap;
+  src: url('../node_modules/@fontsource-variable/funnel-display/files/funnel-display-latin-wght-normal.woff2')
+    format('woff2');
+}
+@font-face {
+  font-family: 'EB Garamond Variable';
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('../node_modules/@fontsource-variable/eb-garamond/files/eb-garamond-latin-wght-normal.woff2')
     format('woff2');
 }

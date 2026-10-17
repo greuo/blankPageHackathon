@@ -8,7 +8,7 @@
 .patient-app h1,
 .patient-app h2,
 .patient-app h3 {
-  font-family: 'Nunito Variable', sans-serif;
+  font-family: var(--font-heading);
   letter-spacing: -0.025em;
   color: var(--ink);
   text-wrap: balance;
@@ -16,18 +16,18 @@
 .patient-app h1 {
   font-size: 38px;
   line-height: 1.12;
-  font-weight: 800;
+  font-weight: 600;
   margin: 0 0 10px;
 }
 .patient-app h2 {
   font-size: 24px;
   line-height: 1.25;
-  font-weight: 800;
+  font-weight: 600;
   margin: 0;
 }
 .patient-app h3 {
   font-size: 19px;
-  font-weight: 750;
+  font-weight: 600;
   margin: 0 0 7px;
 }
 .patient-app p {
@@ -68,7 +68,7 @@
   opacity: 1;
 }
 .patient-header {
-  height: 82px;
+  height: 84px;
   padding: 0 max(28px, calc((100vw - 1440px) / 2));
   display: flex;
   align-items: center;
@@ -94,11 +94,12 @@
   color: var(--action);
   display: grid;
   place-items: center;
-  border-radius: 10px;
+  border-radius: 50%;
 }
 .patient-brand-name {
+  font-family: var(--font-heading);
   font-size: 23px;
-  font-weight: 850;
+  font-weight: 700;
   letter-spacing: -0.04em;
   white-space: nowrap;
 }
@@ -106,33 +107,13 @@
   color: var(--green);
 }
 .patient-header nav {
-  height: 100%;
   display: flex;
   align-items: center;
-  gap: 8px;
-}
-.patient-header nav button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  border: 0;
-  border-radius: 7px;
-  background: none;
-  color: var(--muted);
-  padding: 11px 15px;
-  font-size: 14px;
-  font-weight: 700;
-  min-height: 43px;
-}
-.patient-header nav .current {
-  background: var(--sage);
-  color: var(--ink);
 }
 .patient-header-actions {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 10px;
 }
 .patient-profile {
   width: 40px;
@@ -142,7 +123,7 @@
   background: var(--mint);
   color: var(--green);
   font-size: 21px;
-  font-weight: 750;
+  font-weight: 600;
 }
 .patient-app .icon-btn {
   display: inline-flex;
@@ -151,7 +132,7 @@
   width: 36px;
   height: 36px;
   border: 0;
-  border-radius: 6px;
+  border-radius: 50%;
   padding: 6px;
   background: transparent;
   color: var(--ink);
@@ -167,28 +148,27 @@
   width: 7px;
   height: 7px;
   background: var(--danger);
-  border-radius: 1px;
-  transform: rotate(45deg);
+  border-radius: 50%;
 }
 .patient-home {
   max-width: 1440px;
   margin: auto;
-  padding: 28px 28px 0;
+  padding: 36px 40px 0;
 }
 .patient-dashboard {
   display: grid;
   grid-template-columns: minmax(0, 1.8fr) minmax(350px, 1fr);
-  gap: 28px;
+  gap: 40px;
   align-items: start;
 }
 .patient-content {
   min-width: 0;
 }
 .patient-greeting {
-  padding: 27px 28px;
-  margin-bottom: 30px;
-  border-radius: 12px;
-  background: var(--panel-strong);
+  padding: 12px 0 30px;
+  margin-bottom: 16px;
+  border-radius: 0;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -204,7 +184,7 @@
   align-items: center;
   color: var(--muted);
   font-size: 12px;
-  margin-top: 20px;
+  margin-top: 18px;
   font-weight: 650;
 }
 .patient-app .btn {
@@ -214,9 +194,9 @@
   min-height: 46px;
   padding: 11px 18px;
   gap: 8px;
-  border-radius: 7px;
+  border-radius: var(--radius-pill);
   font-size: 14px;
-  font-weight: 750;
+  font-weight: 600;
   line-height: 1.4;
 }
 .patient-app .btn.primary {
@@ -233,7 +213,7 @@
   background: var(--danger);
   color: var(--surface);
   border: 2px solid var(--danger);
-  font-weight: 850;
+  font-weight: 700;
 }
 .patient-app .btn:disabled {
   opacity: 0.55;
@@ -246,7 +226,7 @@
 .patient-panel {
   border: 1px solid var(--line);
   background: var(--surface);
-  border-radius: 10px;
+  border-radius: var(--radius);
   padding: 22px;
   margin-bottom: 22px;
 }
@@ -268,9 +248,9 @@
   padding: 6px 10px;
   background: var(--mint);
   color: var(--green);
-  border-radius: 5px;
+  border-radius: var(--radius-pill);
   font-size: 12px;
-  font-weight: 750;
+  font-weight: 600;
   white-space: nowrap;
 }
 .patient-app .text-button {
@@ -283,7 +263,7 @@
   min-height: 32px;
   color: var(--action);
   font-size: 14px;
-  font-weight: 750;
+  font-weight: 600;
   text-decoration: none;
 }
 .patient-panel.today-tasks {
@@ -295,26 +275,30 @@
 }
 .patient-task-list {
   display: grid;
-  gap: 10px;
+  gap: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
 }
 .patient-task {
   display: flex;
   gap: 15px;
   align-items: center;
-  min-height: 86px;
+  min-height: 82px;
   padding: 14px 17px;
   background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 9px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
 }
 .task-check {
-  width: 25px;
-  height: 25px;
+  width: 40px;
+  height: 40px;
   border: 1.5px solid var(--line-strong);
   padding: 0;
   background: var(--surface);
   color: var(--surface);
-  border-radius: 5px;
+  border-radius: 50%;
   display: grid;
   place-items: center;
   flex-shrink: 0;
@@ -328,7 +312,7 @@
   place-items: center;
   width: 44px;
   height: 44px;
-  border-radius: 11px;
+  border-radius: 50%;
   background: var(--sage);
   color: var(--green);
   flex-shrink: 0;
@@ -351,13 +335,14 @@
   text-align: left;
   border: 0;
   background: none;
-  padding: 0;
+  padding: 8px 0;
+  min-height: 44px;
   color: var(--ink);
 }
 .task-open strong {
   display: block;
-  font-size: 18px;
-  font-weight: 800;
+  font-size: 17px;
+  font-weight: 600;
   line-height: 1.35;
 }
 .task-open small {
@@ -380,7 +365,7 @@
   background: var(--panel);
 }
 .important-instructions {
-  background: var(--panel);
+  background: transparent;
   border-color: var(--line);
 }
 .guidance-icon {
@@ -390,7 +375,7 @@
   height: 38px;
   background: var(--accent-soft);
   color: var(--action);
-  border-radius: 9px;
+  border-radius: 50%;
   flex-shrink: 0;
 }
 .precaution-row {
@@ -415,10 +400,10 @@
   height: 32px;
   background: var(--selected);
   color: var(--action);
-  border-radius: 7px;
+  border-radius: 50%;
 }
 .recovery-progress {
-  background: var(--panel-strong);
+  background: var(--panel);
   border-color: var(--line);
 }
 .progress-heading {
@@ -429,11 +414,11 @@
 }
 .timeline-percent {
   font-size: 12px;
-  font-weight: 750;
+  font-weight: 600;
   color: var(--action);
   background: var(--selected);
   padding: 5px 8px;
-  border-radius: 5px;
+  border-radius: var(--radius-pill);
 }
 .progress-heading > .text-button {
   margin-left: auto;
@@ -449,7 +434,7 @@
   width: 100%;
   height: 10px;
   border: 0;
-  border-radius: 3px;
+  border-radius: 999px;
   background: var(--track);
   accent-color: var(--progress);
   overflow: hidden;
@@ -460,7 +445,7 @@
 }
 .recovery-progress progress::-webkit-progress-value {
   background: var(--progress);
-  border-radius: 3px;
+  border-radius: 999px;
   transition: width 240ms ease-out;
 }
 .recovery-progress progress::-moz-progress-bar {
@@ -495,7 +480,7 @@
 .next-milestone strong {
   display: block;
   font-size: 15px;
-  font-weight: 750;
+  font-weight: 600;
 }
 .next-milestone span {
   display: block;
@@ -540,7 +525,7 @@
 .patient-demo-footer details button {
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 4px;
+  border-radius: var(--radius-pill);
   color: var(--ink);
   font-size: 12px;
   padding: 7px 10px;
@@ -559,27 +544,27 @@
   flex-direction: column;
   position: sticky;
   top: 24px;
-  height: calc(100dvh - 134px);
+  height: calc(100dvh - 144px);
   min-height: 600px;
   max-height: 1050px;
   min-width: 0;
   border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--surface);
+  border-radius: 24px;
+  background: var(--panel);
   overflow: hidden;
 }
 .assistant-heading {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 21px 19px;
-  background: var(--panel-strong);
-  border-bottom: 1px solid var(--line);
+  padding: 22px 18px;
+  background: var(--navy);
+  border-bottom: 1px solid var(--navy);
 }
 .assistant-heading > .patient-icon {
   width: 43px;
   height: 43px;
-  border-radius: 11px;
+  border-radius: 50%;
   background: var(--selected);
   color: var(--action);
 }
@@ -588,17 +573,18 @@
   min-width: 0;
 }
 .assistant-heading h2 {
-  font-size: 22px;
+  color: var(--surface);
+  font-size: 21px;
 }
 .assistant-heading p {
   font-size: 12px;
   margin-top: 4px;
-  color: var(--muted);
+  color: var(--sky);
 }
 .assistant-heading .icon-btn {
-  width: 30px;
-  height: 32px;
-  color: var(--action);
+  width: 40px;
+  height: 40px;
+  color: var(--surface);
 }
 .assistant-heading .icon-btn svg {
   width: 19px;
@@ -633,7 +619,7 @@
   place-items: center;
   width: 27px;
   height: 27px;
-  border-radius: 7px;
+  border-radius: 50%;
   background: var(--sage);
   color: var(--action);
   margin-top: 5px;
@@ -641,12 +627,12 @@
 }
 .patient-message p {
   max-width: 92%;
-  background: var(--message-assistant);
+  background: var(--surface);
   color: var(--ink);
   padding: 14px 15px;
-  border-radius: 3px 9px 9px;
+  border-radius: 6px 20px 20px;
   font-size: 16px;
-  line-height: 1.65;
+  line-height: 1.6;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   text-wrap: pretty;
@@ -658,7 +644,7 @@
   max-width: 87%;
   background: var(--message-patient);
   color: var(--ink);
-  border-radius: 9px 3px 9px 9px;
+  border-radius: 20px 6px 20px 20px;
 }
 .assistant-prompts {
   display: flex;
@@ -672,13 +658,13 @@
   align-items: center;
   gap: 6px;
   border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: var(--radius-pill);
   background: var(--panel);
   color: var(--action);
   padding: 8px 10px;
   font-size: 12px;
   font-weight: 700;
-  min-height: 36px;
+  min-height: 40px;
 }
 .assistant-prompts .assistant-report-link {
   border: 0;
@@ -688,54 +674,12 @@
   width: 100%;
   margin-top: 2px;
 }
-.patient-composer {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 40px;
-  align-items: center;
-  gap: 8px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: var(--canvas);
-  margin: 0 18px 18px;
-  padding: 10px;
-}
-.patient-composer textarea {
-  resize: none;
-  width: 100%;
-  min-height: 50px;
-  max-height: 160px;
-  border: 0;
-  background: transparent;
-  color: var(--ink);
-  padding: 6px;
-  font-size: 15px;
-  line-height: 1.5;
-}
-.patient-composer > .send-button {
-  background: var(--action);
-  color: var(--surface);
-  border-radius: 7px;
-  width: 38px;
-  height: 38px;
-}
-.patient-composer > .send-button:disabled {
-  opacity: 0.4;
-}
-.patient-composer > small {
-  grid-column: 1/-1;
-  color: var(--muted);
-  font-size: 10px;
-  padding: 0 6px;
-}
 .patient-assistant > .alert {
   margin: 0 18px 14px;
   font-size: 13px;
 }
-.patient-message:last-of-type {
-  animation: patient-arrive 220ms ease-out;
-}
 .patient-app .modal {
-  border-radius: 10px;
+  border-radius: 24px;
   border: 1px solid var(--line);
   background: var(--surface);
 }
@@ -776,11 +720,11 @@
   min-height: 0;
   max-height: none;
   border: 0;
-  border-radius: 0;
+  border-radius: 24px;
 }
 .fullscreen-assistant .assistant-heading {
   padding: 12px 25px;
-  background: var(--surface);
+  background: var(--navy);
 }
 .fullscreen-assistant .assistant-heading > .patient-icon {
   display: none;
@@ -793,7 +737,7 @@
   padding: 25px max(24px, calc((100% - 900px) / 2));
 }
 .fullscreen-assistant .assistant-prompts,
-.fullscreen-assistant .patient-composer {
+.fullscreen-assistant .care-prompt-bar {
   margin-left: max(24px, calc((100% - 900px) / 2));
   margin-right: max(24px, calc((100% - 900px) / 2));
 }
@@ -804,7 +748,7 @@
   width: auto;
   margin: 0 0 0 auto;
 }
-.fullscreen-assistant .patient-composer {
+.fullscreen-assistant .care-prompt-bar {
   margin-bottom: 24px;
 }
 .instructions-page {
@@ -836,7 +780,7 @@
 .checkin-form > label {
   display: grid;
   gap: 8px;
-  font-weight: 750;
+  font-weight: 600;
   font-size: 16px;
 }
 .instruction-form input:not([type='file']),
@@ -846,7 +790,7 @@
   width: 100%;
   padding: 12px 14px;
   border: 1px solid var(--line-strong);
-  border-radius: 6px;
+  border-radius: var(--radius-control);
   background: var(--surface);
   color: var(--ink);
   font-size: 16px;
@@ -879,7 +823,7 @@
   gap: 20px !important;
   background: var(--panel);
   border: 1px dashed var(--line-strong);
-  border-radius: 7px;
+  border-radius: var(--radius-control);
   padding: 25px;
   margin: 11px 0;
   color: var(--action);
@@ -941,7 +885,7 @@
   color: var(--green) !important;
   font-size: 14px;
   background: var(--mint);
-  border-radius: 6px;
+  border-radius: var(--radius-control);
   padding: 12px 15px;
   margin-bottom: 20px !important;
 }
@@ -961,7 +905,7 @@
   background: var(--panel);
   border: 1px solid var(--line);
   padding: 18px;
-  border-radius: 6px;
+  border-radius: var(--radius-control);
   margin: 18px 0;
   max-height: 48dvh;
   overflow: auto;
@@ -993,7 +937,7 @@
 .patient-warning {
   background: var(--warning-surface);
   padding: 15px;
-  border-radius: 6px;
+  border-radius: var(--radius-control);
   color: var(--earth) !important;
   font-size: 14px;
   margin-top: 12px !important;
@@ -1018,7 +962,7 @@
 }
 .checkin-form legend {
   font-size: 16px;
-  font-weight: 750;
+  font-weight: 600;
   margin-bottom: 10px;
 }
 .feeling-options {
@@ -1030,7 +974,7 @@
   align-items: center;
   gap: 8px;
   border: 1px solid var(--line-strong);
-  border-radius: 6px;
+  border-radius: var(--radius-control);
   padding: 11px 20px;
 }
 .feeling-options input {
@@ -1039,7 +983,7 @@
 .checkin-trend {
   background: var(--sage);
   padding: 16px;
-  border-radius: 6px;
+  border-radius: var(--radius-control);
 }
 .checkin-trend p {
   display: flex;
@@ -1060,7 +1004,7 @@
 .milestone > span {
   color: var(--action);
   font-size: 13px;
-  font-weight: 750;
+  font-weight: 600;
   display: block;
   margin-bottom: 8px;
 }
@@ -1093,7 +1037,7 @@
   place-items: center;
   width: 64px;
   height: 64px;
-  border-radius: 12px;
+  border-radius: var(--radius-control);
 }
 .emergency-panel blockquote {
   margin: 0;
@@ -1104,7 +1048,7 @@
   overflow-wrap: anywhere;
 }
 .emergency-panel .emergency-demo-label {
-  font-weight: 750;
+  font-weight: 600;
 }
 .patient-app .emergency-panel .btn.danger {
   background: var(--urgent-ink);
@@ -1133,7 +1077,7 @@
   gap: 14px;
   padding: 16px;
   background: var(--urgent-inset);
-  animation: demo-call 1.5s ease-in-out 1;
+  animation: demo-call 0.45s ease-in-out 1;
 }
 @keyframes patient-arrive {
   from {
@@ -1252,7 +1196,7 @@
   .assistant-prompts {
     padding: 0 14px 14px;
   }
-  .patient-composer {
+  .care-prompt-bar {
     margin: 0 13px 14px;
   }
   .patient-lower {
@@ -1346,7 +1290,7 @@
   .assistant-prompts {
     padding: 0 22px 17px;
   }
-  .patient-composer {
+  .care-prompt-bar {
     margin: 0 22px 22px;
   }
   .patient-demo-footer {
@@ -1373,11 +1317,11 @@
     min-height: 43px;
     min-width: 105px;
     border: 0;
-    border-radius: 7px;
+    border-radius: var(--radius-pill);
     background: none;
     color: var(--muted);
     font-size: 13px;
-    font-weight: 750;
+    font-weight: 600;
   }
   .patient-mobile-nav button.current {
     background: var(--selected);
@@ -1403,7 +1347,7 @@
   .patient-brand-symbol {
     width: 35px;
     height: 35px;
-    border-radius: 8px;
+    border-radius: 50%;
   }
   .patient-brand-symbol svg {
     width: 21px;
@@ -1434,7 +1378,7 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 19px;
-    border-radius: 10px;
+    border-radius: var(--radius-control);
   }
   .patient-greeting h1 {
     font-size: 30px;
@@ -1489,7 +1433,7 @@
   }
   .patient-panel {
     padding: 20px 16px;
-    border-radius: 9px;
+    border-radius: var(--radius);
   }
   .important-instructions .patient-section-heading {
     gap: 10px;
@@ -1563,7 +1507,7 @@
   }
   .patient-assistant {
     height: 650px;
-    border-radius: 10px;
+    border-radius: 24px;
   }
   .assistant-heading {
     padding: 19px 15px;
@@ -1595,7 +1539,7 @@
   .assistant-prompts {
     padding: 0 15px 14px;
   }
-  .patient-composer {
+  .care-prompt-bar {
     margin: 0 14px 16px;
   }
   .patient-mobile-nav {
@@ -1653,7 +1597,7 @@
   }
   .patient-app .modal {
     max-width: calc(100vw - 24px);
-    border-radius: 9px;
+    border-radius: 24px;
   }
   .patient-app .dialog-header {
     padding: 17px;
@@ -1685,7 +1629,7 @@
     padding: 20px 16px;
   }
   .fullscreen-assistant .assistant-prompts,
-  .fullscreen-assistant .patient-composer {
+  .fullscreen-assistant .care-prompt-bar {
     margin-left: 16px;
     margin-right: 16px;
   }
@@ -1693,7 +1637,7 @@
     width: 100%;
     margin-left: 0;
   }
-  .fullscreen-assistant .patient-composer {
+  .fullscreen-assistant .care-prompt-bar {
     margin-bottom: 17px;
   }
   .patient-source pre,
@@ -1737,5 +1681,123 @@
     animation: none !important;
     transition: none !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* Patient workspace: editorial welcome, precise lists, cobalt and sky surfaces. */
+.patient-greeting h1 {
+  font-family: var(--font-editorial);
+  font-size: clamp(36px, 3.5vw, 50px);
+  font-weight: 500;
+  line-height: 1.06;
+  letter-spacing: -0.035em;
+}
+.patient-task:last-child {
+  border-bottom: 0;
+}
+.patient-task .patient-icon {
+  background: transparent;
+}
+.patient-task.is-done .task-open strong {
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+.patient-header nav .current {
+  border: 1px solid var(--line);
+}
+.patient-app .icon-btn {
+  width: 44px;
+  height: 44px;
+}
+.assistant-heading > div:not(.tooltip-anchor) {
+  min-width: 0;
+}
+.assistant-heading .tooltip-anchor {
+  flex: 0 0 auto;
+}
+.patient-app .assistant-heading .icon-btn {
+  width: 44px;
+  height: 44px;
+}
+.patient-app .assistant-heading h2 {
+  font-size: 20px;
+}
+.patient-app .assistant-heading p {
+  font-size: 12px;
+}
+.patient-greeting .add-instructions {
+  flex-shrink: 0;
+}
+@media (max-width: 1150px) {
+  .patient-greeting {
+    padding: 12px 0 20px;
+  }
+  .patient-greeting h1 {
+    font-size: 40px;
+  }
+  .assistant-heading {
+    flex-wrap: wrap;
+  }
+  .assistant-heading > .patient-icon {
+    display: none;
+  }
+}
+@media (max-width: 850px) {
+  .patient-greeting {
+    padding: 8px 0 16px;
+  }
+  .patient-greeting h1 {
+    font-size: clamp(34px, 6vw, 46px);
+  }
+  .assistant-heading {
+    flex-wrap: nowrap;
+  }
+  .assistant-heading > .patient-icon {
+    display: grid;
+  }
+}
+@media (max-width: 480px) {
+  .patient-task {
+    gap: 8px;
+    padding: 12px;
+    min-height: 76px;
+  }
+  .task-check {
+    width: 36px;
+    height: 36px;
+  }
+  .patient-task > .patient-icon {
+    width: 28px;
+  }
+  .patient-app .task-open strong {
+    font-size: 16px;
+  }
+  .patient-greeting .add-instructions {
+    align-self: flex-start;
+  }
+  .patient-section-heading h2 {
+    font-size: 22px;
+  }
+  .patient-section-heading > .task-count {
+    font-size: 11px;
+  }
+  .patient-home {
+    padding-inline: 18px;
+  }
+}
+
+@media (max-width: 380px) {
+  .patient-header {
+    padding-inline: 12px;
+    gap: 8px;
+  }
+  .patient-brand-symbol {
+    display: none;
+  }
+  .patient-brand-name {
+    font-size: 18px;
+  }
+  .patient-header-actions {
+    gap: 4px;
   }
 }

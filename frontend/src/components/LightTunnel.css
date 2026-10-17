@@ -1,0 +1,35 @@
+.care-light-tunnel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.care-light-tunnel canvas,
+.care-light-tunnel-fallback {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.care-light-tunnel canvas {
+  opacity: 0;
+}
+
+.care-light-tunnel[data-renderer='webgl'] canvas {
+  opacity: 1;
+}
+
+.care-light-tunnel-fallback {
+  fill: none;
+  stroke: var(--line);
+  stroke-width: 1;
+  opacity: 0.65;
+}
+
+.care-light-tunnel[data-renderer='webgl'] .care-light-tunnel-fallback {
+  visibility: hidden;
+}

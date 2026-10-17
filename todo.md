@@ -8,13 +8,22 @@ Shared list for both sides.
 
 ## Frontend
 
+- [x] Publish the complete current frontend as Ranveer’s final draft in a new PR replacing #13 (2026-10-17, Gold M for Ranveer).
+
+- [x] Replace green palette with cobalt/sky/navy, round controls, integrate five more React Bits interactions and GSAP click/sound feedback; preserve information and publish original prompts (2026-10-17, Gold M for Ranveer).
+
+- [x] Remove trailing arrows from To-Do rows (2026-10-17, Gold M for Ranveer).
 - [x] Build and verify care-space/conversation frontend pair in fictional demo (2026-10-17, Gold M for Ranveer).
 - [x] Build and verify clinician-builder/checklist frontend pair with provenance and approval (2026-10-17, Gold M for Ranveer).
 - [x] Build and verify approved family-access/consented-handoff frontend pair locally (2026-10-17, Gold M for Ranveer).
 - [ ] Confirm Marcus file ownership and active repository sessions for continued parallel work (2026-10-17, Gold M for Ranveer).
 - [ ] Bind typed frontend adapter to Andrew's agreed Supabase auth/data/storage/AI/realtime contracts (2026-10-17, Gold M for Ranveer).
-- [ ] Publish current frontend through PR as explicitly requested, address Claude/conflict review; no merge without authorization (2026-10-17, Gold M for Ranveer).
+- [x] Publish frontend through PR and address Claude/conflict review; PR #13 UI revamp approved on initial review, no merge performed (2026-10-17, Gold M for Ranveer).
 - [ ] Verify full integrated GitHub revision with separate authenticated roles and direct server policy checks (2026-10-17, Gold M for Ranveer).
+
+- [x] Revamp green patient UI with requested typography, React Bits components, tooltips, skeletons and reduced-motion support; build + 62 tests and responsive browser checks pass (2026-10-17, Gold M for Ranveer).
+- [ ] When backend connection resumes, agree `/doctor-message#<token>` and `/doctor-entry#<token>` routes with Andrew; keep the local preview distinct from actual sending (2026-10-17, Gold M for Ranveer).
+- [ ] Add structured What's normal guidance and handle live `warning_sign` / `suggest_notify_doctor` responses during patient-adapter integration (2026-10-17, Gold M for Ranveer).
 
 ## Backend
 

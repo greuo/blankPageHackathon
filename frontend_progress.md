@@ -4,15 +4,44 @@ Owned by the frontend side (Ranveer, Marcus). Only frontend sessions edit this f
 
 ## Current state
 
-- **Stack:** React + TypeScript, Vite, token CSS, Nunito Variable, GSAP/useGSAP, Lucide, Vitest. Isolated under `frontend/`.
-- **Run:** `npm --prefix frontend run dev -- --port 5188`; production build/preview on 5190.
-- **Current UI:** Patient-only dashboard and Add instructions page, embedded/full-screen companion, daily task/dose reporting, check-in/trend, read-only roadmap, reminders, demo emergency/call flow and progress preview and downloadable progress text. No reachable doctor/family/admin screen or role switcher.
-- **Data:** New typed browser-local patient adapter under `frontend/src/patient/`. Fictional data only. Legacy shared-care modules remain reference source and regression tests.
-- **Validation:** Build and 49 tests pass, bounded ECC-informed React/TypeScript source review, desktop/mobile browser flows. See `frontend/docs/VERIFICATION.md` for current versus historical checks.
-- **Deferred:** Andrew's backend, clinician input verification, real LLM, document extraction, email delivery and secure report links. No live privacy/security claim.
-- **Delivery:** PR #3 was merged on GitHub while this revision was in progress. This patient-only follow-up goes through a new PR and Claude/conflict checks. No merge authorization. Latest immutable head/check status is recorded in the local continuity checkpoint after publication.
+- **Stack:** React + TypeScript, Vite, semantic token CSS, Google Sans / Funnel Display / EB Garamond variable fonts, GSAP/useGSAP, Motion for React, Lucide, Vitest. Isolated under `frontend/`; fonts self-hosted with complete OFL licenses.
+- **Run:** `npm --prefix frontend run dev -- --port 5188`; `npm --prefix frontend run build`; production preview on 5190; `npm --prefix frontend test`.
+- **Current UI:** Patient-only cobalt/sky/navy dashboard and Add instructions page; title-only To-Do rows without trailing arrows; daily task/dose reporting; check-in/trend; read-only roadmap; reminders; demo emergency/call flow; original progress report and TXT download. No reachable doctor/family/admin account screens.
+- **New React Bits:** SpringCheck for To-Do, RubberSegment navigation, JellyRadio check-in, SwipeToast saves and CountUp timeline. GSAP click feedback throughout enabled controls, with an optional remembered soft click sound. Five exact upstream prompts plus app-specific instructions under `frontend/docs/REACT-BITS-ANIMATION-PROMPTS.md`.
+- **Companion and motion:** Embedded/full-screen assistant with shared draft, PromptBar shortcuts, send/stop control and focus/hover tooltips. 1.8-second LightTunnel/GSAP opening with Skip, static fallback and reduced-motion bypass. SquishSwitch and StatusMark demonstrate an optional-instructions email draft preview. Skeletons reflect actual pending work.
+- **Data:** Typed browser-local patient adapter in `frontend/src/patient/`, fictional records only. Existing information and source wording preserved. Legacy shared-care modules remain reference source and regression tests. Local assistant remains deterministic.
+- **Validation:** Latest production build and 75 tests pass; independent ECC-informed React/TypeScript review approved after fixing fullscreen header contrast. Current browser checks cover 390/768/1440px, keyboard task/radio/save controls, swipe dismissal, sound preference, intake, fullscreen chat, report preview and splash replay. Browser error/warning logs clean. Vite retains a 519 KB JS chunk advisory. Details: `frontend/docs/VERIFICATION.md`.
+- **Integration next:** Andrew's documented Supabase patient-only tables, guest auth and live `chat` contract are available. Frontend binding is still deferred at Ranveer's request. Live inference, doctor input verification, extraction, email delivery and secure doctor links are not connected in this UI. No live privacy/security claim.
+- **Delivery:** Ranveer designated the complete current UI as the final draft. Published on `codex/final-patient-ui` in a new PR replacing #13, retaining the entire reviewed implementation and prompts. Latest application code is unchanged from `06202ee`; only publication notes were updated. Required Claude/conflict checks remain in place; no merge performed. The local continuity checkpoint records the new PR and exact checks.
 
 ## Session log
+
+### 2026-10-17 · Final-draft publication / Gold M for Ranveer
+
+- **Did:** Packaged every current frontend source, animation, font, test and copied React Bits prompt into a new final-draft PR from `codex/final-patient-ui`, replacing PR #13 at Ranveer's explicit request. Application code is identical to the tested `06202ee` snapshot.
+- **Validation:** Verified the branch contains current `main`, all prior UI commits and no outstanding source edits. Existing build, 75 tests, browser checks and independent review apply to the unchanged application. macOS `.DS_Store` is excluded.
+- **Next:** Complete repository review before merge. Backend connection remains deferred; teammate backend PRs retain separate ownership.
+
+### 2026-10-17 · Blue palette and five React Bits interactions / Gold M for Ranveer
+
+- **Did:** Replaced the green palette with cobalt, sky and navy; pill primary actions, circular icon controls, rounded panels/forms; navy assistant header including fullscreen. Preserved all existing patient information and behaviors.
+- **Motion:** Integrated five actual React Bits adaptations with source prompts/attribution. Added scoped GSAP press feedback and a persistent sound toggle; trusted gestures only, no autoplay. Earlier PromptBar, SquishSwitch, StatusMark and LightTunnel remain integrated.
+- **Validation:** Build + 75 tests pass. Real-browser keyboard, save/swipe, mobile, fullscreen draft, local report and opening checks pass. Independent review approved after a fullscreen contrast fix. Current browser viewport bottoms out at 390px; 320px was requested but not verified as a true 320px layout in this pass.
+- **Delivery:** Update existing PR #13, leave merge/review gates intact. No backend/API changes; binding is still deferred. Exact latest check status is in the local checkpoint.
+
+### 2026-10-17 · To-Do arrow removal / Gold M for Ranveer
+
+- Removed the trailing arrow from each To-Do row; task buttons and reporting behavior remain available.
+- Production build passed; browser confirmed three task rows and zero row arrows. Narrow source review approved. Published through the existing PR #13.
+
+### 2026-10-17 · React Bits patient UI revamp / Gold M for Ranveer
+
+- **Did:** Refined all green surfaces, continuous To-Do list and typography; added adapted PromptBar, tooltip, SquishSwitch, StatusMark and bounded LightTunnel components. Kept existing patient information, reports and flows. Added truthful local email draft preview without sending.
+- **References/tools:** Browsed/scrolled React Bits, Color Hunt and public Mobbin. Installed/authenticated official 21st CLI, retrieved a tooltip reference and ran its local review. Stitch workspace did not load; no generated output claimed. Applied relevant design/memory/ECC skills and documented adaptations.
+- **Validation:** Build + 62 tests pass; responsive and keyboard checks completed; source review approved. Claude's initial PR #13 verdict was looks good/no conflicts. Its aria-disabled visual suggestion is already covered by ReportDraft.css. Bundle advisory retained transparently.
+- **Coordination:** Incorporated PR #12's handoff docs without changing backend code. Read current backend notes; added integration follow-ups to frontend todo. Current email preview does not implement notify-doctor or the proposed public routes.
+- **Next:** Connect the patient adapter to the documented backend when that work resumes; agree the two public routes, structured What's normal field and warning-sign action behavior before live integration. Continue through PR review; no merge authorization.
+
 
 ### 2026-10-17 · Gold M / Codex PR review fixes
 

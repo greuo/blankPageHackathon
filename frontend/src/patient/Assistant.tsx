@@ -1,5 +1,8 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { MessageCircle, Maximize2, Minimize2, Send, FileText, CircleHelp } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { MessageCircle, Maximize2, Minimize2, FileText, CircleHelp } from 'lucide-react';
+import { motion, useReducedMotion } from 'motion/react';
+import PromptBar from '../components/PromptBar';
+import { Tooltip } from '../components/Tooltip';
 import { Skeleton, errorText } from '../components/ui';
 import { useSurfaceEntrance } from '../components/motion';
 import { id, isEmergency, reply, type PatientState } from './model';
@@ -21,6 +24,14 @@ export default function Assistant({
   onReport: () => void;
   onEmergency: (text: string) => void;
 }) {
+  const request = useRef(0);
+  const reduce = useReducedMotion();
+  useEffect(
+    () => () => {
+      request.current += 1;
+    },
+    [],
+  );
   const [pending, setPending] = useState(false);
   const [error, setError] = useState('');
   const [help, setHelp] = useState(false);
@@ -38,12 +49,15 @@ export default function Assistant({
       onEmergency(value);
       return;
     }
+    const sequence = ++request.current;
     pinned.current = true;
     setPending(true);
     setError('');
     try {
-      // Local response preparation only. No live LLM or fabricated network wait.
-      const response = await Promise.resolve(reply(state, value));
+      // Yield for rendering, then prepare the local response. No simulated network delay.
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+      if (request.current !== sequence) return;
+      const response = reply(state, value);
       patientStore.update((s) => {
         s.messages.push(
           { id: id(), role: 'patient', text: value.trim() },
@@ -52,14 +66,10 @@ export default function Assistant({
       });
       setText('');
     } catch (reason) {
-      setError(errorText(reason));
+      if (request.current === sequence) setError(errorText(reason));
     } finally {
-      setPending(false);
+      if (request.current === sequence) setPending(false);
     }
-  }
-  function submit(event: FormEvent) {
-    event.preventDefault();
-    void send();
   }
   return (
     <section
@@ -77,21 +87,25 @@ export default function Assistant({
             {expanded ? 'Your questions. Your provided guidance.' : 'Here with your care plan.'}
           </p>
         </div>
-        <button
-          className="icon-btn"
-          aria-label={expanded ? 'Exit full-screen assistant' : 'Open full-screen assistant'}
-          onClick={onExpand}
-        >
-          {expanded ? <Minimize2 /> : <Maximize2 />}
-        </button>
-        <button
-          className="icon-btn"
-          aria-label="About your companion"
-          aria-expanded={help}
-          onClick={() => setHelp(!help)}
-        >
-          <CircleHelp size={20} />
-        </button>
+        <Tooltip text={expanded ? 'Close full screen' : 'Open full screen'}>
+          <button
+            className="icon-btn"
+            aria-label={expanded ? 'Exit full-screen assistant' : 'Open full-screen assistant'}
+            onClick={onExpand}
+          >
+            {expanded ? <Minimize2 /> : <Maximize2 />}
+          </button>
+        </Tooltip>
+        <Tooltip text="About your companion">
+          <button
+            className="icon-btn"
+            aria-label="About your companion"
+            aria-expanded={help}
+            onClick={() => setHelp(!help)}
+          >
+            <CircleHelp size={20} />
+          </button>
+        </Tooltip>
       </header>
       {help && (
         <div className="assistant-about">
@@ -116,14 +130,20 @@ export default function Assistant({
         aria-busy={pending}
       >
         {state.messages.map((message) => (
-          <div key={message.id} className={`patient-message ${message.role}`}>
+          <motion.div
+            key={message.id}
+            className={`patient-message ${message.role}`}
+            initial={{ opacity: 0, y: reduce ? 0 : 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: reduce ? 0 : 0.22 }}
+          >
             {message.role === 'assistant' && (
               <span className="message-icon">
                 <MessageCircle size={18} />
               </span>
             )}
             <p>{message.text}</p>
-          </div>
+          </motion.div>
         ))}
         {pending && <Skeleton kind="conversation" />}
       </div>
@@ -142,33 +162,17 @@ export default function Assistant({
           {error} Your question is kept here. Try again.
         </p>
       )}
-      <form onSubmit={submit} className="patient-composer">
-        <label className="sr-only" htmlFor={expanded ? 'expanded-question' : 'care-question'}>
-          Ask your care assistant
-        </label>
-        <textarea
-          id={expanded ? 'expanded-question' : 'care-question'}
-          value={text}
-          maxLength={3000}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Ask a question…"
-          rows={2}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
-              e.preventDefault();
-              void send();
-            }
-          }}
-        />
-        <button
-          className="icon-btn send-button"
-          aria-label="Send question"
-          disabled={!text.trim() || pending}
-        >
-          <Send size={21} />
-        </button>
-        <small>Your care team guides your treatment. Local demo.</small>
-      </form>
+      <PromptBar
+        value={text}
+        onChange={setText}
+        busy={pending}
+        onSend={() => void send()}
+        onStop={() => {
+          request.current += 1;
+          setPending(false);
+        }}
+        onReport={onReport}
+      />
     </section>
   );
 }

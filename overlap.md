@@ -65,6 +65,8 @@ Things both sides rely on: API base URL, ports, data shapes, auth, env vars. Eit
 
 ## Frontend → Backend
 
+- [ ] 2026-10-17 · Gold M / Codex for Ranveer: UI revamp PR #13 preserves the patient-only local adapter and adds a local email draft preview using recorded progress. No endpoint, backend schema, env var or port changed; nothing is sent. Read the current live chat/guest contracts and proposed doctor routes. Ranveer still wants frontend work first, so binding, What's normal and warning-sign actions are queued in frontend todo. Public route implementation and email integration remain for the connection pass. Family/admin/doctor-account UI is no longer reachable; old family-access notes below are historical.
+
 - [x] 2026-10-17 · Gold M / Codex for Ranveer: Read backend PR #2 and preserved its changes while preparing our frontend PR. Ranveer requested publication now and deferred backend connection. Frontend has patient/doctor/family care spaces, source-based companion, clinician plan builder, daily checklist and consented handoff; no admin/nurse screens yet. Family grants, private-chat membership and consented handoffs are prototype contracts that need reconciliation with hospital roles and hospital-wide escalations before live integration.
   - ↳ 2026-10-17 · Andrew: Proposing to drop hospital roles and escalations entirely; see `PLAN.md` and the pivot note under Backend → Frontend.
 

@@ -1,0 +1,104 @@
+.care-prompt-bar {
+  position: relative;
+  margin: 0 20px 20px;
+  padding: 14px 14px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 22px;
+  background: var(--surface);
+  color: var(--ink);
+}
+.care-prompt-bar:focus-within {
+  border-color: var(--action);
+}
+.care-prompt-bar textarea {
+  display: block;
+  width: 100%;
+  min-height: 52px;
+  max-height: 130px;
+  resize: none;
+  border: 0;
+  background: transparent;
+  padding: 0 3px;
+  font: 400 16px/1.6 var(--font-body);
+  color: var(--ink);
+}
+.care-prompt-bar textarea:focus-visible {
+  outline-offset: 3px;
+}
+.care-prompt-tools {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding-top: 8px;
+}
+.care-prompt-context {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  font-size: 12px;
+  color: var(--muted);
+}
+.care-prompt-add,
+.care-prompt-send {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  padding: 0;
+  background: var(--rail);
+  color: var(--ink);
+}
+.care-prompt-send {
+  background: var(--action);
+  color: var(--surface);
+}
+.care-prompt-send:disabled {
+  opacity: 1;
+  background: var(--track);
+  color: var(--muted);
+}
+.care-prompt-bar > small {
+  display: block;
+  padding: 9px 3px 0;
+  color: var(--muted);
+  font-size: 11px;
+}
+.care-prompt-menu {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  z-index: 4;
+  padding: 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: 22px;
+  background: var(--surface);
+}
+.care-prompt-menu-label {
+  display: block;
+  padding: 8px 10px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.care-prompt-menu button {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  text-align: left;
+  font-size: 14px;
+  border-radius: 14px;
+}
+.care-prompt-menu button:hover,
+.care-prompt-menu button:focus-visible {
+  background: var(--rail);
+}
+@media (max-width: 600px) {
+  .care-prompt-bar {
+    margin: 0 12px 12px;
+  }
+}

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#f2f6ef" />
+    <meta name="theme-color" content="#eef3fa" />
     <meta
       name="description"
       content="A fictional demonstration of clinician-created recovery companions."
@@ -14,8 +14,8 @@
       html,
       body {
         margin: 0;
-        background: #f2f6ef;
-        color: #203e2f;
+        background: #eef3fa;
+        color: #14284b;
       }
       .first-paint {
         min-height: 100svh;
@@ -29,13 +29,14 @@
         font-family: 'Trebuchet MS', sans-serif;
       }
       .first-symbol {
-        width: 112px;
-        height: 112px;
-        margin-bottom: 24px;
+        width: 74px;
+        height: 74px;
+        margin-bottom: 28px;
       }
       .first-title {
-        font-size: clamp(28px, 4vw, 44px);
-        font-weight: 700;
+        font-family: Georgia, serif;
+        font-size: clamp(42px, 6vw, 70px);
+        font-weight: 500;
         line-height: 1.15;
         letter-spacing: -0.035em;
         margin: 0;
@@ -43,22 +44,22 @@
       .first-description {
         font-size: 17px;
         margin-top: 16px;
-        color: #536a58;
+        color: #506384;
       }
       .first-note {
         position: absolute;
         bottom: 28px;
         font-size: 12px;
-        color: #536a58;
+        color: #506384;
       }
       @media (max-width: 760px) {
         .first-symbol {
-          width: 96px;
-          height: 96px;
+          width: 74px;
+          height: 74px;
         }
         .first-title {
           max-width: 15ch;
-          font-size: 30px;
+          font-size: 42px;
         }
         .first-description {
           max-width: 24ch;
@@ -71,8 +72,8 @@
     <div id="root">
       <main class="first-paint" aria-label="Opening Care companion">
         <svg class="first-symbol" viewBox="0 0 120 120" aria-hidden="true">
-          <path d="M18 102V21a3 3 0 0 1 3-3h81" fill="none" stroke="#286642" stroke-width="2" />
-          <path d="M102 18v81a3 3 0 0 1-3 3H18" fill="none" stroke="#326f4d" stroke-width="2" />
+          <path d="M18 102V21a3 3 0 0 1 3-3h81" fill="none" stroke="#245bd7" stroke-width="2" />
+          <path d="M102 18v81a3 3 0 0 1-3 3H18" fill="none" stroke="#245bd7" stroke-width="2" />
           <text
             x="59"
             y="79"
@@ -80,7 +81,7 @@
             font-family="Trebuchet MS,sans-serif"
             font-size="51"
             letter-spacing="-3"
-            fill="#203e2f"
+            fill="#14284b"
           >
             dc
           </text>

@@ -1,53 +1,68 @@
 # Care companion design
 
-Current direction: a light patient recovery workspace with sage and leaf-green regions, rounded Nunito typography and flat surfaces. Ranveer's two original desktop compositions define the product structure. His newer healthcare mobile references inform hierarchy, navigation and grouping. They are inspiration rather than a booking/doctor-directory feature request.
+Current direction: a brighter patient workspace with cobalt actions, sky surfaces and deep navy text. The latest request replaces the previous green-only direction and calls for softer shapes and responsive, playful interaction. Preserve all patient information and the existing patient-only workflows.
 
-## Tokens and typography
+## Color and type
 
-| Token | Value | Role |
-| --- | --- | --- |
-| Canvas | `#F2F6EF` | Light sage page |
-| Surface | `#FAFCF7` | Green-tinted task rows, forms and dialogs |
-| Sage | `#E4EEDC` | Navigation and soft icon surfaces |
-| Mint | `#DCEBD8` | Support and confirmation |
-| Panel | `#E8F0E2` | Guidance and source text |
-| Strong panel | `#DFEBD6` | Greeting, assistant header and timeline |
-| Action | `#286642` | Primary actions and focus |
-| Green | `#326F4D` | Add instructions and reported state |
-| Ink | `#203E2F` | Text and icons |
-| Muted | `#536A58` | Supporting copy |
-| Line | `#CBDAC4` | Structural dividers |
-| Strong line | `#788E70` | Control boundaries |
-| Urgency | `#123B22` | Deep-green urgent and destructive actions |
-| Urgent surface | `#163D28` | Inverse emergency panel, distinct from pale routine surfaces |
-| Urgent text | `#F0F6E7` | High-contrast emergency copy and filled primary control |
+| Token           | Value     | Use                            |
+| --------------- | --------- | ------------------------------ |
+| Canvas          | `#EEF3FA` | Page and first paint           |
+| Surface         | `#F7F9FD` | Forms, rows and dialogs        |
+| Ink / navy      | `#14284B` | Main text, assistant header    |
+| Muted           | `#506384` | Supporting text                |
+| Action          | `#245BD7` | Primary controls and focus     |
+| Sky             | `#ABD2FA` | Inverse header supporting text |
+| Selected        | `#D3E3FC` | Active controls                |
+| Panel           | `#E4EDFB` | Grouped content                |
+| Line            | `#CCD9EB` | Dividers                       |
+| Strong line     | `#7488A7` | Control boundaries             |
+| Warning surface | `#FBEFD4` | Missed-report guidance         |
+| Urgent surface  | `#432336` | Urgent guidance                |
 
-The October 17 green-only request supersedes the earlier blue/mint palette. Shared color roles live in `src/styles.css`; the patient UI inherits them. Pale sage and leaf tints provide separation, with forest text and actions. Emergency guidance uses a dark inverse panel, light text, a filled primary action and an outlined secondary action. Its words and phone icon remain explicit. Destructive controls use the deepest green, heavier type and a stronger border. Notification markers use a diamond shape. First-paint HTML and the favicon use matching values. Palette names and design-process text stay out of the app.
+The Color Hunt navy/blue/sky and bright-blue references are linked in `docs/REACT-BITS-ANIMATION-PROMPTS.md`. Application tokens adjust those swatches for readable text and controls. Legacy variable names `--green`, `--mint` and `--sage` are compatibility aliases for blue values. Palette names never appear in patient copy.
 
-One self-hosted Latin **Nunito Variable** WOFF2 asset supplies the interface. Main headings use 800; controls 700–750; body 400. Desktop greeting is 32–41px according to breakpoint; mobile is 30px. Sections are 21–24px; task titles 17–18px; editable fields and most care text stay 15–16px. Headings balance short lines, care text wraps naturally and numeric progress uses tabular figures. Font license is distributed at `public/fonts/Nunito-LICENSE.txt`.
+Three self-hosted Latin variable WOFF2 fonts have distinct jobs:
 
-## Layout and shape
+- **Google Sans**: body copy, inputs and controls, 400–700.
+- **Funnel Display**: navigation, section headings and task titles, 300–800 available, generally 600–700 used.
+- **EB Garamond**: opening title and personal greeting, 400–800 available.
 
-Desktop uses an 82px horizontal header, a 1440px maximum page and two working columns with a 28px gap. Home, My instructions and Progress connect to real existing flows. The sage greeting includes the actual local date and Add action. To-Do remains the exact requested heading; freestanding rows show titles and patient report state without secondary descriptions. Provided guidance uses a light sage region. A leaf-green timeline shows elapsed plan time and the next actual milestone. It never claims healing percentage.
+Shared families are `--font-body`, `--font-heading`, and `--font-editorial`. Body and form copy stays approximately 15–16px; desktop greeting is 50px at full size and 34px on mobile. The opening title scales from 42–70px. Care text wraps naturally. Numeric progress uses tabular figures. Complete upstream OFL licenses ship in `public/fonts/`.
 
-The assistant has a sage header, quiet transcript, exact-instructions shortcut, report control and a stable composer. Its message log scrolls independently and preserves older-message reading position. Expanded mode fills the viewport with narrow gutters and one title. Native dialog focus containment, Escape, explicit close and return focus remain.
+## Layout and interaction
 
-Below 850px the dashboard stacks and a fixed Home/My plan/Companion dock connects to existing navigation. Space is reserved below content and focus targets have a bottom scroll margin. At 390px, task icons recede to preserve text width; native checkboxes and action labels remain clear. The assistant becomes an in-page panel and can expand to a nearly full viewport.
+Desktop uses an 84px horizontal header, a 1440px maximum page, generous outer spacing and two working columns. Home, My instructions and Progress connect to the existing flows. The greeting sits directly on the page; Add instructions is the primary action. To-Do is a continuous bordered list with large circular checkbox targets and titles only. Important instructions use fine dividers and a quiet surface. The timeline explicitly describes elapsed plan time, with the next real milestone.
 
-Add instructions is a centered page up to 1060px wide. Doctor name/email are paired on desktop and stack on mobile. Source wording, attachments and Cancel/Save follow one clear vertical sequence. Source, check-in, pill, roadmap, report and urgent dialogs use the same form vocabulary.
+The assistant has one transcript, an anchored composer, existing shortcuts and expandable full-screen mode. PromptBar adapts the supplied React Bits composition to actual care functions: controlled draft, growing textarea, shortcut menu, send-to-stop icon and keyboard submission. It does not invent models, external sources, dictation or integrations. Text survives full-screen transitions. Busy input is read-only so keyboard focus remains stable. Cancellation prevents stale results from being committed.
 
-Corners range from 5–12px according to control and surface scale. Structure comes from spacing, tinted regions and single borders. Icons use the existing Lucide library. No clinician portraits or generated product screenshots are introduced.
+Tooltips explain compact controls on focus or hover. They remain inside the native dialog's top layer, clamp to the panel/viewport, remain reachable by pointer and dismiss with Escape without dismissing the surrounding dialog. Native dialog focus containment and explicit close remain.
 
-## Motion and state
+Below 850px the app stacks and retains its fixed Home/My plan/Companion dock. Space is reserved below content. Intake keeps a single vertical sequence; doctor name/email pair on desktop and stack on mobile. Forms, source dialogs, check-ins, doses, roadmap, reports and emergency guidance share the same typography and color roles.
 
-The initial HTML and React opening share the final canvas, title and centered geometric mark. A scoped GSAP line/wordmark sequence enters automatically after about 1.06 seconds. Skip enters immediately; reduced motion bypasses the timed sequence. Session storage remembers entry, and a demo control can replay it. Focus enters main afterward.
+The existing plain-text progress report and download remain intact. A separate local email draft preview demonstrates the supplied StatusMark and SquishSwitch. Instructions are optional in that draft; the complete original report still contains them. Preparation uses actual recorded data, labels its state honestly and has no sending action.
 
-Interface transitions communicate state with short enter/exit motion, including 140ms dialog exit. GSAP contexts clean up and empty selectors return before starting animation. Default content remains readable. Hover stays static. Real pending images/replies have skeleton feedback; no artificial loading wait is added. Reduced-motion CSS/JS guards remove motion. No 50ms paint or frame-rate guarantee is claimed.
+Primary actions use pill shapes, icon controls are circular, forms use 14px corners, and panels use 20–24px corners. Message bubbles have directional corners. Structure comes from spacing, borders and tinted surfaces. Existing Lucide icons remain. No portraits, stock product screenshots or decorative feature-card rows are added.
 
-Keep empty, pending, saved and failed states explicit. Errors appear inside their active dialog. Emergency help opens even if persistence fails. Check-in emergency detection occurs on submission, with the interrupted draft restored on return.
+## Motion and loading
 
-## Product truth and exclusions
+The first-paint HTML and React opening share the final canvas and readable title. A scoped GSAP sequence lasts **1.8 seconds**, then enters automatically. Skip enters immediately. Reduced motion bypasses the timed opening, and changing the preference during playback ends it. Session storage remembers entry; the demo controls can replay it.
 
-Patient-only fictional browser-local prototype. No reachable doctor/family/admin screen. Clinician verification, live model, document extraction, email delivery and hosted report links remain deferred. The companion quotes provided text and reports recorded entries. Adding text does not silently change the prepared dose schedule or read-only roadmap.
+The supplied **LightTunnel** shader is restricted to the opening: light-mode blue hairlines, low intensity, 24 cables, no pointer steering, no grain or click surges, DPR capped at 1.5. It pauses in hidden tabs and cleans up observers, frames and GPU resources. A static curved-line fallback handles unavailable WebGL or context loss. Reduced motion does not mount the tunnel.
 
-No gradients, shadows, pure-white canvas, hover movement, rainbow/neon category colors, glass, sparkle decorations, colored left stripes, three-feature-card rows, fake testimonials, pricing or legal-footer clutter. Medical urgency remains distinct from routine guidance. No contrast slogans or palette commentary appear in product copy.
+Existing Motion for React handles the prompt menu, send/stop morph, transcript arrivals, switch and report state. Typical changes use 140–360ms; report entry is 200ms. GSAP owns the opening, coordinated entrances, the five new React Bits adaptations, and shared click feedback. Global feedback uses the independent CSS scale property; component motion owns internal elements. The optional short WebAudio tone runs only after trusted activation, is muted with the header control, and remembers that preference. Hover does not move controls. Reduced-motion guards remove displacement and timed effects. Defaults remain readable without animation.
+
+Skeletons represent actual pending work: image load, local reply and report preparation. The report yields a paint before formatting rather than adding a fake delay. Fast local work may show only a brief pending state. No measured frame-rate or 50ms paint guarantee is claimed.
+
+## Product boundaries
+
+The frontend remains a fictional browser-local patient prototype. This UI change does not wire the independently developed backend. Clinician verification, live inference, document extraction, email delivery and hosted doctor links remain deferred. The companion quotes provided text and reports recorded entries; adding instructions does not silently reconfigure the prepared medication schedule or roadmap. Timeline percentage is not healing percentage.
+
+Preserve emergency-on-submission handling, negation guards, draft restoration and visibility even when storage fails. Keep errors within the active dialog.
+
+No pure-white canvas, harsh gradients, drop shadows, glass, rainbow/neon categories, sparkle decorations, colored left stripes, fake testimonials, pricing tiers or legal-footer clutter. No contrast slogans or design-process labels appear in product copy.
+
+Research and adaptation details: [UI-REVAMP-REFERENCES.md](docs/UI-REVAMP-REFERENCES.md). Actual checks: [VERIFICATION.md](docs/VERIFICATION.md).
+
+## Five new React Bits interactions
+
+SpringCheck animates real To-Do reporting controls, RubberSegment moves the desktop navigation pill, JellyRadio animates check-in choices, SwipeToast confirms successful saves with swipe/close dismissal, and CountUp interpolates the actual timeline percentage. Exact copied upstream prompts, app-specific prompts and attribution are in `docs/REACT-BITS-ANIMATION-PROMPTS.md`. Native semantics and reduced-motion behavior take priority over decorative motion.

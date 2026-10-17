@@ -1,0 +1,19 @@
+.tooltip-anchor {
+  display: inline-flex;
+  flex-shrink: 0;
+  position: relative;
+}
+.care-tooltip {
+  position: absolute;
+  z-index: 200;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: min(208px, calc(100vw - 24px));
+  padding: 8px 12px;
+  border-radius: 5px;
+  background: var(--ink);
+  color: var(--surface);
+  font: 400 12px/1.5 var(--font-body);
+  text-align: center;
+  pointer-events: auto;
+}

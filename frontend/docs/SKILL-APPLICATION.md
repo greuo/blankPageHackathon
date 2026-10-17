@@ -536,3 +536,23 @@ This report is an audit of available guidance. Build, browser, deployment and re
 Reused this catalog screen rather than repeating the inventory. Additional detailed readings included Awesome Design MD's Cal hierarchy/spacing reference, Genjutsu paint/cast scope and motion guidance, interface typography, Impeccable craft-floor, presentation style guidance and Designly narrative/strategy guidance. Preserved the user's chosen palette/font/flat-surface restrictions over incompatible source defaults. No full Genjutsu concept tournament, Superdesign canvas, image-generation batch or actual slide export was claimed.
 
 Actual delegation: one routing follow-up, a writing subagent owning only HACKATHON-SLIDESHOW-PROMPT.md/.txt, and a fresh read-only ECC-informed React/TypeScript/visual reviewer. Root implemented the UI and ran browser/build/tests. User confirmed5 minutes and fewer than 6 slides, so the prompt mandates exactly 5 slides, including a60-second demo and four-person handoffs. The exported artifact is a prompt for a deck generator, not a deck.
+
+## Follow-up application: React Bits and green patient UI
+
+Reused the existing catalog inventory and requested a bounded read-only routing follow-up. Applied relevant guidance rather than mixing every style variant or executing unrelated skills.
+
+- **UI/UX Pro Max**: ran the design-system search and reviewed healthcare/accessibility guidance. Rejected returned marketing/testimonial and neumorphic suggestions that contradicted the user's flat patient-workspace brief.
+- **Design DNA, Awesome Design MD and Designly reference-memory/taste guidance**: retained the original patient composition, latest green-only preference and information hierarchy; gave the three requested typefaces distinct semantic roles. Existing reference inventory was reused.
+- **Taste frontend UI engineering, Impeccable typeset/craft-floor and make-interfaces-feel-better**: continuous task list, consistent alignment, readable line lengths, stable focus, actual pending states and responsive controls.
+- **Genjutsu paint/cast/bunshin**: coherent art direction and purposeful state motion; bounded parallel ownership for the splash and interaction components. No full concept tournament, arbitrary long-running workflow or unrelated animation stack was executed.
+- **GSAP React/performance**: scoped 1.8-second opening, teardown and reduced-motion exit. Motion documentation supplied the complementary React state transitions. No double animation ownership of messages.
+- **ECC frontend patterns and React/TypeScript/code review guidance**: independent read-only component/lifecycle/accessibility review, followed by correction and re-review. Concrete findings/results are recorded in VERIFICATION.md.
+- **Stitch design taste**: current semantic DESIGN.md. The live Stitch attempt stopped at an unavailable workspace; no generated design is claimed.
+- **Project continuity**: resumed the verified local checkpoint and will save the final revision, PR and actual checks in the local project memory directory.
+
+Actual external tools used: official authenticated 21st CLI, CUA real-browser inspection, Git/GitHub CLI and official documentation. The 21st MCP server, paid Mobbin library, Superdesign canvas and live model/email providers were not used. Four supplied React Bits prompts were adapted to existing functionality; no new service capability is implied by their animation.
+
+
+### Blue React Bits motion pass
+
+Reused the design/continuity selection and ran one read-only routing subagent for this expanded motion objective. Applied UI/UX Pro Max color/interaction search, Design DNA token roles, make-interfaces-feel-better control shapes/feedback, Genjutsu cast/bunshin bounded collaboration, and GSAP React/performance cleanup guidance. Two workers owned isolated component/feedback files; root handled integration, palette, browser checks and delivery. Independent ECC-informed React/TypeScript review found a fullscreen header contrast regression, fixed before publishing. This is scoped use of relevant skills, not a claim to execute every unrelated package. Original upstream prompts and licenses are preserved.

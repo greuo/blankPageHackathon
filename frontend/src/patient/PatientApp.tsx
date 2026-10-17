@@ -25,12 +25,19 @@ import {
   Pill,
   Plus,
   Phone,
-  X,
 } from 'lucide-react';
 import Opening from '../components/Opening';
+import { SoundToggle } from '../components/InteractionFeedback';
+import { SpringCheck } from '../components/react-bits/SpringCheck';
+import { RubberSegment } from '../components/react-bits/RubberSegment';
+import { JellyRadio } from '../components/react-bits/JellyRadio';
+import { SwipeToast } from '../components/react-bits/SwipeToast';
+import { CountUp } from '../components/react-bits/CountUp';
 import { Modal, errorText } from '../components/ui';
 import { useSurfaceEntrance, reducedMotion } from '../components/motion';
 import Assistant from './Assistant';
+import ReportDraft from './ReportDraft';
+import { Tooltip } from '../components/Tooltip';
 import Instructions from './Instructions';
 import { patientStore } from './store';
 import {
@@ -252,35 +259,49 @@ export default function PatientApp() {
           </span>
         </button>
         <nav aria-label="Main navigation">
-          <button className={route === 'home' ? 'current' : ''} onClick={() => navigate('home')}>
-            <Home size={21} />
-            Home
-          </button>
-          <button onClick={() => setDialog('source')}>
-            <BookOpen size={18} />
-            My instructions
-          </button>
-          <button onClick={() => setDialog('report')}>
-            <FileText size={18} />
-            Progress
-          </button>
+          <RubberSegment
+            label="Main sections"
+            value={
+              dialog === 'source'
+                ? 'source'
+                : dialog === 'report'
+                  ? 'report'
+                  : route === 'home'
+                    ? 'home'
+                    : ''
+            }
+            options={[
+              { value: 'home', label: 'Home', icon: <Home size={19} /> },
+              { value: 'source', label: 'My instructions', icon: <BookOpen size={18} /> },
+              { value: 'report', label: 'Progress', icon: <FileText size={18} /> },
+            ]}
+            onChange={(value) => {
+              if (value === 'home') navigate('home');
+              else setDialog(value === 'source' ? 'source' : 'report');
+            }}
+          />
         </nav>
         <div className="patient-header-actions">
-          <button
-            className="icon-btn notification-button"
-            aria-label={`Notifications, ${reminders.length} reminders`}
-            onClick={() => setDialog('notifications')}
-          >
-            <Bell size={23} />
-            {reminders.length > 0 && <span />}
-          </button>
-          <button
-            className="patient-profile"
-            aria-label="Patient profile and progress"
-            onClick={() => setDialog('report')}
-          >
-            A
-          </button>
+          <SoundToggle />
+          <Tooltip text="View reminders">
+            <button
+              className="icon-btn notification-button"
+              aria-label={`Notifications, ${reminders.length} reminders`}
+              onClick={() => setDialog('notifications')}
+            >
+              <Bell size={23} />
+              {reminders.length > 0 && <span />}
+            </button>
+          </Tooltip>
+          <Tooltip text="Your profile and progress">
+            <button
+              className="patient-profile"
+              aria-label="Patient profile and progress"
+              onClick={() => setDialog('report')}
+            >
+              A
+            </button>
+          </Tooltip>
         </div>
       </header>
       {(patientStore.error() || error) && (
@@ -329,19 +350,7 @@ export default function PatientApp() {
                   Add instructions
                 </button>
               </header>
-              {notice && (
-                <p className="patient-success" role="status">
-                  <Check size={18} />
-                  {notice}
-                  <button
-                    className="icon-btn"
-                    aria-label="Dismiss confirmation"
-                    onClick={() => setNotice('')}
-                  >
-                    <X size={16} />
-                  </button>
-                </p>
-              )}
+              {notice && <SwipeToast message={notice} onDismiss={() => setNotice('')} />}
               <section className="patient-panel today-tasks">
                 <div className="patient-section-heading">
                   <div>
@@ -357,15 +366,11 @@ export default function PatientApp() {
                     const Icon = [Footprints, Pill, ClipboardList][index];
                     return (
                       <div className={`patient-task ${done(task) ? 'is-done' : ''}`} key={task.id}>
-                        <button
-                          role="checkbox"
-                          aria-checked={done(task)}
-                          aria-label={`${done(task) ? 'Review or undo' : 'Record'} ${task.title}`}
-                          className="task-check"
-                          onClick={() => taskClick(task)}
-                        >
-                          {done(task) && <Check size={19} />}
-                        </button>
+                        <SpringCheck
+                          checked={done(task)}
+                          label={`${done(task) ? 'Review or undo' : 'Record'} ${task.title}`}
+                          onChange={() => taskClick(task)}
+                        />
                         <span className="patient-icon">
                           <Icon size={24} />
                         </span>
@@ -378,7 +383,6 @@ export default function PatientApp() {
                           <span>
                             <strong>{task.title}</strong>
                           </span>
-                          <ChevronRight size={19} />
                         </button>
                       </div>
                     );
@@ -418,7 +422,9 @@ export default function PatientApp() {
               <section className="patient-panel recovery-progress">
                 <div className="progress-heading">
                   <h2>Recovery timeline</h2>
-                  <span className="timeline-percent">{progress.percent}% of planned time</span>
+                  <span className="timeline-percent">
+                    <CountUp value={progress.percent} suffix="%" /> of planned time
+                  </span>
                   <button className="text-button" onClick={() => setDialog('roadmap')}>
                     View roadmap
                     <ChevronRight size={17} />
@@ -656,24 +662,13 @@ export default function PatientApp() {
                 placeholder="e.g. 36.8"
               />
             </label>
-            <fieldset>
-              <legend>How are you feeling?</legend>
-              <div className="feeling-options">
-                {['Low', 'Okay', 'Good'].map((feeling) => (
-                  <label key={feeling}>
-                    <input
-                      type="radio"
-                      name="feeling"
-                      required
-                      value={feeling}
-                      checked={check.feeling === feeling}
-                      onChange={() => setCheck({ ...check, feeling })}
-                    />
-                    {feeling}
-                  </label>
-                ))}
-              </div>
-            </fieldset>
+            <JellyRadio
+              name="feeling"
+              label="How are you feeling?"
+              value={check.feeling}
+              options={['Low', 'Okay', 'Good'].map((value) => ({ value, label: value }))}
+              onChange={(feeling) => setCheck({ ...check, feeling })}
+            />
             <label>
               Anything new?
               <textarea
@@ -780,6 +775,7 @@ export default function PatientApp() {
               <Download size={18} />
               Download text report
             </button>
+            <ReportDraft state={state} now={now} />
           </div>,
         )}
       {dialog === 'reset' &&

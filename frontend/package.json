@@ -10,10 +10,13 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@fontsource-variable/nunito": "^5.3.0",
+    "@fontsource-variable/eb-garamond": "^5.3.0",
+    "@fontsource-variable/funnel-display": "^5.3.0",
+    "@fontsource-variable/google-sans": "^5.3.2",
     "@gsap/react": "^2.1.2",
     "gsap": "^3.15.0",
     "lucide-react": "^1.59.0",
+    "motion": "^14.3.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },

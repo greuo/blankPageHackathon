@@ -49,7 +49,7 @@ describe('opening lifecycle', () => {
     );
     expect(host.querySelector('.splash-screen')).not.toBeNull();
     await act(async () => {
-      await wait(1350);
+      await wait(2100);
     });
     expect(host.textContent).toBe('Workspace ready');
     expect(enter).toHaveBeenCalledTimes(1);
@@ -66,7 +66,7 @@ describe('opening lifecycle', () => {
     await act(async () => host.querySelector<HTMLButtonElement>('.splash-skip')!.click());
     expect(host.textContent).toBe('Workspace ready');
     await act(async () => {
-      await wait(1200);
+      await wait(2100);
     });
     expect(enter).toHaveBeenCalledTimes(1);
   });
