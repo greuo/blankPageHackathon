@@ -111,13 +111,13 @@ The `chat` function is also rate-limited (20 messages per 10 minutes, 200 per da
 | Tables, RLS, guest + email sign-in | Live on hosted |
 | `chat` (Claude answers from the notes) | Live; 15/15 on the live eval |
 | Anti-spam limits for doctor emails | Live in the database |
-| `notify-doctor` + `view-doctor-message` | Next (needs an email provider) |
+| `notify-doctor` + `view-doctor-message` | Built and tested on hosted (22/22); deploy after merge, once the Resend secrets are set |
 | `entry-link` + `doctor-entry` (QR) | After that |
 | Frontend | Patient dashboard, instructions page and companion as a browser-local demo; not yet bound to Supabase |
 
 ## Open questions
 
-- Email provider and sending address (Resend is the quickest from an edge function).
+- ~~Email provider and sending address~~ Decided 2026-10-17: Resend's test sender `onboarding@resend.dev` for the demo (no domain needed). It only delivers to the Resend account owner's address, so the demo doctor's email must be that address. A real domain later lets it email any doctor without code changes.
 - Can the doctor reply from the link page, with the reply showing in the patient's chat? (Nice to have.)
 - Keep family sharing, or drop it for the demo? (Frontend's call.)
 - A guest who clears app storage loses their data unless they've signed up. Fine for the demo?

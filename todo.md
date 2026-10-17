@@ -34,10 +34,14 @@ Shared list for both sides.
 - [x] Set the `ANTHROPIC_API_KEY` secret on hosted (2026-10-17, Andrew)
 - [x] Run the bot's live eval once the key is set: 15/15, 0 unsafe (2026-10-17, Andrew)
 - [x] `chat` refers less: clear implications, "is this normal?" from a `normal` list, `warning_sign` action (2026-10-17, Andrew)
-- [ ] Pick email provider (Resend?), verify the sending domain, set `RESEND_API_KEY`, `EMAIL_FROM`, `APP_URL` secrets (2026-10-17, Andrew)
+- [x] Pick email provider: Resend's test sender `onboarding@resend.dev`, no domain needed for the demo (2026-10-17, Andrew)
+- [ ] Sign up for Resend with the demo doctor's inbox; set `RESEND_API_KEY`, `EMAIL_FROM`, `APP_URL` secrets (2026-10-17, Andrew)
 - [ ] Agree doctor-page routes (`/doctor-message`, `/doctor-entry`, token in the URL hash) with frontend in `overlap.md` (2026-10-17, Andrew)
-- [ ] `notify-doctor`: token + `doctor_messages` row, map the trigger's limit hints to 4xx, email `recipient_email` a link-only notice (2026-10-17, Andrew)
-- [ ] `view-doctor-message`: token check, set `opened_at`, return message + first name + current notes; per-IP rate limit (2026-10-17, Andrew)
+- [x] `notify-doctor`: token + `doctor_messages` row, map the trigger's limit hints to 4xx, email `recipient_email` a link-only notice (2026-10-17, Andrew)
+- [x] `view-doctor-message`: token check, set `opened_at`, return message + first name + current notes; per-IP rate limit (2026-10-17, Andrew)
+- [ ] After merge: deploy `notify-doctor` and `view-doctor-message` (`--no-verify-jwt`), send one real email end to end (2026-10-17, Andrew)
+- [ ] Delete the doctor-message live-test leftovers on hosted (SQL in `backend_progress.md` → Known issues) (2026-10-17, Andrew)
+- [ ] Move to a verified sending domain so any doctor's address works, not just the Resend account's (2026-10-17, Andrew)
 - [ ] `entry-link` + `doctor-entry`: QR token (30 min, one use), pre-filled current notes, save as `entered_via = 'qr'` (2026-10-17, Andrew)
 - [ ] Turn on captcha for anonymous sign-ins if guest abuse shows up (2026-10-17, Andrew)
 
@@ -46,6 +50,7 @@ Shared list for both sides.
 Future features and nice-to-haves, either side.
 
 - Doctor replies from the message page, shown in the patient's chat (2026-10-17, Andrew)
+- Doctor sets a PIN at the visit; message links also ask for it, so a forwarded email alone can't be read. Parked by the team for now (2026-10-17, Andrew)
 - Show the patient what changed between care-note versions ("Dr. Okafor raised your dose on Oct 14") (2026-10-17, Andrew)
 - Daily reminder push/SMS for medications from the notes (2026-10-17, Andrew)
 - Chat in the patient's language (notes stay in English, bot answers in theirs) (2026-10-17, Andrew)
