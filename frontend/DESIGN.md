@@ -18,9 +18,11 @@ Current direction: a light patient recovery workspace with sage and leaf-green r
 | Muted | `#536A58` | Supporting copy |
 | Line | `#CBDAC4` | Structural dividers |
 | Strong line | `#788E70` | Control boundaries |
-| Urgency | `#294B35` | Urgent actions with explicit labels and icons |
+| Urgency | `#123B22` | Deep-green urgent and destructive actions |
+| Urgent surface | `#163D28` | Inverse emergency panel, distinct from pale routine surfaces |
+| Urgent text | `#F0F6E7` | High-contrast emergency copy and filled primary control |
 
-The October 17 green-only request supersedes the earlier blue/mint palette. Shared color roles live in `src/styles.css`; the patient UI inherits them. Pale sage and leaf tints provide separation, with forest text and actions. Warning and urgent states retain their words, icons and hierarchy without relying on hue alone. First-paint HTML and the favicon use matching values. Palette names and design-process text stay out of the app.
+The October 17 green-only request supersedes the earlier blue/mint palette. Shared color roles live in `src/styles.css`; the patient UI inherits them. Pale sage and leaf tints provide separation, with forest text and actions. Emergency guidance uses a dark inverse panel, light text, a filled primary action and an outlined secondary action. Its words and phone icon remain explicit. Destructive controls use the deepest green, heavier type and a stronger border. Notification markers use a diamond shape. First-paint HTML and the favicon use matching values. Palette names and design-process text stay out of the app.
 
 One self-hosted Latin **Nunito Variable** WOFF2 asset supplies the interface. Main headings use 800; controls 700–750; body 400. Desktop greeting is 32–41px according to breakpoint; mobile is 30px. Sections are 21–24px; task titles 17–18px; editable fields and most care text stay 15–16px. Headings balance short lines, care text wraps naturally and numeric progress uses tabular figures. Font license is distributed at `public/fonts/Nunito-LICENSE.txt`.
 

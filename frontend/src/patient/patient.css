@@ -167,7 +167,8 @@
   width: 7px;
   height: 7px;
   background: var(--danger);
-  border-radius: 50%;
+  border-radius: 1px;
+  transform: rotate(45deg);
 }
 .patient-home {
   max-width: 1440px;
@@ -231,7 +232,8 @@
 .patient-app .btn.danger {
   background: var(--danger);
   color: var(--surface);
-  border: 1px solid var(--danger);
+  border: 2px solid var(--danger);
+  font-weight: 850;
 }
 .patient-app .btn:disabled {
   opacity: 0.55;
@@ -1074,14 +1076,19 @@
 .emergency-panel {
   display: grid;
   gap: 20px;
+  background: var(--urgent-surface);
+  color: var(--urgent-ink);
 }
-.emergency-panel h2 {
-  color: var(--danger);
+.patient-app .emergency-panel h2,
+.patient-app .emergency-panel p {
+  color: var(--urgent-ink);
+}
+.patient-app .emergency-panel h2 {
   font-size: 30px;
 }
 .emergency-symbol {
-  background: var(--urgent-surface);
-  color: var(--danger);
+  background: var(--urgent-ink);
+  color: var(--urgent-surface);
   display: grid;
   place-items: center;
   width: 64px;
@@ -1090,15 +1097,32 @@
 }
 .emergency-panel blockquote {
   margin: 0;
-  background: var(--urgent-surface);
+  background: var(--urgent-inset);
   padding: 14px;
   border: 0;
   font-size: 15px;
   overflow-wrap: anywhere;
 }
 .emergency-panel .emergency-demo-label {
-  color: var(--danger);
   font-weight: 750;
+}
+.patient-app .emergency-panel .btn.danger {
+  background: var(--urgent-ink);
+  color: var(--danger);
+  border-color: var(--urgent-ink);
+}
+.patient-app .emergency-panel .btn.secondary {
+  background: transparent;
+  color: var(--urgent-ink);
+  border-color: var(--urgent-border);
+}
+.patient-app .emergency-panel :focus-visible {
+  outline-color: var(--urgent-ink);
+}
+.patient-app .emergency-panel .alert.error {
+  background: var(--urgent-inset);
+  color: var(--urgent-ink);
+  border: 1px solid var(--urgent-border);
 }
 .emergency-panel > a {
   font-size: 13px;
@@ -1108,7 +1132,7 @@
   align-items: center;
   gap: 14px;
   padding: 16px;
-  background: var(--urgent-surface);
+  background: var(--urgent-inset);
   animation: demo-call 1.5s ease-in-out 1;
 }
 @keyframes patient-arrive {

@@ -19,7 +19,7 @@
   --line-strong: #788e70;
   --line: #cbdac4;
   --earth: #4b5f31;
-  --danger: #294b35;
+  --danger: #123b22;
   --panel: #e8f0e2;
   --panel-strong: #dfebd6;
   --accent-soft: #d1e3c7;
@@ -28,7 +28,10 @@
   --message-assistant: #edf3e8;
   --message-patient: #dcebd3;
   --warning-surface: #e8ecd9;
-  --urgent-surface: #e0ead8;
+  --urgent-surface: #163d28;
+  --urgent-inset: #234b34;
+  --urgent-ink: #f0f6e7;
+  --urgent-border: #a0bf86;
   --overlay: #203e2f70;
   --white: var(--surface);
   --shadow: none;
