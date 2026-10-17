@@ -1,39 +1,29 @@
-# Product
+# Care companion
 
-<!-- impeccable:product-schema 1 -->
+Current product direction, October 17, 2026. This supersedes the earlier doctor/patient/family workspace. Ranveer supplied a patient dashboard reference, an Add instructions reference and the Discharge Companion feature spec.
 
-## Platform
+## Patient experience
 
-web
+The patient lands on a dashboard with daily tasks, important provided instructions and elapsed plan time. A persistent care assistant sits beside the dashboard on desktop and below it on mobile. Its full-screen view shares the same conversation and draft. Add instructions is a simple page for a doctor's name/email, exact care text and optional attachments. There are no reachable doctor, family, nurse or admin screens or role switcher.
 
-## Stack
+Implemented browser-local features:
 
-React, as requested. Vite and TypeScript selected for an isolated frontend because no app scaffold exists. Backend owned by Andrew: Supabase. Ranveer explicitly deferred backend integration until after frontend/features; the current adapter is a fictional local prototype.
+- Daily task reports and correction, two preconfigured dose slots, due/upcoming/missing report states and reminders.
+- Daily check-in: fixed pain scale, optional temperature in °C, feeling and free text. One editable entry per local date; personal pain trend after two dates.
+- Read-only roadmap estimates with acknowledgment; no clinical clearance or schedule editing.
+- Provided-text companion excerpts, progress summaries and explicit unsupported-answer behavior. Prepared local responses; no live LLM.
+- Emergency phrase routing, demo call animation, demo 911 acknowledgment and doctor-email preview. No real call or email.
+- Plain-text progress preview/download based on actual local reports. No fabricated adherence history or healed percentage.
+- Local persistence with transactional writes and recoverable failure messages. Emergency UI remains usable if saving fails.
 
-## Users and purpose
+## Scope and truth
 
-A clinician builds personalized recovery companions from approved instructions. One fictional patient and family member use separate care spaces, permitted conversations, and daily reports. This visible creation workflow demonstrates the meta theme.
+Fictional Alex Morgan and Dr. Maya Chen only. Do not enter real patient information. Data stays in the browser; the prototype has no authentication or server-side isolation. Supabase binding, clinician input verification, PDF/OCR extraction, hosted report links and email delivery are deferred. Backend files are owned by Andrew and teammates.
 
-## Operating context
+Fixed sample settings and unresolved backend decisions are recorded in [companion instructions](docs/COMPANION-INSTRUCTIONS.md). Uploaded text is stored exactly; adding it does not silently change scheduled tasks or read-only roadmap settings. The future model must follow the same documented grounding and reporting boundaries.
 
-Approximately eight-hour hackathon, four teammates. Ranveer owns frontend. A reliable live demonstration and UI craft matter. No clinical effectiveness claims or real patient records.
+## Design
 
-## Confirmed constraints
+Use Ranveer's supplied two screen compositions with lighter blue/mint/off-white tokens and rounded Nunito. Flat borders, restrained 6–10px panel corners, no shadows, gradients, hover animation, pure-white canvas or marketing boilerplate. Short automatic SVG/GSAP intro, reduced-motion bypass, real pending-state skeletons and concise interface transitions.
 
-Clinical drafts require clinician approval. Private chat access requires explicit participants even for administrators. Doctor and patient can manage family grants. Approved matrix: Basic nonclinical updates/joined chats; Support adds checklist/family reports; Full adds shared plan/documents. No family order editing. No caregiver scheduling or rides. Handoffs require patient approval and route to doctor.
-
-## Product principles
-
-Creation is visible. Provenance travels with instructions. Save/delivery states describe evidence. Fictional local demo must never imply real backend security.
-
-## Accessibility
-
-Keyboard, focus-managed dialogs, readable contrast, touch targets, responsive desktop/mobile, reduced motion and static status cues required.
-
-## Open decisions
-
-Supabase schema, session flow, storage and realtime contracts awaiting backend owner. No production medical use or server-policy verification yet.
-
-## Confirmed next direction · October 17, 2026
-
-Ranveer wants the forthcoming overhaul to focus on patients: clinicians input care information, and the patient uses a conversational companion. The full implementation prompt and ChatGPT-generated reference image are still pending. The current color/font/motion revision preserves existing demo functions while establishing lighter blue/mint surfaces, Nunito typography, an automatic short splash and genuine pending-state skeletons. Backend integration remains deferred.
+The former care-space repository and component source remain available for backend reconciliation, but are not rendered or navigable in the patient app. Their existing data tests remain regression checks; current patient tests and browser evidence are listed separately in `docs/VERIFICATION.md`.

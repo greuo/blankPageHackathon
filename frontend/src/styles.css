@@ -1569,7 +1569,7 @@ a {
   font-size: 14px;
   max-width: 240px;
 }
-main#main {
+.main-shell main#main {
   max-width: 1480px;
   padding: 34px 42px 24px;
   margin: auto;
@@ -1919,7 +1919,7 @@ main#main {
   gap: 7px;
 }
 .demo-disclosure,
-main#main > .alert {
+.main-shell main#main > .alert {
   grid-column: 1 / -1;
 }
 .demo-disclosure {
@@ -1930,7 +1930,7 @@ main#main > .alert {
   max-width: 100ch;
 }
 @media (max-width: 1200px) {
-  main#main {
+  .main-shell main#main {
     padding: 30px;
     column-gap: 28px;
   }
@@ -1966,7 +1966,7 @@ main#main > .alert {
   }
 }
 @media (max-width: 960px) {
-  main#main {
+  .main-shell main#main {
     grid-template-columns: 1fr;
   }
   .home-lower {
@@ -2062,7 +2062,7 @@ main#main > .alert {
   .role-picker > span {
     display: none;
   }
-  main#main {
+  .main-shell main#main {
     padding: 30px 22px 22px;
   }
   .page-heading {

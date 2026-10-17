@@ -1,0 +1,1361 @@
+.patient-app {
+  min-height: 100dvh;
+  color: var(--ink);
+  background: var(--canvas);
+  font-size: 16px;
+  line-height: 1.5;
+}
+.patient-app button {
+  cursor: pointer;
+}
+.patient-app button:disabled {
+  cursor: default;
+}
+.patient-app h1,
+.patient-app h2,
+.patient-app h3 {
+  font-family: 'Nunito Variable', sans-serif;
+  color: #17374b;
+  letter-spacing: -0.025em;
+}
+.patient-app h1 {
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1.15;
+  margin: 0 0 8px;
+}
+.patient-app h2 {
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.2;
+  margin: 0;
+}
+.patient-app h3 {
+  font-size: 19px;
+  margin: 0 0 7px;
+}
+.patient-app p {
+  margin: 0;
+  color: var(--muted);
+}
+.patient-app small {
+  font-size: 13px;
+  line-height: 1.5;
+}
+.patient-app svg {
+  flex-shrink: 0;
+}
+.patient-app button:focus-visible,
+.patient-app a:focus-visible,
+.patient-app summary:focus-visible {
+  outline: 2px solid var(--action);
+  outline-offset: 4px;
+}
+.patient-header {
+  height: 78px;
+  padding: 0 32px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.patient-brand {
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: 27px !important;
+  font-weight: 850;
+  color: #17374b;
+  letter-spacing: -0.045em;
+}
+.patient-brand span {
+  color: #227860;
+}
+.patient-header nav {
+  align-self: stretch;
+  display: flex;
+}
+.patient-header nav button {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 0 26px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: none;
+  color: var(--ink);
+  font-weight: 700;
+}
+.patient-header nav .current {
+  border-color: var(--action);
+}
+.patient-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+.patient-profile {
+  background: var(--mint);
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 50%;
+  font-size: 23px !important;
+  color: var(--ink);
+}
+.notification-button {
+  position: relative;
+}
+.notification-button > span {
+  position: absolute;
+  right: 6px;
+  top: 4px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #a34738;
+}
+.patient-home {
+  padding: 24px 24px 0;
+  max-width: 1800px;
+  margin: auto;
+}
+.patient-dashboard {
+  display: grid;
+  grid-template-columns: minmax(0, 1.85fr) minmax(340px, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+.patient-content {
+  min-width: 0;
+}
+.patient-greeting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin: 0 0 24px;
+  padding: 0 4px;
+}
+.patient-greeting p {
+  font-size: 19px;
+}
+.patient-app .btn {
+  min-height: 46px;
+  border-radius: 6px;
+  gap: 9px;
+  font-weight: 750;
+  font-size: 15px;
+  padding: 10px 18px;
+}
+.patient-app .btn.primary {
+  background: var(--green);
+  border: 1px solid var(--green);
+  color: var(--surface);
+}
+.patient-app .btn.secondary {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line-strong);
+}
+.patient-app .btn.danger {
+  background: var(--danger);
+  color: var(--surface);
+}
+.patient-app .btn:disabled {
+  opacity: 0.55;
+}
+.add-instructions {
+  white-space: nowrap;
+}
+.patient-panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.patient-section-heading {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+.patient-section-heading > div {
+  flex: 1;
+  min-width: 0;
+}
+.patient-section-heading > span:last-child {
+  color: var(--muted);
+  font-size: 13px;
+  white-space: nowrap;
+}
+.patient-section-heading p {
+  margin-top: 3px;
+  font-size: 15px;
+}
+.patient-task-list {
+  display: grid;
+  gap: 8px;
+}
+.patient-task {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 10px 14px;
+  min-height: 74px;
+}
+.task-check {
+  display: grid;
+  place-items: center;
+  border: 1.5px solid var(--line-strong);
+  border-radius: 4px;
+  width: 25px;
+  height: 25px;
+  padding: 0;
+  color: var(--surface);
+  background: var(--surface);
+  flex-shrink: 0;
+}
+.task-check[aria-checked='true'] {
+  background: var(--green);
+  border-color: var(--green);
+}
+.patient-icon {
+  display: grid;
+  place-items: center;
+  background: #e0f1ef;
+  color: #226a72;
+  width: 47px;
+  height: 47px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.task-open {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+  border: 0;
+  background: none;
+  padding: 0;
+  color: var(--ink);
+  gap: 12px;
+  min-width: 0;
+}
+.task-open strong {
+  display: block;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+.task-open small {
+  display: block;
+  color: var(--muted);
+  margin-top: 2px;
+  font-size: 14px;
+}
+.is-done .task-open strong {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+.patient-app .text-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 0;
+  background: none;
+  color: #236389;
+  padding: 0;
+  font-weight: 650;
+  min-height: 32px;
+  text-decoration: none;
+}
+.patient-app .text-button:focus-visible {
+  outline-offset: 3px;
+}
+.important-instructions {
+  background: #f9f7ed;
+  border-color: #d4c6a6;
+}
+.caution-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #f1e2b7;
+  color: #725013;
+}
+.precaution-row {
+  width: 100%;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  text-align: left;
+  border: 0;
+  border-bottom: 1px solid #e3ddcb;
+  border-radius: 0;
+  background: transparent;
+  padding: 9px 0;
+  color: var(--ink);
+  min-height: 58px;
+}
+.precaution-row:last-child {
+  border-bottom: 0;
+}
+.precaution-row > span:nth-child(2) {
+  flex: 1;
+}
+.precaution-row .patient-icon {
+  width: 38px;
+  height: 38px;
+}
+.progress-heading {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.progress-heading > strong {
+  font-size: 35px;
+  line-height: 1.2;
+  font-weight: 850;
+  color: #237582;
+  letter-spacing: -0.04em;
+}
+.progress-heading > .text-button {
+  margin-left: auto;
+  font-size: 14px;
+}
+.recovery-progress p {
+  font-size: 15px;
+}
+.recovery-progress progress {
+  display: block;
+  appearance: none;
+  width: 100%;
+  height: 13px;
+  border: none;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 13px;
+  background: #dfe8ee;
+  accent-color: #358797;
+}
+.recovery-progress progress::-webkit-progress-bar {
+  background: #dfe8ee;
+}
+.recovery-progress progress::-webkit-progress-value {
+  background: #358797;
+  border-radius: 4px;
+  transition: width 240ms ease-out;
+}
+.recovery-progress progress::-moz-progress-bar {
+  background: #358797;
+}
+.progress-scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.recovery-progress > small {
+  display: block;
+  color: var(--muted);
+  margin-top: 5px;
+}
+.patient-lower {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  justify-content: space-between;
+  padding: 16px 4px 24px;
+}
+.patient-lower h2 {
+  font-size: 21px;
+}
+.patient-lower p {
+  font-size: 14px;
+  margin: 5px 0;
+}
+.patient-lower > .btn {
+  flex-shrink: 0;
+}
+.patient-demo-footer {
+  font-size: 12px;
+  color: var(--muted);
+  border-top: 1px solid var(--line);
+  padding: 16px 4px 24px;
+}
+.patient-demo-footer details {
+  margin-top: 10px;
+  max-width: 70ch;
+}
+.patient-demo-footer summary {
+  cursor: pointer;
+}
+.patient-demo-footer details button {
+  border: 1px solid var(--line);
+  padding: 7px 10px;
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--ink);
+  margin: 8px 8px 0 0;
+}
+.patient-demo-footer strong {
+  display: block;
+  color: var(--earth);
+  margin-top: 8px;
+}
+.patient-assistant {
+  position: sticky;
+  top: 20px;
+  height: calc(100dvh - 120px);
+  min-height: 580px;
+  max-height: 1000px;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 22px 18px;
+  min-width: 0;
+}
+.assistant-heading {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding-bottom: 21px;
+}
+.assistant-heading > div {
+  flex: 1;
+  min-width: 0;
+}
+.assistant-heading h2 {
+  font-size: 23px;
+  line-height: 1.2;
+}
+.assistant-heading p {
+  font-size: 14px;
+  margin-top: 4px;
+}
+.patient-app .icon-btn {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: 5px;
+  background: transparent;
+  border: 0;
+  color: var(--ink);
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.assistant-heading .icon-btn {
+  width: 28px;
+  height: 34px;
+}
+.assistant-heading > .patient-icon {
+  width: 50px;
+  height: 50px;
+  background: var(--blue);
+}
+.assistant-about {
+  background: var(--blue);
+  padding: 13px;
+  border-radius: 5px;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+.assistant-about p {
+  margin-top: 5px;
+  color: var(--ink);
+}
+.patient-messages {
+  flex: 1;
+  min-height: 100px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 12px 0 20px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+.patient-message {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+.patient-message p {
+  background: #eaf0f5;
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.6;
+  padding: 15px 17px;
+  border-radius: 9px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-width: 90%;
+}
+.patient-message.patient {
+  justify-content: flex-end;
+}
+.patient-message.patient p {
+  background: #d9efed;
+  max-width: 85%;
+}
+.message-icon {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--blue);
+  color: #226a72;
+  margin-top: 3px;
+}
+.assistant-prompts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 18px;
+}
+.assistant-prompts button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #7aabb6;
+  border-radius: 6px;
+  padding: 8px 11px;
+  color: #246577;
+  background: var(--surface);
+  font-size: 13px;
+  font-weight: 650;
+  min-height: 37px;
+}
+.patient-composer {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 1fr 40px;
+  align-items: center;
+  gap: 8px;
+}
+.patient-composer textarea {
+  resize: none;
+  min-height: 53px;
+  max-height: 150px;
+  border: 0;
+  background: transparent;
+  padding: 6px;
+  line-height: 1.5;
+  width: 100%;
+  color: var(--ink);
+}
+.patient-composer small {
+  grid-column: 1/-1;
+  padding: 0 5px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.patient-composer .send-button {
+  background: var(--action);
+  color: var(--surface);
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+}
+.patient-composer .send-button:disabled {
+  opacity: 0.45;
+}
+.fullscreen-assistant {
+  height: min(78dvh, 850px);
+}
+.fullscreen-assistant .patient-assistant {
+  position: static;
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+}
+.patient-app .modal:has(.fullscreen-assistant) {
+  width: calc(100vw - 32px);
+  max-width: 1100px;
+}
+.patient-app .modal:has(.fullscreen-assistant) .modal-content {
+  padding-top: 4px;
+}
+.instructions-page {
+  max-width: 1080px;
+  margin: 28px auto;
+  padding: 0 24px 40px;
+}
+.instructions-page > header {
+  margin: 24px 0;
+}
+.instructions-page h1 {
+  font-size: 42px;
+}
+.instructions-page > header p {
+  font-size: 20px;
+}
+.instruction-form {
+  padding: 28px;
+}
+.doctor-fields {
+  align-items: start;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+.instruction-form label,
+.checkin-form > label {
+  display: grid;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 17px;
+}
+.instruction-form input:not([type='file']),
+.instruction-form textarea,
+.checkin-form input:not([type='radio'], [type='range']),
+.checkin-form textarea {
+  width: 100%;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: var(--surface);
+  padding: 12px 14px;
+  color: var(--ink);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.5;
+}
+.patient-app input::placeholder,
+.patient-app textarea::placeholder {
+  color: #526c7c;
+  opacity: 1;
+}
+.field-help,
+.instruction-form label small {
+  display: block;
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--muted);
+}
+.instruction-form textarea {
+  resize: vertical;
+  min-height: 210px;
+}
+.attachment-field {
+  margin-top: 24px;
+}
+.attachment-field > strong {
+  font-size: 17px;
+}
+.drop-zone {
+  position: relative;
+  display: flex !important;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 22px !important;
+  border: 1px dashed var(--line-strong);
+  border-radius: 6px;
+  padding: 24px;
+  background: #edf6fa;
+  margin: 10px 0;
+  color: #236389;
+  cursor: pointer;
+  min-height: 105px;
+  font-weight: 600 !important;
+}
+.drop-zone span {
+  font-size: 16px;
+}
+.drop-zone small {
+  display: block;
+  margin-top: 4px;
+}
+.file-input {
+  position: absolute;
+  opacity: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+.drop-zone:focus-within {
+  outline: 2px solid var(--action);
+  outline-offset: 3px;
+}
+.attachment-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--line);
+  padding: 13px 0;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.attachment-row > span {
+  flex: 1;
+  min-width: 0;
+}
+.attachment-row small {
+  display: block;
+}
+.instruction-form footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
+  margin-top: 22px;
+}
+.import-note {
+  font-size: 13px;
+  margin-top: 18px !important;
+}
+.patient-success {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #255d45 !important;
+  font-size: 14px;
+  background: var(--mint);
+  border-radius: 5px;
+  padding: 11px 14px;
+  margin-bottom: 16px !important;
+}
+.patient-success .icon-btn {
+  margin-left: auto;
+}
+.patient-storage-error {
+  margin: 16px 24px;
+}
+.patient-source pre,
+.progress-report pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.65;
+  background: #eaf2f6;
+  border: 1px solid var(--line);
+  padding: 18px;
+  border-radius: 5px;
+  margin: 18px 0;
+  max-height: 48dvh;
+  overflow: auto;
+}
+.progress-report > p {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+.pill-tracker > p {
+  margin-bottom: 18px;
+}
+.dose-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 0;
+  border-top: 1px solid var(--line);
+}
+.dose-row > div {
+  flex: 1;
+}
+.dose-row strong,
+.dose-row small {
+  display: block;
+}
+.patient-warning {
+  background: #f6efd9;
+  padding: 15px;
+  border-radius: 5px;
+  color: var(--earth) !important;
+  font-size: 14px;
+  margin-top: 12px !important;
+}
+.checkin-form {
+  display: grid;
+  gap: 22px;
+}
+.checkin-form input[type='range'] {
+  width: 100%;
+  accent-color: var(--action);
+  height: 30px;
+}
+.range-labels {
+  display: flex;
+  justify-content: space-between;
+}
+.checkin-form fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.checkin-form legend {
+  font-size: 17px;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+.feeling-options {
+  display: flex;
+  gap: 12px;
+}
+.feeling-options label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: 5px;
+  padding: 11px 20px;
+}
+.feeling-options input {
+  accent-color: var(--green);
+}
+.checkin-trend {
+  background: var(--blue);
+  padding: 16px;
+  border-radius: 5px;
+}
+.checkin-trend p {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  margin: 8px 0;
+}
+.checkin-trend meter {
+  flex: 1;
+}
+.milestone {
+  padding: 20px 0;
+  border-top: 1px solid var(--line);
+}
+.roadmap > p {
+  margin-bottom: 20px;
+}
+.milestone > span {
+  color: #236389;
+  font-size: 13px;
+  font-weight: 750;
+  display: block;
+  margin-bottom: 8px;
+}
+.milestone .btn {
+  margin-top: 12px;
+}
+.reminders p {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+  font-size: 15px;
+}
+.emergency-panel {
+  padding: 10px;
+  display: grid;
+  gap: 20px;
+}
+.emergency-panel h2 {
+  color: #86382f;
+  font-size: 30px;
+}
+.emergency-symbol {
+  background: #f6e2dc;
+  color: #8b3a30;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+}
+.emergency-panel blockquote {
+  margin: 0;
+  background: #f6ebe6;
+  padding: 14px;
+  border: 0;
+  font-size: 15px;
+  overflow-wrap: anywhere;
+}
+.emergency-panel .emergency-demo-label {
+  color: #86382f;
+  font-weight: 750;
+}
+.emergency-panel details {
+  border-top: 1px solid var(--line);
+  padding-top: 15px;
+}
+.emergency-panel details p {
+  margin-top: 8px;
+  font-size: 14px;
+}
+.emergency-panel > a {
+  font-size: 13px;
+}
+.demo-call {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  background: #f6e2dc;
+  animation: demo-call 1.5s ease-in-out 1;
+}
+.patient-message:last-of-type {
+  animation: patient-arrive 220ms ease-out;
+}
+.patient-panel,
+.instructions-page {
+  animation: patient-arrive 240ms ease-out;
+}
+.patient-app ::selection {
+  background: #cce6ec;
+  color: #17374b;
+}
+.patient-app input,
+.patient-app textarea {
+  caret-color: var(--action);
+}
+@keyframes patient-arrive {
+  from {
+    opacity: 0.7;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes demo-call {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+@media (min-width: 1450px) {
+  .patient-home {
+    padding: 26px 32px 0;
+  }
+  .patient-dashboard {
+    grid-template-columns: minmax(0, 2fr) minmax(440px, 1fr);
+  }
+  .patient-greeting {
+    margin-bottom: 25px;
+  }
+  .patient-greeting h1 {
+    font-size: 40px;
+  }
+  .patient-assistant {
+    padding: 28px 24px;
+  }
+  .patient-panel {
+    padding: 22px;
+  }
+  .patient-task {
+    min-height: 80px;
+  }
+  .patient-task-list {
+    gap: 9px;
+  }
+  .patient-message p {
+    font-size: 18px;
+  }
+  .patient-section-heading h2 {
+    font-size: 26px;
+  }
+  .patient-app h2 {
+    font-size: 26px;
+  }
+}
+@media (max-width: 1150px) {
+  .patient-home {
+    padding: 20px 18px 0;
+  }
+  .patient-dashboard {
+    gap: 18px;
+    grid-template-columns: minmax(0, 1.5fr) minmax(320px, 1fr);
+  }
+  .patient-greeting {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .patient-greeting h1 {
+    font-size: 31px;
+  }
+  .patient-greeting p {
+    font-size: 17px;
+  }
+  .patient-panel {
+    padding: 17px;
+  }
+  .patient-section-heading {
+    flex-wrap: wrap;
+  }
+  .patient-section-heading > span:last-child {
+    font-size: 12px;
+  }
+  .assistant-heading {
+    gap: 8px;
+  }
+  .assistant-heading h2 {
+    font-size: 20px;
+  }
+  .assistant-heading > .patient-icon {
+    width: 40px;
+    height: 40px;
+  }
+  .assistant-heading .icon-btn {
+    width: 26px;
+  }
+  .patient-assistant {
+    padding: 18px 13px;
+  }
+  .patient-message p {
+    font-size: 15px;
+    padding: 12px;
+  }
+  .patient-lower {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .progress-heading {
+    flex-wrap: wrap;
+  }
+  .progress-heading > .text-button {
+    margin-left: 0;
+  }
+  .patient-task {
+    gap: 10px;
+    padding: 9px;
+  }
+  .patient-task .patient-icon {
+    width: 37px;
+    height: 37px;
+  }
+  .task-open strong {
+    font-size: 16px;
+  }
+  .task-open small {
+    font-size: 13px;
+  }
+}
+@media (max-width: 850px) {
+  .patient-header {
+    padding: 0 20px;
+    height: 70px;
+  }
+  .patient-brand {
+    font-size: 23px !important;
+  }
+  .patient-header nav button {
+    padding: 0 15px;
+  }
+  .patient-header-actions {
+    gap: 12px;
+  }
+  .patient-dashboard {
+    grid-template-columns: 1fr;
+  }
+  .patient-assistant {
+    position: static;
+    height: 630px;
+    min-height: 0;
+    margin-bottom: 24px;
+  }
+  .patient-greeting {
+    align-items: center;
+    flex-wrap: nowrap;
+  }
+  .patient-greeting h1 {
+    font-size: 32px;
+  }
+  .patient-content {
+    display: contents;
+  }
+  .patient-greeting,
+  .patient-panel,
+  .patient-lower,
+  .patient-demo-footer,
+  .patient-success {
+    grid-column: 1;
+  }
+  .patient-assistant {
+    grid-column: 1;
+    grid-row: 6;
+  }
+  .patient-demo-footer {
+    grid-row: 8;
+  }
+  .patient-greeting {
+    margin: 0 0 6px;
+  }
+  .patient-panel {
+    margin-bottom: 0;
+  }
+  .patient-lower {
+    flex-direction: row;
+    align-items: center;
+    padding: 0 4px 8px;
+  }
+  .doctor-fields {
+    align-items: start;
+    gap: 16px;
+  }
+  .instructions-page > header p {
+    font-size: 18px;
+  }
+  .instructions-page h1 {
+    font-size: 36px;
+  }
+}
+@media (max-width: 520px) {
+  .patient-header {
+    padding: 0 16px;
+    gap: 10px;
+    height: 65px;
+  }
+  .patient-brand {
+    font-size: 22px !important;
+    line-height: 1;
+  }
+  .patient-header nav {
+    display: none;
+  }
+  .patient-header-actions {
+    gap: 10px;
+  }
+  .patient-profile {
+    width: 34px;
+    height: 34px;
+    font-size: 19px !important;
+  }
+  .patient-header-actions .icon-btn {
+    width: 30px;
+  }
+  .patient-home {
+    padding: 22px 14px 0;
+  }
+  .patient-dashboard {
+    gap: 14px;
+  }
+  .patient-greeting {
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 0;
+  }
+  .patient-greeting h1 {
+    font-size: 30px;
+  }
+  .patient-greeting p {
+    font-size: 17px;
+  }
+  .add-instructions {
+    width: 100%;
+    justify-content: center;
+  }
+  .patient-panel {
+    padding: 16px 13px;
+    border-radius: 8px;
+  }
+  .patient-app h2 {
+    font-size: 22px;
+  }
+  .patient-section-heading {
+    gap: 10px;
+    margin-bottom: 13px;
+  }
+  .today-tasks .patient-section-heading > span:last-child {
+    width: 100%;
+    padding-top: 1px;
+  }
+  .patient-task {
+    gap: 10px;
+    min-height: 77px;
+  }
+  .patient-task > .patient-icon {
+    display: none;
+  }
+  .task-open strong {
+    font-size: 16px;
+  }
+  .task-open small {
+    font-size: 13px;
+  }
+  .task-check {
+    width: 24px;
+    height: 24px;
+  }
+  .important-instructions .patient-section-heading .text-button {
+    font-size: 12px;
+  }
+  .caution-icon {
+    width: 34px;
+    height: 34px;
+  }
+  .important-instructions h2 {
+    font-size: 20px;
+  }
+  .important-instructions .patient-section-heading p {
+    font-size: 13px;
+  }
+  .precaution-row {
+    gap: 10px;
+    font-size: 14px;
+  }
+  .precaution-row > .patient-icon {
+    width: 33px;
+    height: 33px;
+  }
+  .progress-heading {
+    gap: 10px;
+  }
+  .progress-heading > strong {
+    font-size: 31px;
+  }
+  .progress-heading > .text-button {
+    width: 100%;
+    font-size: 13px;
+  }
+  .recovery-progress p {
+    font-size: 14px;
+  }
+  .patient-lower {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+    padding-top: 6px;
+  }
+  .patient-assistant {
+    height: 650px;
+    padding: 18px 14px;
+    border-radius: 8px;
+  }
+  .assistant-heading > .patient-icon {
+    width: 40px;
+    height: 40px;
+  }
+  .assistant-heading h2 {
+    font-size: 22px;
+  }
+  .assistant-heading p {
+    font-size: 13px;
+  }
+  .patient-message p {
+    font-size: 15px;
+  }
+  .instructions-page {
+    padding: 0 16px 28px;
+    margin-top: 22px;
+  }
+  .instructions-page > header {
+    margin: 20px 0;
+  }
+  .instructions-page h1 {
+    font-size: 34px;
+  }
+  .instructions-page > header p {
+    font-size: 17px;
+  }
+  .instruction-form {
+    padding: 18px 14px;
+  }
+  .doctor-fields {
+    align-items: start;
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .instruction-form label {
+    font-size: 16px;
+  }
+  .drop-zone {
+    gap: 14px !important;
+    padding: 19px 14px;
+  }
+  .drop-zone span {
+    font-size: 14px;
+  }
+  .instruction-form footer .btn {
+    font-size: 13px;
+    padding: 10px 13px;
+  }
+  .dose-row {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .dose-row > .patient-icon {
+    width: 35px;
+    height: 35px;
+  }
+  .dose-row .btn {
+    font-size: 13px;
+    padding: 9px 12px;
+  }
+  .feeling-options {
+    gap: 8px;
+  }
+  .feeling-options label {
+    padding: 9px 12px;
+    font-size: 14px;
+  }
+  .checkin-trend p {
+    flex-wrap: wrap;
+  }
+  .fullscreen-assistant {
+    height: 73dvh;
+  }
+  .fullscreen-assistant .assistant-heading > .patient-icon {
+    display: none;
+  }
+  .fullscreen-assistant .assistant-heading h2 {
+    font-size: 20px;
+  }
+  .patient-app .modal:has(.fullscreen-assistant) {
+    width: calc(100vw - 16px);
+    padding: 17px;
+  }
+  .patient-app .modal h2 {
+    font-size: 23px;
+  }
+  .patient-source pre,
+  .progress-report pre {
+    font-size: 13px;
+    padding: 13px;
+  }
+  .emergency-panel {
+    padding: 0;
+  }
+  .emergency-panel h2 {
+    font-size: 25px;
+  }
+  .patient-storage-error {
+    margin: 14px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .patient-app *,
+  .patient-app *::before,
+  .patient-app *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

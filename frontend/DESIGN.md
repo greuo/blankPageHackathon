@@ -42,3 +42,11 @@ Workspace sections, tab content, conversations, newly shown messages, disclosure
 ## Product truth
 
 This remains a fictional browser-local frontend. Backend connection is deferred. No server authentication, live LLM or remote delivery is implied. Existing permissions and publication behavior remain intact. The next larger overhaul is patient-focused, with clinician input and a patient companion, pending Ranveer's full prompt/reference image.
+
+## Patient-only reference implementation
+
+Ranveer supplied two selected reference images: a patient dashboard with task/important-guidance/timeline stack beside a companion, and a centered Add instructions form. The current app uses that composition. It replaces the navigation rail and care-space overview with a simple horizontal Home header, notifications and patient report control. The photograph and role picker are absent from the patient UI.
+
+At 1536px the dashboard uses approximately two-thirds content and one-third chat, with a 24px gap and 32px page inset. The chat is sticky and independently scrollable. Below 850px the content stacks and chat becomes an in-page panel. Add instructions uses a 1080px maximum width, two doctor fields on desktop, one column on mobile, a large source textarea and a file drop target. Form fields align at the top.
+
+User-selected Nunito and cool off-white tokens intentionally override the reference's pure white, shadows and stronger roundness. Panels use 8–10px corners, rows 6px and chat bubbles 9px. Icons come from the existing Lucide library. No raster illustration is needed for these functional screens. The pre-existing custom geometric opening remains, now titled Care companion.

@@ -38,3 +38,9 @@ Locally served images use the [Unsplash license](https://unsplash.com/license). 
 - Study `coastal-hills-study.jpg`: [Jonathan Borba](https://unsplash.com/photos/8cEhivA0A5c), source `photo-1647439527387-fc35412ad8da`, 900px.
 
 The alternate photos appear only on the research board. One image establishes the product world without cluttering clinical information.
+
+## Patient-only implementation references
+
+- [ECC frontend patterns](https://github.com/affaan-m/ECC/blob/main/skills/frontend-patterns/SKILL.md): component composition, controlled state and forms. Installed local guidance was verified; runtime availability is recorded separately in the skill audit.
+- [React sharing state](https://react.dev/learn/sharing-state-between-components): one draft owner for embedded/full-screen companion views.
+- [WAI modal dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/): focus containment, explicit close and focus restoration. Native dialog plus existing focus handling was retained.

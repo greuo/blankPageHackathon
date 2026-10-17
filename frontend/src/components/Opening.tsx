@@ -44,7 +44,7 @@ export default function Opening({ onEnter }: { onEnter: () => void }) {
     { scope: ref },
   );
   return (
-    <main className="splash-screen" ref={ref} aria-label="Welcome to Discharge Companion">
+    <main className="splash-screen" ref={ref} aria-label="Welcome to Care companion">
       <button className="splash-skip" onClick={complete}>
         Skip intro
       </button>
@@ -56,7 +56,7 @@ export default function Opening({ onEnter }: { onEnter: () => void }) {
             dc
           </text>
         </svg>
-        <h1 className="splash-title">Discharge Companion</h1>
+        <h1 className="splash-title">Care companion</h1>
         <p className="splash-description">A little clarity for the days ahead.</p>
       </div>
       <p className="splash-note">A fictional care experience.</p>

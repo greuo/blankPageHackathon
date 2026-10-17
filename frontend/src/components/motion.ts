@@ -14,7 +14,10 @@ export function useSurfaceEntrance(
   useGSAP(
     () => {
       if (!scope.current || reducedMotion()) return;
-      const targets = selector ? scope.current.querySelectorAll(selector) : scope.current;
+      const targets = selector
+        ? Array.from(scope.current.querySelectorAll(selector))
+        : [scope.current];
+      if (!targets.length) return;
       gsap.fromTo(
         targets,
         { y: 8, opacity: 0.65 },
