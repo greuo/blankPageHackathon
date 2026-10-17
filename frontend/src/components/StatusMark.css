@@ -1,0 +1,44 @@
+.status-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 28px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.status-mark__glyph {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  overflow: visible;
+}
+
+.status-mark__track,
+.status-mark__ring,
+.status-mark__result {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.status-mark__track {
+  opacity: 0.16;
+}
+
+.status-mark__ring {
+  transform-origin: 12px 12px;
+}
+
+.status-mark[data-status='done'],
+.status-mark[data-status='running'] {
+  color: var(--action);
+}
+
+.status-mark[data-status='failed'] {
+  color: var(--danger);
+}

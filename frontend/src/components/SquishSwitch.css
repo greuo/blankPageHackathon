@@ -1,0 +1,72 @@
+.squish-switch-root {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--ink);
+  font-family: var(--font-body, inherit);
+}
+
+.squish-switch {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 54px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.squish-switch__track {
+  display: block;
+  position: relative;
+  width: 52px;
+  height: 30px;
+  border: 1px solid var(--line-strong);
+  border-radius: 18px;
+  background: var(--track);
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease;
+}
+
+.squish-switch__thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--surface);
+}
+
+.squish-switch[data-on='true'] .squish-switch__track {
+  background: var(--action);
+  border-color: var(--action);
+}
+
+.squish-switch:focus-visible {
+  outline: 2px solid var(--action);
+  outline-offset: 3px;
+}
+
+.squish-switch:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.squish-switch__label {
+  cursor: pointer;
+  line-height: 1.35;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .squish-switch__track {
+    transition: none;
+  }
+}

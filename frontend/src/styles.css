@@ -1,38 +1,41 @@
 :root {
-  font-family: 'Nunito Variable', sans-serif;
+  --font-body: 'Google Sans Variable', 'Trebuchet MS', sans-serif;
+  --font-heading: 'Funnel Display Variable', 'Trebuchet MS', sans-serif;
+  --font-editorial: 'EB Garamond Variable', Georgia, serif;
+  font-family: var(--font-body);
   color: var(--ink);
   background: var(--canvas);
   font-synthesis: none;
   font-weight: 400;
   font-size: 16px;
   line-height: 1.55;
-  --canvas: #f2f6ef;
-  --surface: #fafcf7;
-  --ink: #203e2f;
-  --muted: #536a58;
-  --green: #326f4d;
-  --mint: #dcebd8;
-  --sage: #e4eedc;
-  --action: #286642;
-  --rail: #eaf0e5;
-  --selected: #d2e3c8;
-  --line-strong: #788e70;
-  --line: #cbdac4;
+  --canvas: #f1f5ee;
+  --surface: #f9fbf5;
+  --ink: #193c2b;
+  --muted: #536957;
+  --green: #386e4b;
+  --mint: #dfedcf;
+  --sage: #e8efdf;
+  --action: #285e3e;
+  --rail: #eaf0e3;
+  --selected: #d7e8c8;
+  --line-strong: #778d70;
+  --line: #d0dcc8;
   --earth: #4b5f31;
   --danger: #123b22;
-  --panel: #e8f0e2;
-  --panel-strong: #dfebd6;
-  --accent-soft: #d1e3c7;
-  --track: #c3d7b8;
-  --progress: #37764e;
+  --panel: #eaf1e3;
+  --panel-strong: #e0ecd5;
+  --accent-soft: #cee2ba;
+  --track: #c4d5b8;
+  --progress: #3b7650;
   --message-assistant: #edf3e8;
-  --message-patient: #dcebd3;
+  --message-patient: #dfedcf;
   --warning-surface: #e8ecd9;
   --urgent-surface: #163d28;
   --urgent-inset: #234b34;
   --urgent-ink: #f0f6e7;
   --urgent-border: #a0bf86;
-  --overlay: #203e2f70;
+  --overlay: #193c2b70;
   --white: var(--surface);
   --shadow: none;
   --radius: 3px;
@@ -103,7 +106,7 @@ h1,
 h2,
 h3,
 h4 {
-  font-family: 'Nunito Variable', 'Trebuchet MS', sans-serif;
+  font-family: var(--font-heading);
   text-wrap: balance;
 }
 h1 {
@@ -280,7 +283,7 @@ main:focus {
   color: var(--green);
 }
 .checklist-copy h3 {
-  font-family: 'Nunito Variable', sans-serif;
+  font-family: var(--font-body);
   font-weight: 500;
   font-size: 14px;
   line-height: 1.6;
@@ -919,7 +922,7 @@ blockquote {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   font:
-    13px/1.8 'Nunito Variable',
+    13px/1.8 var(--font-body),
     sans-serif;
   background: var(--canvas);
   padding: 16px;
@@ -1322,13 +1325,13 @@ body {
 }
 h1,
 h2 {
-  font-family: 'Nunito Variable', 'Trebuchet MS', sans-serif;
+  font-family: var(--font-heading);
   font-weight: 400;
   letter-spacing: -0.025em;
 }
 h3,
 h4 {
-  font-family: 'Nunito Variable', sans-serif;
+  font-family: var(--font-body);
   font-weight: 600;
   letter-spacing: 0;
 }
@@ -1378,7 +1381,7 @@ a {
   display: inline-flex;
   align-items: center;
   gap: 11px;
-  font-family: 'Nunito Variable', 'Trebuchet MS', sans-serif;
+  font-family: var(--font-heading);
   font-size: 24px;
   line-height: 1;
   letter-spacing: -0.02em;
@@ -1391,14 +1394,14 @@ a {
   color: var(--green);
   display: grid;
   place-items: center;
-  font-family: 'Nunito Variable', 'Trebuchet MS', sans-serif;
+  font-family: var(--font-heading);
   font-size: 24px;
   letter-spacing: -0.08em;
   padding-right: 2px;
 }
 .brand-bottom {
   display: block;
-  font-family: 'Nunito Variable', sans-serif;
+  font-family: var(--font-body);
   font-size: 12px;
   letter-spacing: 0.09em;
   line-height: 1.5;
@@ -1468,7 +1471,7 @@ a {
   display: none;
 }
 .sidebar-help h3 {
-  font-family: 'Nunito Variable', 'Trebuchet MS', sans-serif;
+  font-family: var(--font-heading);
   font-size: 23px;
   font-weight: 400;
   line-height: 1.2;
@@ -1519,7 +1522,7 @@ a {
   background: var(--mint);
   color: var(--ink);
   border: 1px solid var(--line-strong);
-  font-family: 'Nunito Variable', sans-serif;
+  font-family: var(--font-body);
 }
 .avatar:nth-child(2n),
 .avatar:nth-child(3n) {
@@ -1695,7 +1698,7 @@ a {
   margin-top: 7px;
 }
 .count {
-  font-family: 'Nunito Variable', sans-serif;
+  font-family: var(--font-body);
   font-size: 14px;
   color: var(--muted);
 }
@@ -2199,7 +2202,7 @@ a {
 /* Friendly typography and purposeful motion. */
 h1,
 h2 {
-  font-family: 'Nunito Variable', 'Trebuchet MS', sans-serif;
+  font-family: var(--font-heading);
   font-weight: 700;
   letter-spacing: -0.025em;
 }
@@ -2375,7 +2378,7 @@ details[open] > :not(summary) {
 }
 .splash-monogram {
   fill: var(--ink);
-  font-family: 'Nunito Variable', 'Trebuchet MS', sans-serif;
+  font-family: var(--font-heading);
   font-weight: 650;
   font-size: 51px;
   letter-spacing: -0.06em;

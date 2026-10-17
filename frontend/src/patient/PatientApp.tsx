@@ -31,6 +31,8 @@ import Opening from '../components/Opening';
 import { Modal, errorText } from '../components/ui';
 import { useSurfaceEntrance, reducedMotion } from '../components/motion';
 import Assistant from './Assistant';
+import ReportDraft from './ReportDraft';
+import { Tooltip } from '../components/Tooltip';
 import Instructions from './Instructions';
 import { patientStore } from './store';
 import {
@@ -266,21 +268,25 @@ export default function PatientApp() {
           </button>
         </nav>
         <div className="patient-header-actions">
-          <button
-            className="icon-btn notification-button"
-            aria-label={`Notifications, ${reminders.length} reminders`}
-            onClick={() => setDialog('notifications')}
-          >
-            <Bell size={23} />
-            {reminders.length > 0 && <span />}
-          </button>
-          <button
-            className="patient-profile"
-            aria-label="Patient profile and progress"
-            onClick={() => setDialog('report')}
-          >
-            A
-          </button>
+          <Tooltip text="View reminders">
+            <button
+              className="icon-btn notification-button"
+              aria-label={`Notifications, ${reminders.length} reminders`}
+              onClick={() => setDialog('notifications')}
+            >
+              <Bell size={23} />
+              {reminders.length > 0 && <span />}
+            </button>
+          </Tooltip>
+          <Tooltip text="Your profile and progress">
+            <button
+              className="patient-profile"
+              aria-label="Patient profile and progress"
+              onClick={() => setDialog('report')}
+            >
+              A
+            </button>
+          </Tooltip>
         </div>
       </header>
       {(patientStore.error() || error) && (
@@ -780,6 +786,7 @@ export default function PatientApp() {
               <Download size={18} />
               Download text report
             </button>
+            <ReportDraft state={state} now={now} />
           </div>,
         )}
       {dialog === 'reset' &&

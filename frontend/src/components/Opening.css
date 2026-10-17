@@ -1,0 +1,91 @@
+.care-opening.splash-screen {
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 100svh;
+  background: var(--canvas);
+  padding: 76px 24px;
+}
+
+.care-opening .splash-atmosphere {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.care-opening .splash-composition {
+  position: relative;
+  width: min(100%, 630px);
+  padding: 32px 12px 44px;
+}
+
+.care-opening .splash-symbol {
+  width: 74px;
+  height: 74px;
+  margin-bottom: 28px;
+}
+
+.care-opening .splash-line {
+  stroke-width: 1.8;
+}
+
+.care-opening .splash-monogram {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  font-size: 49px;
+  letter-spacing: -0.055em;
+}
+
+.care-opening .splash-title {
+  font-family: var(--font-editorial);
+  font-weight: 500;
+  font-size: clamp(42px, 6vw, 70px);
+  line-height: 1.06;
+  letter-spacing: -0.04em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.care-opening .splash-description {
+  max-width: 32ch;
+  margin-top: 18px;
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: clamp(15px, 2vw, 17px);
+  line-height: 1.6;
+  color: var(--muted);
+  text-wrap: balance;
+}
+
+.care-opening .splash-skip {
+  z-index: 1;
+  top: 24px;
+  right: max(24px, env(safe-area-inset-right));
+  min-height: 44px;
+  padding: 10px 8px;
+  font-family: var(--font-body);
+  color: var(--ink);
+  font-size: 13px;
+  text-underline-offset: 5px;
+}
+
+.care-opening .splash-skip:focus-visible {
+  outline: 2px solid var(--action);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.care-opening .splash-note {
+  bottom: max(28px, env(safe-area-inset-bottom));
+  padding: 0 24px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  text-align: center;
+  color: var(--muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .care-opening .splash-atmosphere {
+    display: none;
+  }
+}

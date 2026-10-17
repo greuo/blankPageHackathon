@@ -1,5 +1,9 @@
 import { useRef } from 'react';
 import { gsap, useGSAP, reducedMotion } from './motion';
+import LightTunnel from './LightTunnel';
+import './Opening.css';
+
+export const OPENING_DURATION_SECONDS = 1.8;
 
 export default function Opening({ onEnter }: { onEnter: () => void }) {
   const ref = useRef<HTMLElement>(null);
@@ -18,33 +22,50 @@ export default function Opening({ onEnter }: { onEnter: () => void }) {
         const frame = requestAnimationFrame(finish);
         return () => cancelAnimationFrame(frame);
       }
+      const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const motionChanged = () => {
+        if (preference.matches) finish();
+      };
+      preference.addEventListener?.('change', motionChanged);
       intro.current = gsap.timeline({ defaults: { ease: 'power3.out' }, onComplete: finish });
       intro.current
+        .fromTo('.splash-atmosphere', { opacity: 0 }, { opacity: 1, duration: 0.55 }, 0)
         .fromTo(
           '.splash-line',
           { strokeDashoffset: 168 },
-          { strokeDashoffset: 0, duration: 0.58, stagger: 0.06 },
-          0,
+          { strokeDashoffset: 0, duration: 0.62, stagger: 0.07 },
+          0.02,
         )
         .fromTo(
           '.splash-monogram',
-          { scale: 0.88, opacity: 0.5 },
-          { scale: 1, opacity: 1, duration: 0.58, transformOrigin: 'center' },
+          { scale: 0.94, opacity: 0.6 },
+          { scale: 1, opacity: 1, duration: 0.45, transformOrigin: 'center' },
           0.04,
         )
-        .fromTo('.splash-title', { y: 9, opacity: 0.6 }, { y: 0, opacity: 1, duration: 0.5 }, 0.14)
+        .fromTo('.splash-title', { y: 8, opacity: 0.65 }, { y: 0, opacity: 1, duration: 0.48 }, 0.1)
         .fromTo(
           '.splash-description',
           { y: 5, opacity: 0.5 },
           { y: 0, opacity: 1, duration: 0.4 },
-          0.25,
+          0.2,
         )
-        .to('.splash-composition', { y: -5, opacity: 0, duration: 0.16, ease: 'power2.in' }, 0.9);
+        .to('.splash-composition', { y: -4, opacity: 0, duration: 0.24 }, 1.52)
+        .to(
+          '.splash-atmosphere, .splash-note',
+          { opacity: 0, duration: 0.26 },
+          OPENING_DURATION_SECONDS - 0.26,
+        );
+      return () => preference.removeEventListener?.('change', motionChanged);
     },
     { scope: ref },
   );
   return (
-    <main className="splash-screen" ref={ref} aria-label="Welcome to Care companion">
+    <main className="splash-screen care-opening" ref={ref} aria-label="Welcome to Care companion">
+      {!reducedMotion() && (
+        <div className="splash-atmosphere" aria-hidden="true">
+          <LightTunnel />
+        </div>
+      )}
       <button className="splash-skip" onClick={complete}>
         Skip intro
       </button>
