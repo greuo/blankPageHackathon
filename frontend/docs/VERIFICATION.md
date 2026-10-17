@@ -25,11 +25,11 @@ ECC-informed specialist review found and corrected implicit family access for ne
 ## Unavailable checks / integration blockers
 Backend integration is explicitly deferred by Ranveer. Andrew's Supabase schema/auth/API/storage/realtime contract is not present in inspected GitHub branches or team docs and has been requested in Slack. No Supabase backend, migration, storage/RLS policy, Edge Function, live AI or remote handoff is integrated or certified. UI role tests establish demo behavior only; all demo storage is readable in devtools. Independent authenticated sessions, direct-API isolation, private attachments/search/notifications/realtime revocation, actual live AI limits/failures and external delivery still need backend integration and runtime testing.
 
-Required active-agent roster and exact-change clearances have not been verified yet. No push, PR, approval, merge or deployment is claimed by this report. Fresh GitHub integrated-revision review must follow the eventual authorized integration; a local checkout check is recorded separately and is not equivalent.
+At the original local-only checkpoint, no push or PR was claimed. Ranveer subsequently explicitly requested publication: PR #3 is open with initial Claude/conflict checks passed. The design and review follow-ups below require checks against their new immutable GitHub revision. No merge or hosting deployment is claimed.
 
 ## Quiet coastal redesign · 2026-10-17
 
-This section describes the new local visual revision, separately from the original frontend snapshot in PR #3.
+This section describes the quiet coastal visual revision added after the original frontend snapshot in PR #3.
 
 - Production build and all 28 repository tests pass after the visual/focus changes.
 - Real in-app-browser inspection at 1280×720 and a narrow 304px viewport: opening screen, workspace, patient conversation, clinician care-space details and builder. Search filters correctly; doctor/patient switching remains usable; a companion question returns the expected attributed approved-source excerpt.
@@ -43,3 +43,11 @@ This section describes the new local visual revision, separately from the origin
 Current screenshot evidence, ignored from Git: `output/playwright/quiet-opening-desktop.png`, `quiet-opening-mobile.png`, `quiet-workspace-desktop.png`, `quiet-workspace-mobile.png`, `quiet-unavailable.png`, `quiet-builder-desktop.png`, `quiet-clinician-mobile.png`.
 
 Research deliverables: `public/design-study.html`, `docs/DESIGN-RESEARCH.md`, updated `DESIGN.md`, seven linked Color Hunt palettes and three licensed photographic options. The working prototype remains fictional and browser-local; backend integration is deferred.
+
+
+## PR #3 follow-up verification
+
+- Production build and 31 data tests pass after the nonblocking Claude review fixes.
+- Regression tests cover independent per-tab actor sessions with shared care updates, selecting one of two family grants, and request IDs without secure-context crypto.
+- Chrome at isolated preview port 5191: doctor and patient remained separate after a shared checklist report; doctor role survived reload. Modal Shift+Tab from Close reached the closed details summary; Tab returned to Close, skipping its hidden select.
+- Initial PR #3 Claude review and deterministic conflict check passed. Backend role/model reconciliation remains deferred and is explicitly not live integration.

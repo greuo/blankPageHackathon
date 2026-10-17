@@ -79,6 +79,7 @@ export interface Grant {
 }
 export interface AuditEntry {
   id: string;
+  familyId?: string;
   spaceId: string;
   actorId: string;
   previousLevel: AccessLevel;

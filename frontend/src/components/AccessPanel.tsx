@@ -32,12 +32,12 @@ function AccessContent({ spaceId, store }: { spaceId: string; store: Store }) {
   const changes = store.audit.filter((entry) => entry.spaceId === spaceId).reverse();
 
   async function save(level: AccessLevel) {
-    if (busy.current || !canManage) return;
+    if (busy.current || !canManage || !grant) return;
     busy.current = true;
     setPending(true);
     setFeedback(null);
     try {
-      await repository.changeGrant(spaceId, level);
+      await repository.changeGrant(spaceId, level, grant.familyId);
       setSelection(level);
       setFeedback({
         kind: 'success',

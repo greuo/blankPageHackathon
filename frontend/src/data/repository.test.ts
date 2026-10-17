@@ -5,6 +5,8 @@ import {
   canViewPlan,
   createDemoRepository,
   DEMO_STORAGE_KEY,
+  DEMO_ACTOR_KEY,
+  uid,
   getActivePlan,
   getChecklistOccurrences,
   getVisibleConversations,
@@ -188,7 +190,7 @@ describe('approved family matrix and revocation', () => {
     repo.publishPlan('context-projection-plan');
     for (const level of ['Basic', 'Support', 'Full'] as const) {
       repo.setActor('patient');
-      repo.changeGrant(space.id, level);
+      repo.changeGrant(space.id, level, 'family');
       repo.setActor('family');
       const visible = getVisibleSpaces(repo.getSnapshot()).find((s) => s.id === space.id)!;
       expect(visible.memberIds).toEqual(space.memberIds);
@@ -227,7 +229,7 @@ describe('approved family matrix and revocation', () => {
     repo.setActor('family');
     expect(getVisibleSpaces(repo.getSnapshot()).some((s) => s.id === space.id)).toBe(false);
     repo.setActor('patient');
-    repo.changeGrant(space.id, 'Support');
+    repo.changeGrant(space.id, 'Support', 'family');
     repo.setActor('family');
     expect(getVisibleSpaces(repo.getSnapshot()).some((s) => s.id === space.id)).toBe(true);
     expect(getVisibleConversations(repo.getSnapshot(), space.id)).toEqual([]);
@@ -246,7 +248,7 @@ describe('approved family matrix and revocation', () => {
   it.each(['Basic', 'Support', 'Full'] as const)(
     '%s implements only its agreed shared information access',
     (level) => {
-      repo.changeGrant('recovery', level);
+      repo.changeGrant('recovery', level, 'family');
       repo.setActor('family');
       expect(getVisibleSpaces(repo.getSnapshot()).some((s) => s.id === 'recovery')).toBe(true);
       expect(canViewPlan(repo.getSnapshot(), 'recovery')).toBe(level === 'Full');
@@ -258,7 +260,7 @@ describe('approved family matrix and revocation', () => {
       expect(
         getVisibleConversations(repo.getSnapshot(), 'recovery').map((c) => c.id),
       ).not.toContain('recovery-doctor');
-      expect(() => repo.changeGrant('recovery', 'Full')).toThrow(/Only/);
+      expect(() => repo.changeGrant('recovery', 'Full', 'family')).toThrow(/Only/);
       const report = {
         id: 'family-report',
         spaceId: 'recovery',
@@ -276,7 +278,7 @@ describe('approved family matrix and revocation', () => {
     repo.setActor('family');
     repo.sendMessage({ id: 'prior', conversationId: 'recovery-family', body: 'Prior access' });
     repo.setActor('doctor');
-    repo.changeGrant('recovery', 'revoked');
+    repo.changeGrant('recovery', 'revoked', 'family');
     repo.setActor('family');
     expect(getVisibleConversations(repo.getSnapshot(), 'recovery')).toEqual([]);
     expect(() =>
@@ -301,7 +303,7 @@ describe('approved family matrix and revocation', () => {
       newLevel: 'revoked',
     });
     repo.setActor('patient');
-    repo.changeGrant('recovery', 'Support');
+    repo.changeGrant('recovery', 'Support', 'family');
     expect(repo.getSnapshot().audit[1].actorId).toBe('patient');
   });
 });
@@ -514,7 +516,7 @@ describe('dated reports and occurrences', () => {
         (o) => o.instruction.id === today?.instruction.id,
       ),
     ).toBe(true);
-    repo.changeGrant('recovery', 'Support');
+    repo.changeGrant('recovery', 'Support', 'family');
     repo.setActor('family');
     expect(
       getChecklistOccurrences(repo.getSnapshot(), firstDate).some(
@@ -523,7 +525,7 @@ describe('dated reports and occurrences', () => {
     ).toBe(true);
     expect(getActivePlan(repo.getSnapshot(), 'recovery')).toBeUndefined();
     repo.setActor('patient');
-    repo.changeGrant('recovery', 'Basic');
+    repo.changeGrant('recovery', 'Basic', 'family');
     repo.setActor('family');
     expect(
       getChecklistOccurrences(repo.getSnapshot(), firstDate).some((o) => o.space.id === 'recovery'),
@@ -559,8 +561,11 @@ describe('truthful browser storage and document handling', () => {
     expect(first.getSnapshot()).toBe(first.getSnapshot());
     expect(Object.isFrozen(first.getSnapshot().spaces)).toBe(true);
     first.setActor('doctor');
+    first.changeGrant('recovery', 'Support', 'family');
     expect(storage.getItem(DEMO_STORAGE_KEY)).toBeTruthy();
-    expect(createDemoRepository(storage).getSnapshot().actorId).toBe('doctor');
+    const restored = createDemoRepository(storage);
+    expect(restored.getSnapshot().actorId).toBe('patient');
+    expect(restored.getSnapshot().grants[0].level).toBe('Support');
   });
   it('surfaces quota failures and does not claim the mutation succeeded', () => {
     const storage = memoryStorage();
@@ -568,7 +573,7 @@ describe('truthful browser storage and document handling', () => {
       throw new Error('Quota exceeded');
     };
     const broken = createDemoRepository(storage);
-    expect(() => broken.setActor('doctor')).toThrow(/could not save/);
+    expect(() => broken.changeGrant('recovery', 'Basic', 'family')).toThrow(/could not save/);
     expect(broken.getSnapshot().actorId).toBe('patient');
     expect(broken.getPersistenceError()).toBeTruthy();
   });
@@ -580,7 +585,7 @@ describe('truthful browser storage and document handling', () => {
     const next = structuredClone(repo.getSnapshot());
     next.actorId = 'family';
     repo.receiveStorage(JSON.stringify(next));
-    expect(repo.getSnapshot().actorId).toBe('family');
+    expect(repo.getSnapshot().actorId).toBe('patient');
     repo.receiveStorage('{broken');
     expect(repo.getPersistenceError()).toContain('invalid');
     expect(changes).toBe(2);
@@ -602,5 +607,58 @@ describe('truthful browser storage and document handling', () => {
     const document = await repo.uploadDocument('recovery', file);
     expect(document.text).toBe('Fictional source text');
     expect(repo.getSnapshot().plans[0].version).toBe(1);
+  });
+});
+
+describe('PR review regressions', () => {
+  it('keeps roles separate across tabs while sharing care changes and restoring each session', () => {
+    const shared = memoryStorage();
+    const doctorSession = memoryStorage();
+    const patientSession = memoryStorage();
+    const doctor = createDemoRepository(shared, doctorSession);
+    const patient = createDemoRepository(shared, patientSession);
+    doctor.setActor('doctor');
+    expect(doctorSession.getItem(DEMO_ACTOR_KEY)).toBe('doctor');
+    expect(shared.getItem(DEMO_STORAGE_KEY)).toBeNull();
+    doctor.changeGrant('recovery', 'Support', 'family');
+    patient.receiveStorage(shared.getItem(DEMO_STORAGE_KEY));
+    expect(patient.getSnapshot().actorId).toBe('patient');
+    expect(patient.getSnapshot().grants[0].level).toBe('Support');
+    patient.changeGrant('recovery', 'Basic', 'family');
+    doctor.receiveStorage(shared.getItem(DEMO_STORAGE_KEY));
+    expect(doctor.getSnapshot().actorId).toBe('doctor');
+    expect(doctor.getSnapshot().grants[0].level).toBe('Basic');
+    expect(createDemoRepository(shared, doctorSession).getSnapshot().actorId).toBe('doctor');
+    expect(createDemoRepository(shared, patientSession).getSnapshot().actorId).toBe('patient');
+  });
+  it('changes only the selected family grant when two family members share a space', () => {
+    const seed = structuredClone(repo.getSnapshot());
+    seed.users.push({ id: 'family-2', name: 'Taylor Morgan', role: 'family', initials: 'TM' });
+    seed.spaces[0].memberIds.push('family-2');
+    seed.grants.push({
+      id: 'second-grant',
+      spaceId: 'recovery',
+      familyId: 'family-2',
+      level: 'Basic',
+    });
+    repo.receiveStorage(JSON.stringify(seed));
+    repo.changeGrant('recovery', 'Support', 'family-2');
+    expect(
+      repo.getSnapshot().grants.find((g) => g.familyId === 'family' && g.spaceId === 'recovery')
+        ?.level,
+    ).toBe('Full');
+    expect(repo.getSnapshot().grants.find((g) => g.id === 'second-grant')?.level).toBe('Support');
+    expect(repo.getSnapshot().audit[0].familyId).toBe('family-2');
+    expect(() => repo.changeGrant('recovery', 'Full', 'missing-family')).toThrow(/invitation/);
+  });
+  it('creates unique demo request IDs when secure-context randomUUID is unavailable', () => {
+    vi.stubGlobal('crypto', undefined);
+    try {
+      const first = uid();
+      expect(first).toMatch(/^demo-/);
+      expect(uid()).not.toBe(first);
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });
