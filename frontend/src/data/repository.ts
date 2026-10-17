@@ -15,8 +15,9 @@ export type * from './types';
  * A real integration must authorize database, document and realtime access server-side.
  */
 export const DEMO_STORAGE_KEY = 'discharge-companion:fictional-demo:v1';
+export const DEMO_ACTOR_KEY = 'discharge-companion:demo-actor:v1';
 const isoNow = (): string => new Date().toISOString();
-const uid = (): string =>
+export const uid = (): string =>
   globalThis.crypto?.randomUUID?.() ?? `demo-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 export const localDate = (date: Date = new Date()): string =>
   `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
@@ -412,7 +413,10 @@ function parseStore(raw: string): Store {
   return state;
 }
 
-export function createDemoRepository(storage: Storage | null = null) {
+export function createDemoRepository(
+  storage: Storage | null = null,
+  actorStorage: Storage | null = null,
+) {
   let state = deepFreeze(createSeed());
   let persistenceError: string | null = null;
   const listeners = new Set<() => void>();
@@ -421,14 +425,23 @@ export function createDemoRepository(storage: Storage | null = null) {
   };
   try {
     const saved = storage?.getItem(DEMO_STORAGE_KEY);
-    if (saved) state = deepFreeze(parseStore(saved));
+    const loaded = saved ? parseStore(saved) : state;
+    const savedActor = actorStorage?.getItem(DEMO_ACTOR_KEY);
+    const actorId =
+      savedActor && loaded.users.some((user) => user.id === savedActor)
+        ? savedActor
+        : createSeed().actorId;
+    state = deepFreeze({ ...loaded, actorId });
   } catch {
     persistenceError = 'Saved demo data could not be loaded. Reset the demo to recover.';
   }
   const commit = (next: Store): void => {
     if (storage) {
       try {
-        storage.setItem(DEMO_STORAGE_KEY, JSON.stringify(next));
+        storage.setItem(
+          DEMO_STORAGE_KEY,
+          JSON.stringify({ ...next, actorId: createSeed().actorId }),
+        );
       } catch {
         persistenceError =
           'Your browser could not save this change. Check storage permissions or available space, then retry.';
@@ -471,7 +484,11 @@ export function createDemoRepository(storage: Storage | null = null) {
     },
     receiveStorage(raw: string | null): void {
       try {
-        state = deepFreeze(raw ? parseStore(raw) : createSeed());
+        const loaded = raw ? parseStore(raw) : createSeed();
+        const actorId = loaded.users.some((user) => user.id === state.actorId)
+          ? state.actorId
+          : createSeed().actorId;
+        state = deepFreeze({ ...loaded, actorId });
         persistenceError = null;
       } catch {
         persistenceError = 'Another tab saved invalid demo data. Reset the demo to recover.';
@@ -480,10 +497,20 @@ export function createDemoRepository(storage: Storage | null = null) {
     },
     setActor(id: string): void {
       if (!state.users.some((u) => u.id === id)) throw new Error('Unknown demo role.');
-      commit({ ...state, actorId: id });
+      try {
+        actorStorage?.setItem(DEMO_ACTOR_KEY, id);
+      } catch {
+        persistenceError =
+          'Your browser could not save this tab’s demo role. Check session storage permissions and retry.';
+        emit();
+        throw new Error(persistenceError);
+      }
+      state = deepFreeze({ ...state, actorId: id });
+      persistenceError = null;
+      emit();
     },
     resetDemo(): void {
-      commit(createSeed());
+      commit({ ...createSeed(), actorId: state.actorId });
     },
     async createSpace(input: {
       name: string;
@@ -790,14 +817,14 @@ export function createDemoRepository(storage: Storage | null = null) {
       commit(next);
       return document;
     },
-    changeGrant(spaceId: string, level: AccessLevel): void {
+    changeGrant(spaceId: string, level: AccessLevel, familyId: string): void {
       const space = requireSpace(spaceId);
       const actor = getActor(state);
       if (actor.role !== 'doctor' && actor.id !== space.patientId)
         throw new Error('Only the patient and clinician can manage family access.');
       if (!['Full', 'Basic', 'Support', 'revoked'].includes(level))
         throw new Error('Choose a valid family access level.');
-      const grant = state.grants.find((g) => g.spaceId === spaceId);
+      const grant = state.grants.find((g) => g.spaceId === spaceId && g.familyId === familyId);
       if (!grant) throw new Error('No family invitation exists in this space.');
       if (grant.level === level) return;
       const next = copy();
@@ -806,6 +833,7 @@ export function createDemoRepository(storage: Storage | null = null) {
         id: uid(),
         spaceId,
         actorId: actor.id,
+        familyId,
         previousLevel: grant.level,
         newLevel: level,
         createdAt: isoNow(),
@@ -872,7 +900,15 @@ if (typeof window !== 'undefined') {
     };
   }
 }
-export const repository = createDemoRepository(browserStorage);
+let browserSession: Storage | null = null;
+if (typeof window !== 'undefined') {
+  try {
+    browserSession = window.sessionStorage;
+  } catch {
+    // A tab can still demonstrate a role in memory when session storage is unavailable.
+  }
+}
+export const repository = createDemoRepository(browserStorage, browserSession);
 if (typeof window !== 'undefined')
   window.addEventListener('storage', (event) => {
     if (event.key === DEMO_STORAGE_KEY || event.key === null)

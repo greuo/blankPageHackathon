@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
-import { repository, getActor, getChecklistOccurrences, localDate } from '../data/repository';
+import { repository, getActor, getChecklistOccurrences, localDate, uid } from '../data/repository';
 import { dateTime, errorText } from './ui';
 gsap.registerPlugin(useGSAP);
 function CheckControl({
@@ -112,7 +112,7 @@ export default function Checklist({
     try {
       if (report) await repository.undoReport(report.id);
       else {
-        requestIds.current[key] ??= crypto.randomUUID();
+        requestIds.current[key] ??= uid();
         await repository.report({ id: requestIds.current[key], spaceId, instructionId, date: day });
         delete requestIds.current[key];
       }

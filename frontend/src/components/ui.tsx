@@ -59,7 +59,11 @@ export function Modal({
           ref.current.querySelectorAll<HTMLElement>(
             'button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), summary, [tabindex="0"]',
           ),
-        ).filter((node) => node.getClientRects().length > 0 && !node.closest('[hidden]'));
+        ).filter((node) => {
+          if (!node.getClientRects().length || node.closest('[hidden], [inert]')) return false;
+          const closedDetails = node.closest('details:not([open])');
+          return !closedDetails || node === closedDetails.querySelector(':scope > summary');
+        });
         const first = nodes[0];
         const last = nodes[nodes.length - 1];
         if (!first) {

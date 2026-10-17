@@ -10,7 +10,7 @@ import {
   RotateCcw,
   Send,
 } from 'lucide-react';
-import { repository, getActor, getVisibleConversations } from '../data/repository';
+import { repository, getActor, getVisibleConversations, uid } from '../data/repository';
 import { errorText, time } from './ui';
 
 export default function Conversations({
@@ -64,7 +64,7 @@ export default function Conversations({
       return;
     busy.current = true;
     const conversationId = active.id;
-    const id = requestId ?? crypto.randomUUID();
+    const id = requestId ?? uid();
     setRequestId(id);
     setPending(true);
     setError('');

@@ -11,7 +11,7 @@ import {
   Upload,
   X,
 } from 'lucide-react';
-import { getActivePlan, getActor, repository } from '../data/repository';
+import { getActivePlan, getActor, repository, uid } from '../data/repository';
 import type { Instruction, Plan } from '../data/types';
 import './PlanBuilder.css';
 
@@ -32,7 +32,7 @@ function localTime(value: string | undefined) {
 }
 function newInstruction(text = '', sourceLabel = '', sourcePassage = ''): EditableInstruction {
   return {
-    id: crypto.randomUUID(),
+    id: uid(),
     kind: 'action',
     text,
     sourceLabel,
@@ -74,7 +74,7 @@ function BuilderEditor({ spaceId, onClose }: PlanBuilderProps) {
       ) + 1;
     const rebased = !!savedDraft && savedDraft.version <= maxApproved;
     return {
-      id: savedDraft?.id ?? crypto.randomUUID(),
+      id: savedDraft?.id ?? uid(),
       version: rebased ? nextVersion : (savedDraft?.version ?? nextVersion),
       rebased,
       title: original?.title ?? 'My recovery plan',
