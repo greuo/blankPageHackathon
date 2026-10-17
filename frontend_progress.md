@@ -6,9 +6,9 @@ Owned by the frontend side (Ranveer, Marcus). Only frontend sessions edit this f
 
 - **Stack:** React + TypeScript, Vite, token CSS, Nunito Variable, GSAP/useGSAP, Lucide, Vitest. Isolated under `frontend/`.
 - **Run:** `npm --prefix frontend run dev -- --port 5188`; production build/preview on 5190.
-- **Current UI:** Patient-only dashboard and Add instructions page, embedded/full-screen companion, daily task/dose reporting, check-in/trend, read-only roadmap, reminders, demo emergency/call/email preview and downloadable progress text. No reachable doctor/family/admin screen or role switcher.
+- **Current UI:** Patient-only dashboard and Add instructions page, embedded/full-screen companion, daily task/dose reporting, check-in/trend, read-only roadmap, reminders, demo emergency/call flow and progress preview and downloadable progress text. No reachable doctor/family/admin screen or role switcher.
 - **Data:** New typed browser-local patient adapter under `frontend/src/patient/`. Fictional data only. Legacy shared-care modules remain reference source and regression tests.
-- **Validation:** Build and 48 tests pass, bounded ECC-informed React/TypeScript source review, desktop/mobile browser flows. See `frontend/docs/VERIFICATION.md` for current versus historical checks.
+- **Validation:** Build and 49 tests pass, bounded ECC-informed React/TypeScript source review, desktop/mobile browser flows. See `frontend/docs/VERIFICATION.md` for current versus historical checks.
 - **Deferred:** Andrew's backend, clinician input verification, real LLM, document extraction, email delivery and secure report links. No live privacy/security claim.
 - **Delivery:** PR #3 was merged on GitHub while this revision was in progress. This patient-only follow-up goes through a new PR and Claude/conflict checks. No merge authorization. Latest immutable head/check status is recorded in the local continuity checkpoint after publication.
 

@@ -12,7 +12,7 @@ Implemented browser-local features:
 - Daily check-in: fixed pain scale, optional temperature in °C, feeling and free text. One editable entry per local date; personal pain trend after two dates.
 - Read-only roadmap estimates with acknowledgment; no clinical clearance or schedule editing.
 - Provided-text companion excerpts, progress summaries and explicit unsupported-answer behavior. Prepared local responses; no live LLM.
-- Emergency phrase routing, demo call animation, demo 911 acknowledgment and doctor-email preview. No real call or email.
+- Emergency phrase routing, demo call animation, demo 911 acknowledgment and progress-report preview. No real call or email.
 - Plain-text progress preview/download based on actual local reports. No fabricated adherence history or healed percentage.
 - Local persistence with transactional writes and recoverable failure messages. Emergency UI remains usable if saving fails.
 

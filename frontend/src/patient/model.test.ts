@@ -77,3 +77,16 @@ describe('patient-only model', () => {
     expect(report).not.toContain('12 out of 14');
   });
 });
+
+it('ignores common negated symptoms and still detects an affirmative emergency', () => {
+  for (const text of [
+    'no chest pain',
+    "I don't have chest pain",
+    'without shortness of breath',
+    'not unconscious',
+    'no chest pain or shortness of breath',
+  ])
+    expect(isEmergency(text)).toBe(false);
+  expect(isEmergency('No chest pain, but I cannot breathe')).toBe(true);
+  expect(isEmergency('I have chest pain')).toBe(true);
+});

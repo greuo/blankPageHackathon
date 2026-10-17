@@ -65,6 +65,7 @@ export default function PatientApp() {
     [error, setError] = useState(''),
     [notice, setNotice] = useState('');
   const [draft, setDraft] = useState('');
+  const [resumeCheckIn, setResumeCheckIn] = useState(false);
   const [emergencyFallback, setEmergencyFallback] = useState<Emergency | null>(null);
   const [tick, setTick] = useState(0);
   useEffect(() => {
@@ -115,9 +116,10 @@ export default function PatientApp() {
     window.scrollTo({ top: 0, behavior: 'instant' });
     requestAnimationFrame(() => document.getElementById('main')?.focus({ preventScroll: true }));
   }
-  function trigger(text: string) {
+  function trigger(text: string, fromCheckIn = false, demo = false) {
     const eventId = id();
-    const event = { id: eventId, at: now.toISOString(), trigger: text };
+    const event = { id: eventId, at: now.toISOString(), trigger: text, demo };
+    setResumeCheckIn(fromCheckIn);
     setDraft('');
     setEmergencyFallback(event);
     setEmergencyId(eventId);
@@ -166,11 +168,11 @@ export default function PatientApp() {
   function saveCheck(event: FormEvent) {
     event.preventDefault();
     try {
-      validateCheckIn(check);
       if (isEmergency(check.notes)) {
-        trigger(check.notes);
+        trigger(check.notes, true);
         return;
       }
+      validateCheckIn(check);
       if (
         action((s) => {
           s.checkIns = [
@@ -466,7 +468,7 @@ export default function PatientApp() {
                   </button>
                   <button
                     onClick={() => {
-                      trigger('Demonstration emergency');
+                      trigger('Demonstration emergency', false, true);
                     }}
                   >
                     Preview emergency
@@ -572,7 +574,7 @@ export default function PatientApp() {
       {dialog === 'checkin' &&
         modal(
           'Your daily check-in',
-          <form className="checkin-form" onSubmit={saveCheck}>
+          <form className="checkin-form" onSubmit={saveCheck} noValidate>
             <p>Prepared questions. Keep a record in your own words.</p>
             <label>
               Pain level: {check.pain} out of 10
@@ -628,7 +630,6 @@ export default function PatientApp() {
                 onChange={(e) => {
                   const notes = e.target.value;
                   setCheck({ ...check, notes });
-                  if (isEmergency(notes)) trigger(notes);
                 }}
                 placeholder="Record a change or a question for your doctor"
               />
@@ -672,7 +673,7 @@ export default function PatientApp() {
                     ? 'Earlier'
                     : milestone.day === progress.day
                       ? 'Now'
-                      : index === 1
+                      : index === milestones.findIndex((item) => item.day > progress.day)
                         ? 'Next'
                         : 'Later'}{' '}
                   · around day {milestone.day}
@@ -753,7 +754,17 @@ export default function PatientApp() {
           </div>,
         )}
       {emergency && (
-        <Modal title="Get emergency help" onClose={() => setEmergencyId(null)} wide>
+        <Modal
+          title="Get emergency help"
+          onClose={() => {
+            setEmergencyId(null);
+            if (resumeCheckIn) {
+              setDialog('checkin');
+              setResumeCheckIn(false);
+            }
+          }}
+          wide
+        >
           <section className="emergency-panel">
             {error && (
               <p className="alert error" role="alert">
@@ -808,18 +819,9 @@ export default function PatientApp() {
             >
               {emergency.calledAt ? '911 acknowledgment recorded (demo)' : '911 called (demo)'}
             </button>
-            <details>
-              <summary>Doctor email preview</summary>
-              <p>To: {state.email}</p>
-              <p>Subject: Demo emergency report for {state.patient}</p>
-              <p>
-                Reported at {new Date(emergency.at).toLocaleString()}: {emergency.trigger}
-              </p>
-              <p>
-                {emergency.calledAt ? '911 acknowledgment recorded.' : '911 call not acknowledged.'}{' '}
-                Delivery pending backend connection. Nothing sent.
-              </p>
-            </details>
+            <p className="field-help">
+              Emergency events stay in your local report. Emergency email delivery is disabled.
+            </p>
             <a
               href="https://www.heart.org/en/news/2025/04/15/call-911-for-heart-attack-or-stroke-symptoms-or-just-drive-to-the-er"
               target="_blank"

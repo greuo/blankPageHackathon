@@ -8,7 +8,13 @@ export type CheckIn = {
   notes: string;
 };
 export type ChatMessage = { id: string; role: 'patient' | 'assistant'; text: string };
-export type Emergency = { id: string; at: string; trigger: string; calledAt?: string };
+export type Emergency = {
+  id: string;
+  at: string;
+  trigger: string;
+  calledAt?: string;
+  demo?: boolean;
+};
 export interface PatientState {
   version: 1;
   patient: string;
@@ -122,8 +128,13 @@ export function timeline(state: PatientState, now = clock(state)) {
 }
 export function isEmergency(text: string) {
   const normal = text.toLowerCase().normalize('NFKC').replace(/[’‘]/g, "'");
+  // Conservative literal demo guard, not a clinical triage classifier.
+  const affirmative = normal.replace(
+    /\b(?:no|not|without|denies|deny|denied|not having|do not have|don't have)\s+(?:(?:any|current|new|ongoing|signs of|symptoms of)\s+)*(?:chest pain|shortness of breath|trouble breathing|difficulty breathing|unconscious|severe bleeding)(?:\s+or\s+(?:chest pain|shortness of breath|trouble breathing|difficulty breathing|severe bleeding))?\b/g,
+    '',
+  );
   return /\b(can'?t breathe|cannot breathe|can not breathe|chest pain|shortness of breath|trouble breathing|difficulty breathing|unconscious|severe bleeding)\b/.test(
-    normal,
+    affirmative,
   );
 }
 export function doseStatus(
@@ -166,7 +177,7 @@ export function summary(state: PatientState, now = clock(state)) {
     Object.entries(state.doses)
       .map(([date, slots]) => `${date}: ${slots.join(', ')}`)
       .join('\n') || 'No doses reported.'
-  }\n\nEMERGENCY EVENTS\n${state.emergencies.map((e) => `${e.at}: ${e.trigger}. ${e.calledAt ? '911 called acknowledged at ' + e.calledAt : 'No call acknowledgment recorded.'} Demo only; no call placed or email sent.`).join('\n') || 'No emergency events recorded.'}\n\nPROVIDED INSTRUCTIONS\n${state.instructions}\n\nSource: patient-reported browser-local demo records. No clinical assessment. No email sent.`;
+  }\n\nEMERGENCY EVENTS\n${state.emergencies.map((e) => `${e.demo ? 'DEMO EXERCISE · ' : ''}${e.at}: ${e.trigger}. ${e.calledAt ? '911 called acknowledged at ' + e.calledAt : 'No call acknowledgment recorded.'} Demo only; no call placed or email sent.`).join('\n') || 'No emergency events recorded.'}\n\nPROVIDED INSTRUCTIONS\n${state.instructions}\n\nSource: patient-reported browser-local demo records. No clinical assessment. No email sent.`;
 }
 export function reply(state: PatientState, question: string) {
   const { day, percent } = timeline(state);
