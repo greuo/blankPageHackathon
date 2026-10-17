@@ -16,13 +16,25 @@ Things both sides rely on: API base URL, ports, data shapes, auth, env vars. Eit
 - **`SUPABASE_ANON_KEY`:** `sb_publishable_igEs9JeKLT-n8_SAYRjkwg_wAMphe15` (publishable key, safe in the browser; RLS does the access control)
 - **Auth:** patients only. Guest = Supabase anonymous sign-in; signed in = email + password, self sign-up. A guest can upgrade to an account and keep their data.
 - **Roles:** none. Every signed-in user (guest or not) is a patient and sees only their own rows.
-- **Data shapes:** draft tables and edge functions in `PLAN.md`; the API table in `backend_progress.md` becomes the source of truth once the patient-only migration lands. Until then the current tables are the old hospital model, so don't bind to them.
-- **Demo logins:** `admin@general.example.com`, `dr.kim@…`, `dr.patel@…`, `nurse.lee@…`, `alex@…`, `jordan@…`, `sam@general.example.com`; other hospital: `dr.reyes@riverside.example.com`, `casey@riverside.example.com`. Shared password: ask Andrew. These belong to the old hospital model and go away with the patient-only migration.
+- **Data shapes:** the patient-only tables are live (2026-10-17); "Data model", "Edge functions" and the supabase-js cheat sheet in `backend_progress.md` are the source of truth. `PLAN.md` has the overview. Edge function contracts get added there as each one lands.
+- **Demo logins:** `alex@demo.example.com` (patient with a doctor, two care-note versions, chat and a sent doctor message; password: ask Andrew). Guest: `supabase.auth.signInAnonymously()` gives a fresh, empty patient (on hosted once the dashboard toggle is on). The old hospital logins are deleted.
 
 ## Backend → Frontend
 
+- [ ] 2026-10-17 · Andrew: **Patient-only tables are live on hosted; bind to these.** Full columns, rules and supabase-js snippets: `backend_progress.md` → Data model / cheat sheet.
+  - `patients` (`id` = auth user, `display_name`): created on sign-up; you can update `display_name`.
+  - `doctors` (`name`, `email`, `clinic`, `clinic_phone`): read / insert / update / delete.
+  - `care_notes` (`doctor_id`, `version`, `content` JSON, `entered_via`, `created_at`): each insert is a new version (server sets `version`); no update; delete allowed. Read the latest from the `current_care_notes` view.
+  - `messages` (`sender` `patient`|`bot`, `content`): read + insert your own (`sender` defaults to `patient`). Bot replies come from `chat`, which is being rewritten (the deployed one is broken).
+  - `doctor_messages`, `entry_links`: read-only; edge functions write them.
+  - RLS: every signed-in user, guest or email, sees only their own rows; signed out sees nothing. `patient_id` defaults to the caller, so leave it out of inserts.
+  - Guest: `supabase.auth.signInAnonymously()`; upgrade with `updateUser({ email })`, then `updateUser({ password })` once confirmed; same user id, data kept. On hosted this needs a dashboard toggle (Andrew); until then use email sign-up.
+  - Realtime on `messages` and `care_notes`.
+  - Old hospital demo logins are gone; demo patient is `alex@demo.example.com` (see Agreed).
 - [ ] 2026-10-17 · Andrew: **Pivot agreed by the whole team (2026-10-17), now under Agreed:** patients-only app, written up in `PLAN.md` at the repo root. No doctor/nurse/admin accounts or hospitals. Doctor enters notes in a Doctor mode on the patient's phone (optional: scan a QR and type on their own phone). Chatbot answers from those notes. Patient can use it as a guest or signed in. "Send to my doctor" emails the doctor a secure link to the message stored in Supabase. Your clinician builder maps onto Doctor mode; family access is your call. This replaces the hospital model above, so hold off binding to the current tables.
+  - ↳ 2026-10-17 · Andrew: The new patient-only tables are live (note above), so no need to hold off any more.
 - [ ] 2026-10-17 · Andrew: Backend is live on Supabase; see **Agreed** above for URL, key, roles and demo logins. Access model: a hospital has admin / doctor / nurse / patient accounts. Patients chat with the bot; their care team (assigned doctors + nurses) can read and reply. When a chat is forwarded (`escalations`), it's routed to the treating doctor but every doctor in the hospital sees it. Admins manage accounts and care teams but can't read chats. Full table in `backend_progress.md`.
+  - ↳ 2026-10-17 · Andrew: Superseded: the hospital model and its tables are gone; see the patient-only note at the top.
 - [ ] 2026-10-17 · Andrew: Question: which screens are you building first (patient chat, doctor escalation inbox, admin user management)? We'll prioritise the chatbot or any missing queries around that.
 
 ## Frontend → Backend
@@ -32,5 +44,6 @@ Things both sides rely on: API base URL, ports, data shapes, auth, env vars. Eit
 
 - [ ] 2026-10-17 · Gold M / Codex for Ranveer: frontend owns proposed `frontend/` tree, internal view model in `frontend/src/data/types.ts`, fictional adapter in `repository.ts`; no production table/API names assumed. Please confirm branch and contracts before live binding. Contact thread: https://blankpagehackathon.slack.com/archives/C0C9ZF57F9U/p1792247444562409 .
 - [ ] 2026-10-17 · Gold M / Codex for Ranveer: need Supabase public config, authenticated test identities, schema/RPC/Edge Function/error contracts, source/approval/checklist occurrence states, private document policy, scoped realtime/revocation behavior. No service-role/secret keys in frontend. See `frontend/docs/INTEGRATION.md`.
+  - ↳ 2026-10-17 · Andrew: Public config is under Agreed; tables, RLS and supabase-js snippets are in `backend_progress.md`; test identity `alex@demo.example.com` or a guest (see Agreed). No service-role key needed in the frontend. Edge function contracts follow as each one lands.
 - [ ] 2026-10-17 · Gold M / Codex for Ranveer: Ranveer approved Basic = nonclinical updates + explicitly joined chats; Support adds approved checklist/questions/observations/attributed family reports; Full adds shared plans/documents. All private chats require participation, including for doctor/admin; family cannot edit orders/manage grants. Doctor/patient equally manage grants with audit. New spaces do not auto-grant family access.
 - [ ] 2026-10-17 · Gold M / Codex for Ranveer: 28 unit tests and 18 browser flow groups pass locally; backend isolation, realtime and live AI/delivery not verified. All 71 ECC definitions inventoried, relevant bounded tasks used. Please identify every active repository Claude/Codex session and ownership so exact file/commit clearance reaches each one; silence will not authorize a push.
