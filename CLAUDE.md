@@ -57,4 +57,4 @@ Skip all of this if the session changed nothing (e.g. it only answered questions
 
 - `main` is protected: every change goes through a PR. See `README.md`.
 - Every PR gets a conflict check and a Claude review. Comment `@claude resolve the merge conflicts` on a PR to have conflicts fixed.
-- No code yet. Once a side picks its stack, record it (and how to run it) under "Current state" in that side's progress file.
+- Each side records its stack and how to run it under "Current state" in its progress file (backend: Supabase in `backend/`; frontend: React + Vite in `frontend/`).
