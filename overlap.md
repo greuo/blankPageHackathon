@@ -38,7 +38,7 @@ Things both sides rely on: API base URL, ports, data shapes, auth, env vars. Eit
   - New `action: "warning_sign"`: the patient described one of the warning signs in their notes. The reply says what the notes say to do; `suggest_notify_doctor` is true, so show "Send to my doctor" (same as `referred`).
   - Care notes can have an optional `normal` list: what's expected after the visit ("slight pinkness along the stitches for 2-3 days"). Please add a **What's normal** field to Doctor mode / the instructions page. With it the bot can answer "is this normal?"; without it, those questions go to the doctor.
 
-- [ ] 2026-10-17 · Andrew: **`chat` is live for the patient-only tables, and guest sign-in is on hosted.**
+- [x] 2026-10-17 · Andrew: **`chat` is live for the patient-only tables, and guest sign-in is on hosted.**
   - Call `supabase.functions.invoke('chat', { body: { content } })` instead of inserting into `messages` yourself. It saves the patient message and the bot reply (both also arrive by realtime). Response: `{ patient_message, reply, action, suggest_notify_doctor }`, `action` is `answered` | `small_talk` | `referred` | `emergency`. When `suggest_notify_doctor` is true, offer "Send to my doctor". 429 means too many messages (20 per 10 minutes).
   - Care notes: saving your free-text instructions as `{ "instructions": "…" }` works today; the bot reads it line by line. See `PLAN.md` → Care-notes content shape.
   - "Send to my doctor" will need an email account: guests get asked to add an email first (anti-spam, `PLAN.md` → Doctor emails: abuse limits).
@@ -64,6 +64,8 @@ Things both sides rely on: API base URL, ports, data shapes, auth, env vars. Eit
   - ↳ 2026-10-17 · Andrew: Superseded by the patient-only plan; no inbox or admin screens any more.
 
 ## Frontend → Backend
+
+- [ ] 2026-10-17 · Claude for Sangwoo: **Live chat is bound** (branch `feat/chat-live-binding`). The patient assistant signs guests in with `supabase.auth.signInAnonymously()` and sends through `supabase.functions.invoke('chat')` (`frontend/src/data/supabase.ts` + `frontend/src/patient/Assistant.tsx`); replies render live, 429 shows the retry wait, and `suggest_notify_doctor: true` (both `referred` and `warning_sign`) shows a "Send to my doctor" button that creates/reuses a `doctors` row and calls `notify-doctor`, with `guest_must_sign_up` / `doctor_has_no_email` / 429 / 502 / 503 mapped to patient-facing messages. Verified in the browser against hosted: a fresh guest got a live `referred` reply, and `notify-doctor` answered 503 (Resend key still unset), which the UI explains. Not yet bound: chat history + realtime from `messages` (local storage still renders the transcript), saving care notes/doctors from Doctor mode, and the "What's normal" field. The canned local `reply()` in `patient/model.ts` is no longer used by the assistant.
 
 - [ ] 2026-10-17 · Gold M / Codex for Ranveer: UI revamp PR #13 preserves the patient-only local adapter and adds a local email draft preview using recorded progress. No endpoint, backend schema, env var or port changed; nothing is sent. Read the current live chat/guest contracts and proposed doctor routes. Ranveer still wants frontend work first, so binding, What's normal and warning-sign actions are queued in frontend todo. Public route implementation and email integration remain for the connection pass. Family/admin/doctor-account UI is no longer reachable; old family-access notes below are historical.
 

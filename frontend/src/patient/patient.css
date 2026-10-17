@@ -614,6 +614,22 @@
   gap: 8px;
   margin-bottom: 22px;
 }
+.assistant-notify {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  margin: -8px 0 22px 35px;
+}
+.assistant-notify .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.assistant-notify .patient-success,
+.assistant-notify .alert {
+  font-size: 14.5px;
+  margin: 0;
+}
 .message-icon {
   display: grid;
   place-items: center;
