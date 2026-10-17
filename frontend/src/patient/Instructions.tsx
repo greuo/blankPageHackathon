@@ -2,6 +2,7 @@ import { useRef, useState, type FormEvent } from 'react';
 import { ArrowLeft, UploadCloud, FileText, X, Save } from 'lucide-react';
 import { errorText } from '../components/ui';
 import { useSurfaceEntrance } from '../components/motion';
+import { ensureSession, syncCareNotes } from '../data/supabase';
 import { patientStore } from './store';
 import type { Attachment, PatientState } from './model';
 export default function Instructions({
@@ -73,6 +74,11 @@ export default function Instructions({
         s.instructions = text.trim();
         s.attachments = files;
       });
+      // Warm the server copy so the assistant answers from the new text right away. Best effort:
+      // the assistant re-syncs before every question, so a failure here costs nothing.
+      void ensureSession()
+        .then(() => syncCareNotes({ doctor, email, instructions: text }))
+        .catch(() => {});
       onSaved();
     } catch (reason) {
       setError(errorText(reason));

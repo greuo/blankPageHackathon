@@ -1,12 +1,44 @@
 import { useEffect, useRef, useState } from 'react';
-import { MessageCircle, Maximize2, Minimize2, FileText, CircleHelp } from 'lucide-react';
+import { MessageCircle, Maximize2, Minimize2, FileText, CircleHelp, Mail } from 'lucide-react';
 import { motion, useReducedMotion } from 'motion/react';
 import PromptBar from '../components/PromptBar';
 import { Tooltip } from '../components/Tooltip';
 import { Skeleton, errorText } from '../components/ui';
 import { useSurfaceEntrance } from '../components/motion';
-import { id, isEmergency, reply, type PatientState } from './model';
+import {
+  EdgeError,
+  ensureDoctor,
+  ensureSession,
+  notifyDoctor,
+  sendChat,
+  syncCareNotes,
+} from '../data/supabase';
+import { isEmergency, type ChatMessage, type PatientState } from './model';
 import { patientStore } from './store';
+
+const MAX_CHAT_LENGTH = 4000;
+
+function chatErrorText(reason: unknown): string {
+  if (reason instanceof EdgeError && reason.status === 429) {
+    const minutes = Math.max(1, Math.ceil((reason.retryAfterSeconds ?? 600) / 60));
+    return `You’ve reached the message limit for now. Try again in about ${minutes} minute${minutes === 1 ? '' : 's'}.`;
+  }
+  return errorText(reason);
+}
+
+function notifyErrorText(reason: unknown): string {
+  if (reason instanceof EdgeError) {
+    if (reason.code === 'guest_must_sign_up')
+      return 'Guest sessions can’t email a doctor yet. Add an email to your account first.';
+    if (reason.code === 'doctor_has_no_email')
+      return 'Your doctor has no email on file. Add one first.';
+    if (reason.status === 429)
+      return 'Too many messages to your doctor for now. Please try again later.';
+    if (reason.status === 502) return 'The email could not be sent; nothing was saved. Try again.';
+    if (reason.status === 503) return 'Doctor email isn’t configured in this demo yet.';
+  }
+  return errorText(reason);
+}
 export default function Assistant({
   state,
   expanded = false,
@@ -43,10 +75,20 @@ export default function Assistant({
     if (messageLog.current && pinned.current)
       messageLog.current.scrollTop = messageLog.current.scrollHeight;
   }, [state.messages.length, pending]);
+  const [notify, setNotify] = useState<{
+    id: string;
+    status: 'sending' | 'sent' | 'error';
+    note: string;
+  } | null>(null);
   async function send(value = text) {
-    if (!value.trim() || pending) return;
-    if (isEmergency(value)) {
-      onEmergency(value);
+    const content = value.trim();
+    if (!content || pending) return;
+    if (isEmergency(content)) {
+      onEmergency(content);
+      return;
+    }
+    if (content.length > MAX_CHAT_LENGTH) {
+      setError(`Keep a message under ${MAX_CHAT_LENGTH.toLocaleString()} characters.`);
       return;
     }
     const sequence = ++request.current;
@@ -54,23 +96,53 @@ export default function Assistant({
     setPending(true);
     setError('');
     try {
-      // Yield for rendering, then prepare the local response. No simulated network delay.
-      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+      await ensureSession();
+      // The bot reads notes from the server, so give it the instructions saved in this app.
+      await syncCareNotes({
+        doctor: state.doctor,
+        email: state.email,
+        instructions: state.instructions,
+      });
+      const response = await sendChat(content);
       if (request.current !== sequence) return;
-      const response = reply(state, value);
       patientStore.update((s) => {
         s.messages.push(
-          { id: id(), role: 'patient', text: value.trim() },
-          { id: id(), role: 'assistant', text: response },
+          { id: response.patient_message.id, role: 'patient', text: content },
+          {
+            id: response.reply.id,
+            role: 'assistant',
+            text: response.reply.content,
+            ...(response.suggest_notify_doctor
+              ? { suggestNotifyDoctor: true, patientText: content }
+              : {}),
+          },
         );
       });
       setText('');
     } catch (reason) {
-      if (request.current === sequence) setError(errorText(reason));
+      if (request.current === sequence) setError(chatErrorText(reason));
     } finally {
       if (request.current === sequence) setPending(false);
     }
   }
+  async function sendToDoctor(message: ChatMessage) {
+    if (notify?.status === 'sending') return;
+    setNotify({ id: message.id, status: 'sending', note: '' });
+    try {
+      await ensureSession();
+      const doctorId = await ensureDoctor(state.doctor, state.email);
+      await notifyDoctor(doctorId, message.patientText ?? message.text);
+      setNotify({
+        id: message.id,
+        status: 'sent',
+        note: `Sent. ${state.doctor} will receive an email with a secure link to your message (it expires in 7 days).`,
+      });
+    } catch (reason) {
+      setNotify({ id: message.id, status: 'error', note: notifyErrorText(reason) });
+    }
+  }
+  const last = state.messages.at(-1);
+  const suggestion = last?.role === 'assistant' && last.suggestNotifyDoctor ? last : null;
   return (
     <section
       className={`patient-assistant ${expanded ? 'expanded' : ''}`}
@@ -111,9 +183,9 @@ export default function Assistant({
         <div className="assistant-about">
           <strong>Here to help you keep track.</strong>
           <p>
-            I find provided instructions and summarize your own reports. I do not diagnose, adjust
-            treatment or verify that a dose was taken. This demo uses prepared responses and sends
-            no email.
+            I answer from the care notes your doctor provided, through your care service. I do not
+            diagnose, adjust treatment or verify that a dose was taken. When I can’t answer safely,
+            I’ll suggest sending your question to your doctor.
           </p>
         </div>
       )}
@@ -145,6 +217,30 @@ export default function Assistant({
             <p>{message.text}</p>
           </motion.div>
         ))}
+        {suggestion && (
+          <div className="assistant-notify">
+            <button
+              className="btn secondary"
+              disabled={notify?.id === suggestion.id && notify.status !== 'error'}
+              onClick={() => void sendToDoctor(suggestion)}
+            >
+              <Mail size={16} />
+              {notify?.id === suggestion.id && notify.status === 'sending'
+                ? 'Sending to your doctor…'
+                : notify?.id === suggestion.id && notify.status === 'sent'
+                  ? 'Sent to your doctor'
+                  : 'Send to my doctor'}
+            </button>
+            {notify?.id === suggestion.id && notify.status === 'sent' && (
+              <p className="patient-success">{notify.note}</p>
+            )}
+            {notify?.id === suggestion.id && notify.status === 'error' && (
+              <p className="alert error" role="alert">
+                {notify.note}
+              </p>
+            )}
+          </div>
+        )}
         {pending && <Skeleton kind="conversation" />}
       </div>
       <div className="assistant-prompts">

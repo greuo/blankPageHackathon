@@ -23,7 +23,9 @@ Shared list for both sides.
 
 - [x] Revamp green patient UI with requested typography, React Bits components, tooltips, skeletons and reduced-motion support; build + 62 tests and responsive browser checks pass (2026-10-17, Gold M for Ranveer).
 - [ ] When backend connection resumes, agree `/doctor-message#<token>` and `/doctor-entry#<token>` routes with Andrew; keep the local preview distinct from actual sending (2026-10-17, Gold M for Ranveer).
-- [ ] Add structured What's normal guidance and handle live `warning_sign` / `suggest_notify_doctor` responses during patient-adapter integration (2026-10-17, Gold M for Ranveer).
+- [ ] Add structured What's normal guidance ~~and handle live `warning_sign` / `suggest_notify_doctor` responses~~ handled in the chat binding below (2026-10-17, Gold M for Ranveer).
+- [x] Bind the live chat: anonymous guest session + `chat` edge function in the assistant, 429 handled, `suggest_notify_doctor` → "Send to my doctor" via `notify-doctor` with the contract's error codes mapped (2026-10-17, Claude for Sangwoo).
+- [ ] Bind the rest of the patient data: chat history + realtime from `messages`, save care notes/doctors from Doctor mode to Supabase (local-only today) (2026-10-17, Claude for Sangwoo).
 
 ## Backend
 

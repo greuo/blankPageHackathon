@@ -13,7 +13,11 @@ Snapshot of what exists right now. Rewrite it each session; don't append.
     - new tables start read-only for the API roles
     - care-note versions are never reused (`patients.last_note_version`)
     - the `doctor_messages` insert trigger enforces the anti-spam limits: email account only, 5/hour and 20/day per patient, 10/day per recipient address (stored in `recipient_email`), and the doctor must have an email
-  - Anonymous (guest) sign-in is on, locally and on hosted. The sign-up trigger creates the `patients` row for every new user; a guest who adds an email keeps the same id and data.
+  - Sign-in: the app is **login-only** (email + password) since 2026-10-17, at the user's request.
+    - `config.toml` has `[auth] enable_signup = false`. GoTrue treats anonymous sign-in as a sign-up, so this also turns guests off.
+    - **Hosted still has sign-ups and guests on** until the dashboard switch (Authentication → Sign In / Providers → "Allow new users to sign up") is turned off. That is waiting on the login gate being merged. After it is off, `GET /auth/v1/settings` shows `disable_signup: true`.
+    - The sign-up trigger still creates the `patients` row for every new user, so accounts made by hand (SQL, dashboard) work like any other.
+    - Registration emails are not set up (no SMTP). Hosted keeps email confirmations on (`mailer_autoconfirm: false`), so re-opening sign-up later needs a mail sender first.
   - Realtime on `messages` and `care_notes`.
   - `chat` edge function, deployed, with `ANTHROPIC_API_KEY` set:
     - answers from the current care notes, including clear implications and "is this normal?" when the notes have a `normal` list
@@ -22,6 +26,7 @@ Snapshot of what exists right now. Rewrite it each session; don't append.
     - contract below
   - Demo data:
     - Alex Rivera, `alex@demo.example.com`. Password in Andrew's `backend/.env.local`.
+    - Sample admin, `admin@demo.example.com` (id `…0103`, in `seed.sql` and created on hosted 2026-10-17). An ordinary patient with an empty care space; the only difference is `app_metadata.role = 'admin'`, which only the service role can write. No policy or function reads it yet, so it is a label, not extra access. Password: `ADMIN_PASSWORD` in `backend/.env.local` (git-ignored); `local-demo-only` after a local `db reset`.
     - a guest "Sam" (anonymous, can't be logged into)
     - each has a doctor, care notes with a `normal` list (Alex v1 + v2, Sam v1) and a short chat. Alex has a sent doctor message, Sam a used QR link.
 - **Built, not deployed yet (PR `backend/doctor-message-link`):** `notify-doctor` and `view-doctor-message`, the secure-link doctor emails. Contracts below. Deploy both after merge, and only once the email secrets are set (see "Start here" step 1); until then `notify-doctor` answers 503 and saves nothing.
@@ -43,12 +48,13 @@ Snapshot of what exists right now. Rewrite it each session; don't append.
     4. Rerun `tests/access.sql`.
     - Use the Supabase MCP, the SQL editor, or the Management API `POST /v1/projects/<ref>/database/query` with the CLI's token.
   - Bot behaviour change: deploy the branch as a temporary `chat-preview` function, run the cases in `chat/eval_live.ts` through it, then delete it. That way the live `chat` is never touched before merge.
-- **In progress:** doctor-message PR open; needs the Resend key and the frontend's `/doctor-message` page. **Next: see "Start here: next session" below.**
+- **In progress:** login gate written and tested but not committed (see the session log); once it is merged, turn off the hosted sign-up switch. Doctor-message PR open; needs the Resend key and the frontend's `/doctor-message` page. **Next: see "Start here: next session" below.**
 - **Known issues:**
   - Demo email uses Resend's test sender `onboarding@resend.dev` (no domain): it only delivers to the Resend account owner's address, so the demo doctor's email must be that address. Other recipients fail with 502 and nothing is saved.
   - Leftovers from the doctor-message live test, still on hosted (the SQL cleanup was declined): one expired test message from Alex (`content` starts with `LIVE TEST`) and one anonymous test guest with doctor "Dr Test". Harmless; delete with `delete from public.doctor_messages where content like 'LIVE TEST%'; delete from auth.users where id = '7eba3d3a-d255-4809-9d93-6046f65d2d84';`
   - Supabase advisor: leaked-password protection is off (dashboard setting).
-  - Supabase limits anonymous sign-ups to 30/hour per IP. Turn on captcha if that's not enough.
+  - Supabase limits anonymous sign-ups to 30/hour per IP. Turn on captcha if that's not enough. (Moot once sign-ups are off.)
+  - `config.toml` has drifted from the hosted auth settings. `supabase config push` previews these changes to hosted: email confirmations on → off, `site_url` `http://localhost:3000` → `http://127.0.0.1:3000`, redirect URLs, OTP length 8 → 6, email `max_frequency` 1m → 1s, TOTP MFA on → off, plus `storage.vector`. **Don't push it whole.** Change one hosted setting through the dashboard or the Management API instead (`PATCH /v1/projects/<ref>/config/auth` with only that field), or bring `config.toml` in line with hosted first. The hosted sign-up switch was left for the dashboard because the CLI token can't be read from the keychain by a Claude session.
   - PR #4 (hospital-model chatbot) is closed. Its migration `20261017152104_chatbot.sql` stays in `migrations/` so the repo matches the hosted history; the patient-only migration drops its tables again.
 
 ## Start here: next session
@@ -127,12 +133,14 @@ Patient functions: `supabase.functions.invoke(name, { body })` while signed in (
 RLS filters everything to the caller, so no permission `where` is needed (updates and deletes still need a filter).
 
 ```js
-// Sign in
-await supabase.auth.signInAnonymously()                // guest
-await supabase.auth.signUp({ email, password, options: { data: { display_name } } })
+// Sign in. Login-only: signInWithPassword is the only way in. The next two stop working once
+// sign-ups are off (config.toml has them off; hosted after the dashboard switch).
+await supabase.auth.signInAnonymously()                // guest (off with sign-ups)
+await supabase.auth.signUp({ email, password, options: { data: { display_name } } })  // (off)
 await supabase.auth.signInWithPassword({ email, password })
+await supabase.auth.signOut({ scope: 'local' })        // this browser only
 
-// Guest → email account: same user id, keeps all data
+// Guest → email account: same user id, keeps all data (only while guests exist)
 await supabase.auth.updateUser({ email })     // user confirms the email if confirmations are on
 await supabase.auth.updateUser({ password })  // once the email is confirmed
 // (email already has an account → error; sign in to it instead, guest data doesn't move)
@@ -167,6 +175,17 @@ Newest first. One entry per session:
 - **Notes:** blockers, decisions, gotchas (optional)
 ```
 
+### 2026-10-17 · Andrew (care-notes sync: the app's instructions now reach the bot)
+- **Did:** frontend fix on the backend contract: before every chat question (and best-effort on saving instructions) the app inserts a new `care_notes` version `{ instructions }` linked to the patient's `doctors` row (created/updated from the locally saved doctor), so the deployed `chat` bot answers from the same notes the app shows instead of referring everything. Richer structured notes (keys beyond `instructions`) are never overwritten. `ensureDoctor` now also keeps name/email in step.
+- **Files:** `frontend/src/data/supabase.ts` (`syncCareNotes`, `ensureDoctor`), `frontend/src/patient/Assistant.tsx`, `frontend/src/patient/Instructions.tsx`, tests (`supabase.sync.test.ts`, `Assistant.test.tsx`). Branch `feat/ai-chat-binding`, on top of the chat-binding commit 63db7ab.
+- **Next:** merge the PR; frontend may add a "What's normal" / warning-signs field to Add instructions so those answers cite structured items.
+- **Notes:** verified live on hosted as a fresh guest: no notes → referred; after sync → cited answer ("no swimming until stitches out"), "is this normal?" answered from the normal line with the safety footer, dose change → referred with "Send to my doctor" shown. Backend itself unchanged.
+
+### 2026-10-17 · Andrew (login page, sign-ups off, sample admin)
+- **Did:** The user asked for a login page, registration turned off (no registration emails) and a sample admin account. Backend: `config.toml` `[auth] enable_signup = false`; `admin@demo.example.com` added to `seed.sql` and created on hosted (bcrypt hash computed locally, so the password never went through chat; stored as `ADMIN_PASSWORD` in `backend/.env.local`); checked hosted `signInWithPassword` for the admin (200) and that a wrong password and an unknown email give the identical `invalid_credentials` 400. Frontend, written from this backend session at the user's request: `frontend/src/auth/` login page + `AuthGate`, `PatientApp` sign-out and name greeting, sign-in helpers at the top of `data/supabase.ts`, 24 new tests (frontend suite: 109 passing). Ran an independent security / regression / UX review workflow on it.
+- **Files:** `backend/supabase/config.toml`, `backend/supabase/seed.sql`, `frontend/src/auth/*`, `frontend/src/data/supabase.ts` (top block), `frontend/src/data/supabase.auth.test.ts`, `frontend/src/patient/PatientApp.tsx`, `PatientApp.auth.test.tsx`, `frontend/src/App.tsx`, `PLAN.md`, `overlap.md`, `todo.md`, this file
+- **Next:** merge the login gate, then turn off "Allow new users to sign up" on hosted (dashboard) and confirm `GET /auth/v1/settings` says `disable_signup: true`. Team to ack that guests and self sign-up are gone (changes `overlap.md` → Agreed → Auth).
+- **Notes:** I could not flip the hosted switch myself: the permission check denied reading the Supabase CLI token from the keychain, which the Management API call needs. `supabase config push` is not an option either: it would rewrite eight unrelated hosted auth settings (see Known issues). Nothing is committed from this session; the frontend files sit in the shared checkout beside another Claude session's chat-binding work.
 ### 2026-10-17 · Andrew (remove the Claude PR review)
 - **Did:** Removed the broken Claude review from CI: deleted the `claude-review` job from `.github/workflows/pr-checks.yml` (the deterministic conflict check stays), updated `README.md` and the two `CLAUDE.md` lines that described it. `@claude` PR/issue comments (`claude.yml`) and `conflict-watch.yml` are untouched. No backend code changed.
 - **Files:** `.github/workflows/pr-checks.yml`, `README.md`, `CLAUDE.md`, `overlap.md`, this file
