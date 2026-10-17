@@ -11,6 +11,14 @@
    - **Claude review**: Claude reviews the diff, leaves inline comments on real problems, and flags textual and semantic conflicts.
 4. Merge once **Claude review** passes and there are no conflicts.
 
+## Team docs
+
+Claude Code sessions read and update these automatically (rules in `CLAUDE.md`):
+
+- `backend_progress.md` / `frontend_progress.md`: current state and session log for each side. Each side only edits its own.
+- `todo.md`: what's left to do on each side, plus feature ideas.
+- `overlap.md`: notes for the other side (API changes, requests, questions).
+
 ## Asking Claude for help
 
 Comment on any PR or issue with `@claude ...`. For example:
