@@ -60,7 +60,12 @@ Shared list for both sides.
 - [ ] `entry-link` + `doctor-entry`: QR token (30 min, one use), pre-filled current notes, save as `entered_via = 'qr'` (2026-10-17, Andrew)
 - [ ] Turn on captcha for anonymous sign-ins if guest abuse shows up (2026-10-17, Andrew) (moot once sign-ups are off)
 - [x] Login-only: `enable_signup = false` in `config.toml`, sample admin `admin@demo.example.com` in `seed.sql` and on hosted, login page + gate in the frontend (written from the backend session at the user's request) (2026-10-17, Andrew)
-- [ ] After the login gate is merged: turn off "Allow new users to sign up" on hosted (Dashboard → Authentication → Sign In / Providers) and check `GET /auth/v1/settings` shows `disable_signup: true` (2026-10-17, Andrew)
+- [ ] **Urgent:** turn off "Allow new users to sign up" AND "Allow anonymous sign-ins" on hosted (Dashboard → Authentication → Sign In / Providers) and check `GET /auth/v1/settings` shows `disable_signup: true`. The login gate is merged (#21); until this is done anyone can mint guest accounts, each with a fresh chat quota (2026-10-17, Andrew)
+- [x] Strict `chat` rate limits: account / address / global over minute, hour, day; atomic counters in the database; fails closed; message and context size bounded (2026-10-17, Andrew)
+- [x] Apply migration `20261017200000_chat_rate_limits.sql` on hosted, redeploy `chat`, rerun `tests/access.sql` (113/115; the 2 misses are the `LIVE TEST` leftover), check the limiter and the edge's address headers live (2026-10-17, Andrew)
+- [ ] Run `backend/supabase/functions/chat/burst_live.ts` with a real login (instructions in its header) to confirm a burst gets 429s through the deployed `chat`; it leaves ~10 test rows in that account's chat (2026-10-17, Andrew)
+- [ ] Set a monthly spend limit on the Anthropic key's workspace (console) as the hard cap behind the code limits (2026-10-17, Andrew)
+- [ ] Decide how judges get in once sign-ups are off (shared demo login given to judges, or a short-lived judge account) and check the numbers in `backend_progress.md` → Chat rate limits fit that (2026-10-17, Andrew)
 - [ ] Bring `config.toml` in line with the hosted auth settings (email confirmations, site URL, redirect URLs, OTP length, MFA) so `supabase config push` is safe to run (2026-10-17, Andrew)
 - [ ] Update `PLAN.md` flows once the team agrees to login-only (it still describes guests and self sign-up) (2026-10-17, Andrew)
 

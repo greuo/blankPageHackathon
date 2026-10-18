@@ -228,6 +228,12 @@ select pg_temp.try_write('Sam (guest): cannot write a message for Alex', false,
 select pg_temp.try_write('Sam (guest): cannot rename Alex', false,
   $q$update patients set display_name = 'Fake' where id = '00000000-0000-0000-0000-000000000101'$q$);
 
+-- The rate limiter is for the service role only: signed-in users can't call it or read its counters.
+select pg_temp.try_value('Sam (guest): cannot call the rate limiter (-1 = denied)', -1,
+  $q$select count(*) from public.hit_rate_limits(array['access-check'], array[60], array[1])$q$);
+select pg_temp.try_value('Sam (guest): cannot read the rate-limit counters (-1 = denied)', -1,
+  $q$select count(*) from private.rate_limits$q$);
+
 -- ---------------------------------------------------------------- Not signed in
 set role anon;
 set request.jwt.claims = '{"role":"anon"}';
@@ -249,6 +255,11 @@ select pg_temp.try_write('anon: cannot add a doctor', false,
 select pg_temp.try_write('anon: cannot save care notes', false,
   $q$insert into care_notes (patient_id, doctor_id, content)
      values ('00000000-0000-0000-0000-000000000101', '00000000-0000-0000-0000-000000000201', '{"reason":"Fake"}')$q$);
+
+select pg_temp.try_value('anon: cannot call the rate limiter (-1 = denied)', -1,
+  $q$select count(*) from public.hit_rate_limits(array['access-check'], array[60], array[1])$q$);
+select pg_temp.try_value('anon: cannot read the rate-limit counters (-1 = denied)', -1,
+  $q$select count(*) from private.rate_limits$q$);
 
 reset role;
 reset request.jwt.claims;
@@ -313,6 +324,99 @@ begin
 end $$;
 select pg_temp.try_value('Limits: editing the doctor row doesn''t reset the per-address cap (-1 = blocked)', -1,
   $q$select pg_temp.recipient_cap_bypass()$q$);
+
+-- ---------------------------------------------------------------- Rate limiter (as postgres)
+-- The edge functions call hit_rate_limits with the service role. Each helper runs a short sequence of
+-- calls inside one check (now() doesn't move within a transaction, so a window can't roll over
+-- halfway), and try_value undoes the counters afterwards.
+create or replace function pg_temp.rl_blocked_calls(k text, w integer, mx integer, times integer) returns bigint
+language plpgsql as $$
+declare c bigint; total bigint := 0;
+begin
+  for i in 1 .. times loop
+    select count(*) into c from public.hit_rate_limits(array[k], array[w], array[mx]);
+    total := total + c;
+  end loop;
+  return total;
+end $$;
+
+create or replace function pg_temp.rl_hits_after(k text, w integer, mx integer, times integer) returns bigint
+language plpgsql as $$
+begin
+  perform pg_temp.rl_blocked_calls(k, w, mx, times);
+  return (select hits from private.rate_limits where key = k and window_seconds = w);
+end $$;
+
+-- Two limits [5, 1]: the second call is stopped by the second one, and must give back its increment
+-- on the first. Returns first-counter-hits * 10 + blocked position.
+create or replace function pg_temp.rl_rollback() returns bigint
+language plpgsql as $$
+declare pos integer;
+begin
+  perform 1 from public.hit_rate_limits(array['rl:c1', 'rl:c2'], array[60, 60], array[5, 1]);
+  select blocked into pos from public.hit_rate_limits(array['rl:c1', 'rl:c2'], array[60, 60], array[5, 1]);
+  return (select hits from private.rate_limits where key = 'rl:c1') * 10 + coalesce(pos, 0);
+end $$;
+
+-- Same key, two window lengths: separate counters. Call 3 is stopped by the 60 s window; call 2 must not be.
+create or replace function pg_temp.rl_windows() returns bigint
+language plpgsql as $$
+declare total bigint := 0; c bigint;
+begin
+  select count(*) into c from public.hit_rate_limits(array['rl:w'], array[60], array[1]);   total := total + c;
+  select count(*) into c from public.hit_rate_limits(array['rl:w'], array[3600], array[1]); total := total + c;
+  select count(*) into c from public.hit_rate_limits(array['rl:w'], array[60], array[1]);   total := total + c;
+  return total;
+end $$;
+
+create or replace function pg_temp.rl_bad_input(kind int) returns bigint
+language plpgsql as $$
+begin
+  if kind = 1 then perform public.hit_rate_limits(array['a', 'b'], array[60], array[1]);        -- lengths differ
+  elsif kind = 2 then perform public.hit_rate_limits(array['a'], array[0], array[1]);             -- window too short
+  elsif kind = 3 then perform public.hit_rate_limits(array['a'], array[86401], array[1]);         -- window over a day
+  elsif kind = 4 then perform public.hit_rate_limits(array['a'], array[60], array[-1]);           -- negative max
+  elsif kind = 5 then perform public.hit_rate_limits(array[''], array[60], array[1]);             -- empty key
+  else perform public.hit_rate_limits(array[]::text[], array[]::integer[], array[]::integer[]);   -- nothing to check
+  end if;
+  return 0;
+exception when others then
+  return 1;
+end $$;
+
+select pg_temp.try_value('Rate limiter: max calls per window pass (3 calls, max 3 -> 0 blocked)', 0,
+  $q$select pg_temp.rl_blocked_calls('rl:a', 60, 3, 3)$q$);
+select pg_temp.try_value('Rate limiter: the call over the max is blocked (4 calls, max 3 -> 1 blocked)', 1,
+  $q$select pg_temp.rl_blocked_calls('rl:a', 60, 3, 4)$q$);
+select pg_temp.try_value('Rate limiter: stays blocked until the window ends (10 calls, max 3 -> 7 blocked)', 7,
+  $q$select pg_temp.rl_blocked_calls('rl:a', 60, 3, 10)$q$);
+select pg_temp.try_value('Rate limiter: blocked calls are not counted (5 calls, max 2 -> counter is 2)', 2,
+  $q$select pg_temp.rl_hits_after('rl:b', 60, 2, 5)$q$);
+select pg_temp.try_value('Rate limiter: a blocked call undoes its earlier increments (counter 1, blocked at 2 -> 12)', 12,
+  $q$select pg_temp.rl_rollback()$q$);
+select pg_temp.try_value('Rate limiter: a max of 0 blocks at once', 1,
+  $q$select pg_temp.rl_blocked_calls('rl:zero', 60, 0, 1)$q$);
+select pg_temp.try_value('Rate limiter: window lengths of one key count separately (-> 1 blocked)', 1,
+  $q$select pg_temp.rl_windows()$q$);
+select pg_temp.try_value('Rate limiter: different keys count separately (2 keys x 2 calls, max 2 -> 0 blocked)', 0,
+  $q$select pg_temp.rl_blocked_calls('rl:k1', 60, 2, 2) + pg_temp.rl_blocked_calls('rl:k2', 60, 2, 2)$q$);
+select pg_temp.try_value('Rate limiter: retry_after is within the window (1-60 s)', 1,
+  $q$select (select retry_after between 1 and 60 from public.hit_rate_limits(array['rl:r'], array[60], array[0]))::int$q$);
+select pg_temp.try_value('Rate limiter: array lengths must match', 1, $q$select pg_temp.rl_bad_input(1)$q$);
+select pg_temp.try_value('Rate limiter: window under 1 s is rejected', 1, $q$select pg_temp.rl_bad_input(2)$q$);
+select pg_temp.try_value('Rate limiter: window over a day is rejected', 1, $q$select pg_temp.rl_bad_input(3)$q$);
+select pg_temp.try_value('Rate limiter: negative max is rejected', 1, $q$select pg_temp.rl_bad_input(4)$q$);
+select pg_temp.try_value('Rate limiter: empty key is rejected', 1, $q$select pg_temp.rl_bad_input(5)$q$);
+select pg_temp.try_value('Rate limiter: an empty list is rejected', 1, $q$select pg_temp.rl_bad_input(6)$q$);
+insert into results (check_name, expected, actual)
+select 'Rate limiter: only the service role can execute it (anon, authenticated: no)', 0, count(*)
+from information_schema.routine_privileges
+where routine_schema = 'public' and routine_name = 'hit_rate_limits'
+  and grantee in ('anon', 'authenticated', 'PUBLIC');
+insert into results (check_name, expected, actual)
+select 'Rate limiter: service_role can execute it', 1, count(*)
+from information_schema.routine_privileges
+where routine_schema = 'public' and routine_name = 'hit_rate_limits' and grantee = 'service_role';
 
 -- ---------------------------------------------------------------- Default privileges
 insert into results (check_name, expected, actual)

@@ -22,7 +22,7 @@ Snapshot of what exists right now. Rewrite it each session; don't append.
   - `chat` edge function, deployed, with `ANTHROPIC_API_KEY` set:
     - answers from the current care notes, including clear implications and "is this normal?" when the notes have a `normal` list
     - flags warning signs from the notes, refers everything unclear to the doctor, and sends red-flag emergencies to 911 / the clinic phone
-    - rate-limited per patient
+    - rate-limited in three layers (per account, per network address, global), counted in the database: see "Chat rate limits" below
     - contract below
   - Demo data:
     - Alex Rivera, `alex@demo.example.com`. Password in Andrew's `backend/.env.local`.
@@ -34,14 +34,16 @@ Snapshot of what exists right now. Rewrite it each session; don't append.
 - **Frontend hosting:** `https://foredge.me` and `www.foredge.me` serve `frontend/dist` from the Cloudflare Worker `foredge` (static assets, SPA fallback so `/doctor-message` loads). Config `frontend/wrangler.jsonc`; deploy with `cd frontend && npm run deploy` (needs `npx wrangler login` to Andrew's Cloudflare account). The old Vercel `www` record is gone.
 - **Tests (all passing):**
   - `tests/access.sql`: 94/94 on hosted.
-  - `chat` unit tests: 19/19.
-  - Live run of the bot against Claude: 15/15 cases as expected, 0 unsafe.
+  - `chat` unit tests: 27/27 (incl. the limit settings and the notes cap); `_shared` (limiter helpers) 7/7.
+  - `tests/access.sql`: 113/115 on hosted after the migration. The 2 misses are the known `LIVE TEST` leftover (Alex has 2 doctor messages instead of 1, and his per-address daily cap is already used), not the limiter; all 21 new limiter checks pass (behaviour, bad input, only the service role can call it). They go back to green once the leftover is deleted (SQL under Known issues).
+  - Limiter live on hosted through a temporary no-JWT test function (deleted): 3 rounds of 15 parallel calls against a limit of 5 let exactly 5 through each time; 7 sequential `chat`-shaped calls (9 counters) blocked the 6th and 7th on the account minute limit with `retry_after` 48 and left every counter at exactly 5 (a blocked call costs no budget on any layer).
+  - Address headers on Supabase's edge (checked live): `cf-connecting-ip` is the real client address; a client-sent `CF-Connecting-IP` is rejected by Cloudflare (error 1000); client-sent `X-Real-IP` and `X-Forwarded-For` are discarded. So the per-address limit can't be dodged by spoofing.  - Live run of the bot against Claude: 15/15 cases as expected, 0 unsafe.
   - `notify-doctor` unit tests: 7/7 (token format, hashing, first-name escaping, email has no message content).
   - Doctor-message live run against temporary `-preview` deploys on hosted: 22/22 (since deleted).
 - **How to run / deploy:**
   - Frontend: nothing to run, use the hosted project (URL and key in `overlap.md` → Agreed).
   - Local stack: `cd backend && supabase start && supabase db reset`. Needs Docker; seeds the demo patients with password `local-demo-only`.
-  - Unit tests: `deno test --config backend/supabase/functions/chat/deno.json backend/supabase/functions/chat/` and `deno test backend/supabase/functions/notify-doctor/`
+  - Unit tests: `deno test --config backend/supabase/functions/chat/deno.json backend/supabase/functions/chat/`, `deno test backend/supabase/functions/_shared/` and `deno test backend/supabase/functions/notify-doctor/`
   - Deploy a function: `cd backend && supabase functions deploy <name> --project-ref repvtuxyszlqdjzciojx --use-api`. `--use-api` means no Docker. `view-doctor-message` also needs `--no-verify-jwt` (doctors have no login; `config.toml` says the same for local).
   - Schema change:
     1. Add `migrations/<timestamp>_<name>.sql`.
@@ -50,10 +52,11 @@ Snapshot of what exists right now. Rewrite it each session; don't append.
     4. Rerun `tests/access.sql`.
     - Use the Supabase MCP, the SQL editor, or the Management API `POST /v1/projects/<ref>/database/query` with the CLI's token.
   - Bot behaviour change: deploy the branch as a temporary `chat-preview` function, run the cases in `chat/eval_live.ts` through it, then delete it. That way the live `chat` is never touched before merge.
-- **In progress:** login gate written, tested (123 frontend tests) and independently reviewed, committed on branch `feat/login-page` (not pushed or merged yet; see the session log); once it is merged, turn off the hosted sign-up switch. Doctor-message emails: set `RESEND_API_KEY` (currently the placeholder `re_PASTE_KEY`, so sends fail with 502) and send one real email end to end; `/doctor-message` (#17) is live on foredge.me. **Next: see "Start here: next session" below.**
+- **In progress:** **strict `chat` rate limits** are **live on hosted since 2026-10-17** (PR #22: migration `20261017200000_chat_rate_limits.sql` applied and recorded, `chat` redeployed from the branch; the new `chat` answers 503 without the migration). Still to do: the end-to-end burst check through a real login (`chat/burst_live.ts`, run by a person) and the Anthropic spend limit. **Hosted still allows sign-ups and guest sign-in** (`GET /auth/v1/settings` on 2026-10-17: `disable_signup: false`, `anonymous_users: true`) even though the login gate is merged (#21): turn both off in the dashboard now, because anyone can mint guest accounts and each gets its own per-account quota. Doctor-message emails: set `RESEND_API_KEY` (currently the placeholder `re_PASTE_KEY`, so sends fail with 502) and send one real email end to end; `/doctor-message` (#17) is live on foredge.me. **Next: see "Start here: next session" below.**
 - **Known issues:**
   - Leftovers from the doctor-message live test, still on hosted (the SQL cleanup was declined): one expired test message from Alex (`content` starts with `LIVE TEST`) and one anonymous test guest with doctor "Dr Test". Harmless; delete with `delete from public.doctor_messages where content like 'LIVE TEST%'; delete from auth.users where id = '7eba3d3a-d255-4809-9d93-6046f65d2d84';`
   - Supabase advisor: leaked-password protection is off (dashboard setting).
+  - **Hosted sign-ups and guest sign-in are still on** (checked 2026-10-17: `disable_signup: false`, `anonymous_users: true`). Until they are off, per-account chat limits don't protect the Claude budget (a new guest = a new quota), only the address and global layers do. Dashboard → Authentication → Sign In / Providers: turn off "Allow new users to sign up" and "Allow anonymous sign-ins"; then `GET /auth/v1/settings` should show `disable_signup: true`.
   - Supabase limits anonymous sign-ups to 30/hour per IP. Turn on captcha if that's not enough. (Moot once sign-ups are off.)
   - `config.toml` has drifted from the hosted auth settings. `supabase config push` previews these changes to hosted: email confirmations on → off, `site_url` `http://localhost:3000` → `http://127.0.0.1:3000`, redirect URLs, OTP length 8 → 6, email `max_frequency` 1m → 1s, TOTP MFA on → off, plus `storage.vector`. **Don't push it whole.** Change one hosted setting through the dashboard or the Management API instead (`PATCH /v1/projects/<ref>/config/auth` with only that field), or bring `config.toml` in line with hosted first. The hosted sign-up switch was left for the dashboard because the CLI token can't be read from the keychain by a Claude session.
   - PR #4 (hospital-model chatbot) is closed. Its migration `20261017152104_chatbot.sql` stays in `migrations/` so the repo matches the hosted history; the patient-only migration drops its tables again.
@@ -122,7 +125,24 @@ Patient functions: `supabase.functions.invoke(name, { body })` while signed in (
 | `entry-link` | patient | creates a QR token (`entry_links`) | planned |
 | `doctor-entry` | anyone with a QR token | returns current notes, saves a new version (`entered_via = 'qr'`), marks the token used | planned |
 
-`chat`: body `{ content }` (1-4000 characters). Response 201 `{ patient_message, reply, action, suggest_notify_doctor }`; `action` is `answered` (from the notes or a clear implication of them, cited; symptom answers end with a fixed "contact your doctor / 911" line), `warning_sign` (the patient described a warning sign from the notes: what the notes say to do, `suggest_notify_doctor: true`), `small_talk` (fixed reply), `referred` ("check with your doctor", `suggest_notify_doctor: true`) or `emergency` (red-flag keyword: call 911 / clinic phone, no model call). 429 `{ error, retry_after_seconds }` past 20 messages per 10 minutes or 200 per day. Safety rules in `chat/safety.ts` (unit tests: `deno test --config backend/supabase/functions/chat/deno.json backend/supabase/functions/chat/`); live check against Claude: `chat/eval_live.ts`.
+`chat`: body `{ content }` (1-1000 characters; was 4000). Response 201 `{ patient_message, reply, action, suggest_notify_doctor }`; `action` is `answered` (from the notes or a clear implication of them, cited; symptom answers end with a fixed "contact your doctor / 911" line), `warning_sign` (the patient described a warning sign from the notes: what the notes say to do, `suggest_notify_doctor: true`), `small_talk` (fixed reply), `referred` ("check with your doctor", `suggest_notify_doctor: true`) or `emergency` (red-flag keyword: call 911 / clinic phone, no model call). 429 `{ error, code, retry_after_seconds }` (+ `Retry-After` header) when a limit is full, `code` = `rate_limited_user` | `rate_limited_ip` | `rate_limited_global`; the `error` text says how long to wait and always ends with "If this is an emergency, call 911.". 503 `code: "limiter_unavailable"` if the limits can't be checked (fails closed). Limits below. Safety rules in `chat/safety.ts` (unit tests: `deno test --config backend/supabase/functions/chat/deno.json backend/supabase/functions/chat/`); live check against Claude: `chat/eval_live.ts`.
+
+#### Chat rate limits
+
+Every `chat` message can cost a Claude call and the judges can't be allow-listed, so the limits are tight and layered. Only accepted messages count (a turned-away message costs nobody budget, so the global numbers are Claude calls). Counters live in `private.rate_limits`, updated atomically by `public.hit_rate_limits` (service role only), so parallel requests can't slip past and every function instance shares them.
+
+| Layer | Per minute | Per hour | Per day | Secrets (`CHAT_LIMIT_…`) |
+| --- | --- | --- | --- | --- |
+| Account (one signed-in user) | 5 | 20 | 60 | `USER_MIN`, `USER_HOUR`, `USER_DAY` |
+| Network address (`cf-connecting-ip`, else `x-real-ip`; stored hashed) | 8 | 40 | 150 | `IP_MIN`, `IP_HOUR`, `IP_DAY` |
+| Global (everybody together: the spending cap) | 15 | 100 | 400 | `GLOBAL_MIN`, `GLOBAL_HOUR`, `GLOBAL_DAY` |
+
+- Change one without a redeploy: `supabase secrets set CHAT_LIMIT_GLOBAL_DAY=150 --project-ref repvtuxyszlqdjzciojx`. A bad value (typo, negative) keeps the default; `0` blocks that limit completely, so `CHAT_LIMIT_GLOBAL_DAY=0` pauses the chat for everyone.
+- Also bounded per call: message 1,000 characters, 12 turns of history (each cut to 1,000), notes cut to 20,000 characters. Defined in `chat/index.ts` / `chat/limits.ts`.
+- Limiter unreachable (e.g. migration missing) = `chat` answers 503 instead of running unlimited.
+- Trade-offs: the global cap can lock out everyone for the rest of the window if someone burns it (they need an account, so keep sign-ups off); judges behind one venue network share the per-address numbers; if all judges share the demo login they share the account numbers.
+- A limiter for another function: `_shared/ratelimit.ts` (`checkLimits`, `envInt`, `clientIp`) is generic; give it your own keys.
+- Not code: set a monthly spend limit in the Anthropic console for the key's workspace; that is the only cap that holds even if everything above is bypassed.
 
 `notify-doctor`: body `{ doctor_id, content }` (one of my doctors; content 1-4000 characters). Saves the message with a random 32-byte token (only its sha256 is stored) and emails `recipient_email` a fixed notice: "Your patient <first name> sent you a message", the link `APP_URL/doctor-message#<token>` (expires in 7 days), "not for emergencies". No message content in the email. Response 201 `{ id, expires_at }`. Errors carry `{ error, code? }`: 400 bad body or `code: "doctor_has_no_email"`; 401; 403 `code: "guest_must_sign_up"` (ask the guest to add an email); 404 not my doctor; 429 `code: "patient_rate_limited" | "recipient_rate_limited"`; 502 the email failed (nothing saved, try again); 503 email not configured. The patient sees the doctor opened it via `doctor_messages.opened_at`. Secret `EMAIL_DEV_MODE=true` skips the email and returns `dev_link` instead (demo fallback only).
 
@@ -174,6 +194,12 @@ Newest first. One entry per session:
 - **Next:** what should happen next
 - **Notes:** blockers, decisions, gotchas (optional)
 ```
+
+### 2026-10-17 · Andrew (strict chat rate limits)
+- **Did:** The user wants only the judges to be able to use the Claude-backed chat but can't allow-list people they don't know, so the limits had to be tight and hold even against strangers. The old per-patient limit (20/10 min, 200/day, counted from `messages` before the insert) capped nothing: hosted still allows guest sign-ups (anyone mints accounts, each with its own quota) and parallel requests all passed the count before any insert. Replaced with a database-backed limiter: three layers (account, network address, global) over minute / hour / day, atomic upsert counters, a blocked call undoes all its increments so only accepted messages count, fails closed (503) if the limiter is unreachable, accurate `retry_after_seconds` + `Retry-After`, secrets to tune or pause (`CHAT_LIMIT_*`). Also bounded the cost of one call: message 1,000 chars (was 4,000), 12 turns of history (was 40), notes capped at 20,000 chars.
+- **Files:** `migrations/20261017200000_chat_rate_limits.sql`, `functions/_shared/ratelimit.ts` (+ test), `functions/_shared/http.ts` (`json` takes extra headers), `functions/chat/limits.ts` (+ test), `chat/burst_live.ts` (live burst check, run by a person), `chat/index.ts`, `chat/notes.ts` (`capNotes`), `tests/access.sql`, `PLAN.md`, `overlap.md`, `todo.md`, this file
+- **Next:** (1) turn off sign-ups AND anonymous sign-ins on hosted (dashboard); (2) run `chat/burst_live.ts` with a real login (see its header) to see a burst get 429s through the deployed function; (3) set a monthly spend limit on the Anthropic key. Done in this session: migration applied and recorded, `chat` deployed, `access.sql` rerun, limiter and address headers checked live.
+- **Notes:** Written in a separate worktree (`.claude/worktrees/chat-rate-limits`) because another session had uncommitted bot-prompt edits to `chat/bot.ts`, `index.ts`, `safety.ts` in the shared checkout; this branch is cut from `main` without them, so expect a small merge in `chat/index.ts` for whoever lands the other (different lines). `x-forwarded-for` is not used for the address limit (its first entry is client-written). The 4000 → 1000 character cap is a contract change for the frontend (`overlap.md`).
 
 ### 2026-10-17 · Andrew (care-notes sync: the app's instructions now reach the bot)
 - **Did:** frontend fix on the backend contract: before every chat question (and best-effort on saving instructions) the app inserts a new `care_notes` version `{ instructions }` linked to the patient's `doctors` row (created/updated from the locally saved doctor), so the deployed `chat` bot answers from the same notes the app shows instead of referring everything. Richer structured notes (keys beyond `instructions`) are never overwritten. `ensureDoctor` now also keeps name/email in step.

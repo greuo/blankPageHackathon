@@ -9,19 +9,24 @@
 //   reply   – the bot's message row (also delivered by realtime on `messages`)
 //   action  – "answered" | "warning_sign" | "small_talk" | "referred" | "emergency"
 //             (suggest_notify_doctor is true for "warning_sign" and "referred")
-// Response 429: { error, retry_after_seconds } when the patient sends too many messages.
+// Response 429: { error, code, retry_after_seconds } (and a Retry-After header) when a limit is full:
+//   code "rate_limited_user"   this account sent too many messages
+//   code "rate_limited_ip"     too many from this network address
+//   code "rate_limited_global" the whole app is at its Claude-call budget
+//   See limits.ts for the numbers and how to change them.
+// Response 503: { error, code: "limiter_unavailable" } when the limits can't be checked (the chat
+//   refuses rather than run unlimited).
 import { callerClient, corsHeaders, getCaller, json, serviceClient } from "../_shared/http.ts";
+import { checkLimits, clientIp, hashKey, waitText } from "../_shared/ratelimit.ts";
 import { askClaude, type Turn } from "./bot.ts";
-import { doctorNote, flattenNotes } from "./notes.ts";
+import { chatLimits, limitMessage } from "./limits.ts";
+import { capNotes, doctorNote, flattenNotes } from "./notes.ts";
 import { decide, emergencyNotice, patientReply, redFlag, referNotice } from "./safety.ts";
 
-const MAX_LENGTH = 4000;
-const HISTORY_LIMIT = 40;
-// Each message can cost a Claude call, and anyone can make a guest account, so cap per patient.
-const LIMITS = [
-  { window: 10 * 60, max: 20 },
-  { window: 24 * 60 * 60, max: 200 },
-];
+// What one message can cost is bounded too: a short message, a short history, a bounded set of notes.
+const MAX_LENGTH = 1000;
+const HISTORY_LIMIT = 12;
+const NOTES_MAX_CHARS = 20_000;
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -38,17 +43,26 @@ Deno.serve(async (req) => {
     return json({ error: `content (1-${MAX_LENGTH} characters) is required` }, 400);
   }
 
-  for (const { window, max } of LIMITS) {
-    const { count, error } = await admin
-      .from("messages")
-      .select("id", { count: "exact", head: true })
-      .eq("patient_id", patient_id)
-      .eq("sender", "patient")
-      .gt("created_at", new Date(Date.now() - window * 1000).toISOString());
-    if (error) return json({ error: "Could not check the message limit" }, 500);
-    if ((count ?? 0) >= max) {
-      return json({ error: "You're sending messages too quickly. Please wait a bit.", retry_after_seconds: window }, 429);
-    }
+  // Before anything is saved or any Claude call is made. Fails closed: no limiter, no chat.
+  const ip = clientIp(req.headers);
+  let blocked;
+  try {
+    blocked = await checkLimits(admin, chatLimits(patient_id, ip ? await hashKey(ip) : null, (name) => Deno.env.get(name)));
+  } catch (e) {
+    console.error("chat: rate limiter failed:", e);
+    return json({ error: "The assistant is unavailable right now. Please try again in a few minutes.", code: "limiter_unavailable" }, 503);
+  }
+  if (blocked) {
+    console.log(`chat: ${blocked.scope} limit (${blocked.window}s) full for patient ${patient_id}`);
+    return json(
+      {
+        error: limitMessage(blocked.scope, waitText(blocked.retryAfter)),
+        code: `rate_limited_${blocked.scope}`,
+        retry_after_seconds: blocked.retryAfter,
+      },
+      429,
+      { "Retry-After": String(blocked.retryAfter) },
+    );
   }
 
   // Insert as the caller so RLS and the column grants apply.
@@ -90,7 +104,7 @@ Deno.serve(async (req) => {
     }
 
     // 2. Ask Claude, using only this patient's current notes.
-    const notes = [...flattenNotes(current?.content), ...doctorNote(doctor)];
+    const notes = [...capNotes(flattenNotes(current?.content), NOTES_MAX_CHARS), ...doctorNote(doctor)];
     const { data: earlier } = await admin
       .from("messages")
       .select("sender, content")
@@ -100,7 +114,7 @@ Deno.serve(async (req) => {
       .limit(HISTORY_LIMIT);
     const history: Turn[] = (earlier ?? []).reverse().map((m) => ({
       from: m.sender === "patient" ? "patient" : "assistant",
-      text: m.content,
+      text: m.content.slice(0, MAX_LENGTH),
     }));
     const verdict = await askClaude(notes, history, content);
 

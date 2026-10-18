@@ -46,7 +46,20 @@ export function flattenNotes(content: unknown): Note[] {
   return notes;
 }
 
-export type DoctorContact = { name: string; clinic: string | null; clinic_phone: string | null };
+// Every note goes to Claude on every message, and the patient can save a huge one (a single save can
+// hold 200 items of 2,000 characters), so keep the first notes that fit in `maxChars` and drop the rest.
+export function capNotes(notes: Note[], maxChars: number): Note[] {
+  const kept: Note[] = [];
+  let used = 0;
+  for (const note of notes) {
+    used += note.text.length;
+    if (used > maxChars) break;
+    kept.push(note);
+  }
+  return kept;
+}
+
+export type DoctorContact ={ name: string; clinic: string | null; clinic_phone: string | null };
 
 // The doctor's contact details are notes too ("what's my clinic's number?").
 export function doctorNote(doctor: DoctorContact | null): Note[] {
