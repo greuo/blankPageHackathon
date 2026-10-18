@@ -22,7 +22,7 @@ Things both sides rely on: API base URL, ports, data shapes, auth, env vars. Eit
 
 ## Backend → Frontend
 
-- [ ] 2026-10-17 · Andrew: **`chat` gets strict rate limits (in a PR; live once the migration is applied and `chat` is redeployed).** What changes for you:
+- [ ] 2026-10-17 · Andrew: **`chat` has strict rate limits, live on hosted since 2026-10-17 (PR #22).** What changes for you:
   - **Messages are limited to 1,000 characters** (was 4,000). Please lower `MAX_CHAT_LENGTH` in `frontend/src/patient/Assistant.tsx` (and the `sendChat` comment in `data/supabase.ts`) to 1000, or longer messages get a 400.
   - **429 now has a `code` and a real wait.** Body `{ error, code, retry_after_seconds }`, `code` = `rate_limited_user` | `rate_limited_ip` | `rate_limited_global`. `retry_after_seconds` is now the true wait until the window ends, so it can be hours for a daily limit (it used to be the window length). `error` is a ready-to-show sentence ("…Please try again in 3 hours. If this is an emergency, call 911."); showing it as-is is fine.
   - **New 503** `code: "limiter_unavailable"`: the limits couldn't be checked, so the chat refuses; show `error`.
